@@ -2,11 +2,11 @@
 {% load static %}
 
 {% block main %}
-  <div class='main'>
-    <div class='content'>
-      <p class='text'>テスト用です!！</p>
-      <p class='sub_text'>これは、テスト用です。</p>
-    </div>
-  </div>
+    {% if user.is_authenticated %}
+    <p class="display-4">Hello, {{ user.username }}</p>
+    <a class="lead" href='/logout/'>Log out</a>
+    {% else %}
+    <a class="lead" href='/login/'>Log in</a>
+    {% endif %}
 
 {% endblock %}

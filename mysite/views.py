@@ -8,6 +8,13 @@ from django.urls import reverse
 import requests
 
 """
+クッキー設定
+"""
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+import datetime
+
+"""
 ライブラリ
 """
 from mysite.library import *
@@ -16,6 +23,13 @@ from mysite.library import *
 modelsファイル
 """
 from mysite.models.user import *
+
+"""
+クッキー
+"""
+def set_cookie(response, key, value, max_page):
+    date = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
+    response.set_cookie(key, value, max_age=max_age, date=date)
 
 """
 Index View
@@ -66,7 +80,13 @@ class Confirm(CreateView):
 
         users_create(request.POST)
 
-        return render(request, 'new_confirm.html', user_form)
+        template = 'mypage.html'
+        # context = {'documents': 'test'}
+
+        response = HttpResponse(template)
+        response.set_cookie(key='test', value=user.name, max_age=None, expires=None, path='/', domain=None, secure=None)
+
+        return render(request, 'new_confirm.html', user_form, response)
 
 Confirm = Confirm.as_view()
 

@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from django.contrib.auth import views
 from django.urls import path, include
 from mysite import views
 
@@ -10,6 +11,7 @@ import os
 
 urlpatterns = [
     path('', include('mysite.urls') ),
+    path('auth/', include('social_django.urls', namespace='social')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

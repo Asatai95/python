@@ -7,6 +7,9 @@ import sys
 
 import django
 
+FACEBOOK_ID = '333564927437881'
+FACEBOOK_SECRET = 'da43ee4cd59781031fd6f98c85be5f51'
+FACEBOOK_CALLBACK_URL = 'http://localhost:5000/facebook/callback'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,6 +32,8 @@ INSTALLED_APPS = [
     'mysite.models',
     'social_django',
 ]
+
+SESSION_COOKIE_SECURE=None
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,20 +68,38 @@ TEMPLATES = [
         },
     ]
 
+LOGIN_URL = '/login/'
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.github.GithubOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-cepitheum60d4c87iit6ft46veqf92q9.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '8kaj-wfWDzDkK2fnzEVzPBYI'
+
+LOGIN_REDIRECT_URL = '/index/'
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+
+
 sys.path.append('/var/www/django/config')
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'test',
-#         'USER': 'root',
-#         'PASSWORD': 'Asatai951156',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'roomii',
+        'USER': 'root',
+        'PASSWORD': 'Asatai951156',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
 
 
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
