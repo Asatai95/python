@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html lang="ja">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/plain" ; charset="UTF-8" ; Content-Transfer-Encoding="base64" />
+  <meta charset="utf-8">
+  <meta name='keywords' content=''>
+  <meta name='description' content="">
+  <meta name='viewport' content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="{% static 'img/wanko.png' %}">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+
+  <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick-1.8.1/slick/slick.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick-1.8.1/slick/slick-theme.css' %}" />
+
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'TextInputEffects/fonts/font-awesome-4.2.0/css/font-awesome.min.css' %}" />
+  <link rel="stylesheet" type="text/css" href="{% static 'TextInputEffects/css/normalize.css' %}" />
+  <link rel="stylesheet" href="{% static 'TextInputEffects/css/demo.css' %}">
+  <link rel="stylesheet" href="{% static 'TextInputEffects/css/set1.css' %}">
+  <script src="{% static 'TextInputEffects/js/classie.js' %}"></script>
+
+  <script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+
+
+  <title>roomii</title>
+
+</head>
+<body>
+  <div class='header'>
+    <div class='header img'>
+      <a href="#"><img src="{% static 'img/wanko.png' %}" alt=""  /></a>
+    </div>
+    <div class='contents'>
+      <ul id='menu' class="menu">
+        <li class='login'><a href="/login">Login</a></li>
+        <li class='sign'><a href="/register">Sign up</a></li>
+      </ul>
+    </div>
+  </div>
+  {% block main %}{% endblock %}
+
+  <footer>
+    <div>
+      <p class='footer'>Copyright ©️ 2018 那覇市</p>
+    </div>
+  </footer>
+</body>
+</html>

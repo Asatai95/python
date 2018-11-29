@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block main %}
+<div class='main_confirm'>
+  <div class="container center">
+  	<h3>ユーザー登録（確認画面）</h3>
+  </div>
+  <div class="row">
+      <div class="container">
+      <table>
+          <tbody>
+              <tr>
+              <td>ユーザー名</td>
+              <td>{{name}}</td>
+              </tr>
+              <tr>
+              <td>メールアドレス</td>
+              <td>{{email}}</td>
+              </tr>
+              <tr>
+              <td>パスワード</td>
+              <td>非表示</td>
+              </tr>
+          </tbody>
+      </table>
+      </div>
+      <form class="col l10 offset-l1 s12" action="/register/" method="post">
+        {% csrf_token %}
+        <div class="container">
+          <ul class="container"></ul>
+          <div class="input-field container">
+            {% if user.name is not None %}
+            <input name="name" id="name" type="hidden" class="validate" value="{{name}}">
+            {% endif %}
+          </div>
+          <div class="input-field container">
+            {% if user.email is not None %}
+            <input name="email" id="email" type="hidden" class="validate" value="{{email}}">
+            {% endif %}
+          </div>
+    			<div class="input-field container">
+    				<input name="password" id="password" type="hidden" required class="validate" value="{{password}}">
+    			</div>
+    			<div class=" container center-align">
+            <button class="container center-align btn waves-effect waves-light" type="submit" name="action">登録する</button>
+    			</div>
+    		</div>
+      </form>
+      <div class="col l10 offset-l1 s12">
+          <div class="container">
+              <div class=" container center-align"><br>
+                  <button class="container center-align btn waves-effect waves-light " onclick="goBack()" >戻る</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+
+{% endblock %}
