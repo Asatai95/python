@@ -1,5 +1,6 @@
 from django import *
 
+from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from config.settings import session
 
@@ -12,11 +13,7 @@ from mysite.models.user import *
 def login_user(user_name):
 
     response = redirect('/users/mypage/')
-    response.set_cookie(
-              key='cookie',
-              value=user_name,
-              max_age= 360 * 24 * 365 * 2,
-              path='/')
+    response.set_cookie(key='cookie', value=user_name, max_age= 360 * 24 * 365 * 2, path='/')
 
     return response
 
@@ -26,9 +23,19 @@ def login_user(user_name):
 
 def get_cookie(request):
 
-    cookie = request.COOKIE.get("value")
+    user_name = request.COOKIE.get("value")
+    if user_name:
+        return session.query(User).get(user_name)
+    else:
+        return None
 
-    return cookie
+"""
+ログインしていれば、リダイレクト
+"""
+
+def is_logged_in_redirect(user):
+    if user is not None:
+        redirect('/index/')
 
 """
 ユーザー登録確認画面用のチェック項目
@@ -85,21 +92,46 @@ def users_create(form):
 """
 ログイン画面
 """
+
 def user_login(form):
 
     mail = session.query(User).filter(
                 User.email == form.get('email')
            ).first()
 
+    if mail == None:
+        error = {
+            'error': 'メールアドレスの内容が異なります'
+        }
+        return error
+
     password = session.query(User).filter(
                   User.password == form.get('password')
                ).first()
 
+    if password == None:
+        error = {
+            'error': 'パスワードの内容が異なります'
+        }
+        return error
 
-    if mail == None or password == None:
-        return False
-    else:
-        return True
+def login_user_checker(form):
+
+    user_name_check = session.query(User).filter(
+            User.email == form.get('email')
+          ).first()
+
+    return user_name_check.name
+
+"""
+クッキーの削除、ログアウト
+"""
+def logout():
+
+    response = redirect('/login/')
+    response.delete_cookie(key='cookie')
+
+    return response
 
 """
 SNSログイン、調整中

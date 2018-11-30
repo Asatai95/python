@@ -13,6 +13,7 @@ urlpatterns = [
     path('login/', views.Login, name='login'),
     path('users/mypage/', views.Mypage, name='mypage'),
     path('index/', views.Index, name='index'),
+    path('logout/', views.Logout, name='logout'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

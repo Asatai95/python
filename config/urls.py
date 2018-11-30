@@ -12,6 +12,7 @@ import os
 urlpatterns = [
     path('', include('mysite.urls') ),
     path('auth/', include('social_django.urls', namespace='social')),
+    path('', views.Index, name='index')
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

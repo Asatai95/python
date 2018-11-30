@@ -11,6 +11,7 @@
       </div>
       <form action="/login/" method="post" id='login_form_main' data-validate >
         {% csrf_token %}
+        {{ form.as_p }}
 
         <div class='error'>
           <span class="error_meaasage login">{{error}}</span>
@@ -48,7 +49,7 @@
           </div>
           <div class='container'>
             <p class='sns login'>
-              <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+              <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
             </p>
           </div>
         </div>

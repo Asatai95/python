@@ -1,18 +1,12 @@
 from django.http import HttpResponse
-from django.views.generic.edit import CreateView
+from django.views.generic import CreateView, ListView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 import requests
-
-"""
-クッキー設定
-"""
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-import datetime
 
 """
 ライブラリ
@@ -30,7 +24,7 @@ Index View(テスト画面)
 class IndexView(View):
 
     template_name = 'index.html'
-
+    @login_required
     def get(self, request, *args, **kwargs):
 
         return render(request, self.template_name)
@@ -86,9 +80,9 @@ class Confirm(CreateView):
         クッキー
         """
 
-        login_user(user['name'])
+        cookie = login_user(user['name'])
 
-        return login_user
+        return cookie
 
 Confirm = Confirm.as_view()
 
@@ -107,24 +101,20 @@ class Login(View):
 
         login_form = user_login(request.POST)
 
-        if login_form is False:
+        user = login_user_checker(request.POST)
 
-            not_match = 'Email、またはパスワードの入力内容が異なります'
-            error = {
-               'error': not_match
-            }
-
-            return render(request, self.template_name, error)
-        else:
+        if login_form == None:
 
             """
             クッキー
             """
+            cookie = login_user(user)
 
-            response = redirect('/mypage/')
-            response.set_cookie(key='cookie', value=user['name'], max_age=None, path='/')
+            return cookie
 
-            return redirect('/users/mypage/')
+        else:
+
+            return render(request, self.template_name, login_form['error'])
 
 Login = Login.as_view()
 
@@ -141,3 +131,16 @@ class Mypage(View):
         return render(request, self.template_name)
 
 Mypage = Mypage.as_view()
+
+
+"""
+ログアウト機能
+"""
+
+class Logout(View):
+
+    def get(self, request, *args, **kwargs):
+        log = logout()
+
+        return log
+Logout = Logout.as_view()
