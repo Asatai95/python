@@ -5,6 +5,35 @@ from config.settings import session
 
 from mysite.models.user import *
 
+"""
+クッキーの設定
+"""
+
+def login_user(user_name):
+
+    response = redirect('/users/mypage/')
+    response.set_cookie(
+              key='cookie',
+              value=user_name,
+              max_age= 360 * 24 * 365 * 2,
+              path='/')
+
+    return response
+
+"""
+クッキーの取得
+"""
+
+def get_cookie(request):
+
+    cookie = request.COOKIE.get("value")
+
+    return cookie
+
+"""
+ユーザー登録確認画面用のチェック項目
+"""
+
 def check_form(form):
 
     user = User(
@@ -13,7 +42,17 @@ def check_form(form):
          password=form.get('password'),
     )
 
-    return user
+    user_form = {
+        'name': user.name,
+        'email': user.email,
+        'password': user.password,
+    }
+
+    return user_form
+
+"""
+Emailの有、無
+"""
 
 def check_email(form):
 
@@ -25,6 +64,10 @@ def check_email(form):
         return False
     else:
         return True
+
+"""
+usersテーブル作成
+"""
 
 def users_create(form):
 
@@ -39,7 +82,9 @@ def users_create(form):
 
     return user
 
-
+"""
+ログイン画面
+"""
 def user_login(form):
 
     mail = session.query(User).filter(
@@ -55,6 +100,10 @@ def user_login(form):
         return False
     else:
         return True
+
+"""
+SNSログイン、調整中
+"""
 
 #
 # def create_facebook_user(data):

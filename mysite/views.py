@@ -25,34 +25,32 @@ modelsファイル
 from mysite.models.user import *
 
 """
-クッキー
-"""
-def set_cookie(response, key, value, max_page):
-    date = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
-    response.set_cookie(key, value, max_age=max_age, date=date)
-
-"""
-Index View
+Index View(テスト画面)
 """
 class IndexView(View):
+
+    template_name = 'index.html'
+
     def get(self, request, *args, **kwargs):
 
-        return render(request, 'index.html')
+        return render(request, self.template_name)
 
 Index = IndexView.as_view()
 
 """
-Sign up
+ユーザー登録
 """
 class Register(CreateView):
 
+    template_name = 'sign.html'
+
     def get(self, request, *args, **kwargs):
 
-        return render(request, 'sign.html')
+        return render(request, self.template_name)
 
-    def post(self, request, *args, **kwargs):
-
-        return redirect("/login/")
+    # def post(self, request, *args, **kwargs):
+    #
+    #     return redirect("/login/")
 
 Register = Register.as_view()
 
@@ -61,13 +59,17 @@ Register = Register.as_view()
 """
 class Confirm(CreateView):
 
-    def post(self, request, *args, **kwargs):
+    template_name = 'sign.html'
+
+    def get(self, request, *args, **kwargs):
+
         user = check_form(request.POST)
-        user_form = {
-            'name': user.name,
-            'email': user.email,
-            'password': user.password,
-        }
+
+        return user
+
+    def post(self, request, *args, **kwargs):
+
+        user = check_form(request.POST)
 
         mail = check_email(request.POST)
         if mail is False:
@@ -76,17 +78,17 @@ class Confirm(CreateView):
                'error': duplicate_error
             }
 
-            return render(request, 'sign.html', error)
+            return render(request, self.template_name, error)
 
         users_create(request.POST)
 
-        template = 'mypage.html'
-        # context = {'documents': 'test'}
+        """
+        クッキー
+        """
 
-        response = HttpResponse(template)
-        response.set_cookie(key='test', value=user.name, max_age=None, expires=None, path='/', domain=None, secure=None)
+        login_user(user['name'])
 
-        return render(request, 'new_confirm.html', user_form, response)
+        return login_user
 
 Confirm = Confirm.as_view()
 
@@ -94,9 +96,12 @@ Confirm = Confirm.as_view()
 ログイン画面
 """
 class Login(View):
+
+    template_name = 'login.html'
+
     def get(self, request, *args, **kwargs):
 
-        return render(request, 'login.html')
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
 
@@ -109,8 +114,15 @@ class Login(View):
                'error': not_match
             }
 
-            return render(request, 'login.html', error)
+            return render(request, self.template_name, error)
         else:
+
+            """
+            クッキー
+            """
+
+            response = redirect('/mypage/')
+            response.set_cookie(key='cookie', value=user['name'], max_age=None, path='/')
 
             return redirect('/users/mypage/')
 
@@ -121,8 +133,11 @@ Login = Login.as_view()
 """
 
 class Mypage(View):
+
+    template_name = 'mypage.html'
+
     def get(self, request, *args, **kwargs):
 
-        return render(request, 'mypage.html')
+        return render(request, self.template_name)
 
 Mypage = Mypage.as_view()
