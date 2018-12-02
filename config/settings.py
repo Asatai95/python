@@ -9,17 +9,18 @@ import sys
 
 from django import *
 from django.contrib.messages import *
+from django.contrib import *
+
 
 FACEBOOK_ID = '333564927437881'
 FACEBOOK_SECRET = 'da43ee4cd59781031fd6f98c85be5f51'
-FACEBOOK_CALLBACK_URL = 'http://localhost:5000/facebook/callback'
+FACEBOOK_CALLBACK_URL = 'http://localhost:8000/facebook/callback/'
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PROJECT_NAME = os.path.basename(BASE_DIR)
 
 SECRET_KEY = '75c6@w6i1c=xsb$($_117$zk-v!@n*5r9(@tgcj+n=jj+ff*g!'
-
 
 DEBUG = True
 
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'mysite.apps.WebappConfig',
+    'social.apps.django_app.default',
     'mysite.models',
     'social_django',
 ]
@@ -47,7 +49,26 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
-sys.path.append('/var/www/django/config')
+SOCIAL_AUTH_AUTHENTICATION_BACKENDS = [
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+]
+SESSION_COOKIE_SAMESITE = None
+
+
+# SESSION_COOKIE_SECURE = True
+
+sys.path.append(os.getcwd())
 
 ROOT_URLCONF = 'config.urls'
 
@@ -70,32 +91,11 @@ TEMPLATES = [
         },
     ]
 
-LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'index'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/index/'
+LOGOUT_URL = '/index/'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-cepitheum60d4c87iit6ft46veqf92q9.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '8kaj-wfWDzDkK2fnzEVzPBYI'
-
-AUTHENTICATION_BACKENDS = [
-    'social.backends.google.GoogleOpenId',
-    'social.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_SAMESITE = None
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
-
-#
-# SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state']
-
-
-# SOCIAL_AUTH_RAISE_EXCEPTIONS = False
-
-
-
-sys.path.append('/var/www/django/config')
-
+sys.path.append(os.getcwd())
 WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
@@ -108,7 +108,6 @@ DATABASES = {
         'PORT': '3306',
     }
 }
-
 
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
        "root",
@@ -171,3 +170,6 @@ session = scoped_session(
 
 Base = declarative_base()
 Base.query = session.query_property()
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-kqqb70df90scmclga7ure2v1t8502rjb.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '2KuvRwHi0OLoc_h07cIQr7PE'

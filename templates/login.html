@@ -11,7 +11,6 @@
       </div>
       <form action="/login/" method="post" id='login_form_main' data-validate >
         {% csrf_token %}
-        {{ form.as_p }}
 
         <div class='error'>
           <span class="error_meaasage login">{{error}}</span>
@@ -41,15 +40,16 @@
         </div>
         <div class='sns'>
           <p class='sns_text'>SNSでログインする場合</p>
-          <div class="container">
+          <div class="container facebook">
             <div class="container-button">
               <img src="{% static 'img/facebook_icon.png'%}" alt="">
-              <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="/facebook/login">Facebookでログインする</a>
+              <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="/login/facebook/">Facebookでログインする</a>
             </div>
           </div>
-          <div class='container'>
-            <p class='sns login'>
-              <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Login with Google</a>
+          <div class='container google'>
+            <div class="container-button google">
+              <img class='google' src="{% static 'img/google.png'%}" alt="">
+              <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
             </p>
           </div>
         </div>

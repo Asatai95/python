@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.contrib.auth import views
 from django.urls import path, include
-from mysite import views
+from . import views
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -11,8 +11,9 @@ import os
 
 urlpatterns = [
     path('', include('mysite.urls') ),
+    path('index/', views.Index, name='index' ),
     path('auth/', include('social_django.urls', namespace='social')),
-    path('', views.Index, name='index')
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
