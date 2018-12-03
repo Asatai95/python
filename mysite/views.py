@@ -1,12 +1,13 @@
 from django import *
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.views.generic import CreateView, ListView
 from django.contrib.auth import login, authenticate
 from django.shortcuts import redirect, render
 from django.views import View
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+
 
 """
 Google, ログイン認証
@@ -18,9 +19,7 @@ from apiclient.discovery import build
 """
 Settingファイル
 """
-import config.settings
-
-import requests
+from config import settings
 
 """
 ライブラリ
@@ -32,15 +31,12 @@ modelsファイル
 """
 from mysite.models.user import *
 
-class Indexhome(View):
-
-    template_name = 'index.html'
-
-    def get(self, request, *args, **kwargs):
-
-        return render(request, 'index.html')
-
-home = Indexhome.as_view()
+"""
+facebook
+"""
+FACEBOOK_ID = '333564927437881'
+FACEBOOK_SECRET = '99948e0dc25ab9a0a19476bd6e2d4716'
+FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
 
 """
 Index View(テスト画面)
@@ -48,7 +44,6 @@ Index View(テスト画面)
 class IndexView(View):
 
     template_name = 'index.html'
-    @login_required
     def get(self, request, *args, **kwargs):
 
         return render(request, self.template_name)
@@ -97,7 +92,7 @@ class Confirm(CreateView):
 
         user = check_form(request.POST)
 
-        mail = check_email(request.POST)
+        mail = check_email(request, request.POST)
         if mail is False:
             duplicate_error = 'すでに使用されているEmail('+request.POST.get('email')+')アドレスです'
             error = {
@@ -155,9 +150,41 @@ class Mypage(View):
 
     def get(self, request, *args, **kwargs):
 
-        return render(request, self.template_name)
+        user = get_user_info(request)
+
+        return render(request, self.template_name, user)
 
 Mypage = Mypage.as_view()
+
+"""
+ユーザー情報編集
+"""
+class MypageEdit(View):
+
+    template_name = 'edit.html'
+
+    def get(self, request, *args, **kwargs):
+
+        user = get_user_info(request)
+
+        return render(request, self.template_name, user)
+
+    def post(self, request, *args, **kwargs):
+
+        check = check_email(request, request.POST)
+        if check is False:
+            duplicate_error = 'すでに使用されているEmail('+request.POST.get('email')+')アドレスです'
+            error = {
+               'error': duplicate_error
+            }
+
+            return render(request, self.template_name, error)
+
+        update_users(request, request.POST)
+
+        return redirect('/users/mypage/')
+
+MypageEdit = MypageEdit.as_view()
 
 """
 google、ログイン機能
@@ -219,15 +246,22 @@ Facebook, ログイン認証
 class FacebookLogin(View):
 
     def get(self, request, *args, **kwargs):
-        url = 'https://www.facebook.com/dialog/oauth/'
+
+        import requests
+        import urllib3
+
+        url = 'https://www.facebook.com/v3.2/dialog/oauth'
 
         params = {
             'response_type': 'code',
-            'redirect_uri': config.settings.FACEBOOK_CALLBACK_URL,
-            'client_id': config.settings.FACEBOOK_ID
+            'redirect_uri': FACEBOOK_CALLBACK_URL,
+            'client_id': FACEBOOK_ID,
         }
 
         redirect_url = requests.get(url, params=params).url
+        print(redirect_url)
+        print(redirect_url)
+
         return redirect(redirect_url)
 
 FacebookLogin = FacebookLogin.as_view()

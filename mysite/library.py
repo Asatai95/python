@@ -1,9 +1,11 @@
 from django import *
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 from config.settings import session
+
+import urllib3
 
 from mysite.models.user import *
 from mysite.models.social import *
@@ -11,9 +13,19 @@ from mysite.models.social import *
 """
 Google, ログイン認証
 """
+from httplib2 import Http
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from apiclient.discovery import build
+
+"""
+facebook
+"""
+FACEBOOK_ID = '333564927437881'
+FACEBOOK_SECRET = '99948e0dc25ab9a0a19476bd6e2d4716'
+FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
+
+import requests
 
 """
 Settingファイル
@@ -49,11 +61,30 @@ def login_user(user_id):
 
 def get_cookie(request):
 
-    user_name = request.COOKIE.get("value")
-    if user_name:
+    user_id = request.COOKIES["cookie"]
+    if user_id:
         return session.query(User).get(user_name)
     else:
         return None
+
+"""
+ユーザー情報
+"""
+def get_user_info(request):
+
+    user_id = request.COOKIES["cookie"]
+
+    user = session.query(User).filter(
+                 User.id == user_id
+           ).first()
+
+    user_info = {
+        'name': user.name,
+        'email': user.email,
+        'created_at': user.created_at
+    }
+
+    return user_info
 
 """
 ログインしていれば、リダイレクト
@@ -87,16 +118,27 @@ def check_form(form):
 Emailの有、無
 """
 
-def check_email(form):
+def check_email(request, form):
 
-    user_email_cheker = session.query(User).filter(
-                            User.email == form.get('email'),
-                        ).all()
+    user_id = request.COOKIES["cookie"]
+    if user_id is not None:
 
-    if user_email_cheker:
-        return False
+        user_email_cheker = session.query(User).filter(
+                                User.id == user_id,
+                                User.email == form.get('email'),
+                            ).all()
+        if user_email_cheker:
+            pass
     else:
-        return True
+
+        user_email_cheker = session.query(User).filter(
+                                User.email == form.get('email'),
+                            ).all()
+
+        if user_email_cheker:
+            return False
+        else:
+            return True
 
 """
 usersテーブル作成
@@ -148,6 +190,26 @@ def login_user_checker(form):
           ).first()
 
     return user_name_check.id
+
+
+"""
+ユーザー編集画面
+"""
+
+def update_users(request, form):
+
+    user_id = request.COOKIES["cookie"]
+
+    user = session.query(User).filter(
+                User.id == user_id
+          ).first()
+    user.name = form.get('name')
+    user.email = form.get('email')
+
+    session.commit()
+
+    return user
+
 
 """
 SNSログイン
@@ -212,11 +274,11 @@ facebook, ログイン認証
 
 def get_facebook_access_token(code):
 
-    url = 'https://graph.facebook.com/v3.1/oauth/access_token'
+    url = 'https://graph.facebook.com/v3.2/oauth/access_token'
     params = {
-            'redirect_uri': config.settings.FACEBOOK_CALLBACK_URL,
-            'client_id': config.settings.FACEBOOK_ID,
-            'client_secret': config.settings.FACEBOOK_SECRET,
+            'redirect_uri': FACEBOOK_CALLBACK_URL,
+            'client_id': FACEBOOK_ID,
+            'client_secret': FACEBOOK_SECRET,
             'code': code,
     }
     r = requests.get(url, params=params)
@@ -227,7 +289,7 @@ def check_facebook_access_tokn(access_token):
     url = 'https://graph.facebook.com/debug_token'
     params = {
         'input_token': access_token,
-        'access_token': '%s|%s' % (config.settings.FACEBOOK_ID, config.settings.FACEBOOK_SECRET)
+        'access_token': '%s|%s' % (FACEBOOK_ID, FACEBOOK_SECRET)
     }
     r = requests.get(url, params=params)
     return r.json()['data']

@@ -8,16 +8,17 @@ from django.conf.urls.static import static
 app_name = 'mysite'
 
 urlpatterns = [
+    # path('index/', views.Index, name='index'),
     path('register/', views.Register, name='register'),
     path('confirm/', views.Confirm, name='confirm'),
-    path('login/', views.Login, name='login'),
-    path('users/mypage/', views.Mypage, name='mypage'),
-    path('index/', views.Index, name='index'),
-    path('logout/', views.Logout, name='logout'),
     path('login/google/', views.GoogleLogin, name='google'),
     path('auth/complete/google-oauth2/', views.GoogleCallBack, name='GoogleCallBack'),
-    path('login/facebook/', views.FacebookLogin, name='facebook'),
-    path('auth/complete/callback/', views.FacebookCallBack, name='FacebookCallBack'),
+    path('facebook/login/', views.FacebookLogin, name='facebook'),
+    path('auth/complete/facebook/', views.FacebookCallBack, name='FacebookCallBack'),
+    path('login/', views.Login, name='login'),
+    path('logout/', views.Logout, name='logout'),
+    path('users/mypage/', views.Mypage, name='mypage'),
+    path('users/mypage/edit/', views.MypageEdit, name='mypageedit'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -1,0 +1,45 @@
+{% extends 'base_login.html' %}
+{% load static %}
+
+{% block main %}
+
+<div class='main mypage'>
+  <div class="contents mypage">
+    <div class='title'>
+      <p class='text'>プロフィール編集画面</p>
+    </div>
+    <form class="col s12" action="/users/mypage/edit/" method="POST" data-validate/>
+      {% csrf_token %}
+
+      <div class='error'>
+        <span class='error_text'></span>
+        <span>{{error}}</span>
+      </div>
+      <div class="input_file">
+        <div class="file">
+          <div class="preview">
+            <img class='sample_img' src="{% 'static' 'img/profile.png' %}" alt="">
+          </div>
+          <input id="imgFile" type="file">
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s6">
+          <input id="name" name="name" type="text" class="validate edit" value={{name}} required/>
+          <label for="edit_name">ユーザー名</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="email" name="email" type="email" class="validate edit" value="{{email}}" required/>
+          <label for="email">Email</label>
+        </div>
+      </div>
+      <div class='button'>
+        <input type="submit" id='submit' value="編集完了" disabled/>
+        <button class='back' type="button" onclick="history.back()">戻る</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

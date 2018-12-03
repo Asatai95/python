@@ -11,7 +11,7 @@
       </div>
       <form action="/login/" method="post" id='login_form_main' data-validate >
         {% csrf_token %}
-
+        
         <div class='error'>
           <span class="error_meaasage login">{{error}}</span>
         </div>
@@ -43,7 +43,7 @@
           <div class="container facebook">
             <div class="container-button">
               <img src="{% static 'img/facebook_icon.png'%}" alt="">
-              <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="/login/facebook/">Facebookでログインする</a>
+              <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="/facebook/login/">Facebookでログインする</a>
             </div>
           </div>
           <div class='container google'>

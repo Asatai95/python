@@ -1,12 +1,59 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
-    <p>test</p>
-    <p><a href="/logout/">Logout</a></p>
+{% extends 'base.html' %}
+{% load static %}
 
-  </body>
-</html>
+{% block main %}
+
+<div class='main'>
+  <div class="profilecard">
+    <div class="profile-header">
+
+      <img src="{% static 'img/profile.png' %}" alt="">
+      <p><span class="user-name">{{name}}</span><a href="/users/mypage/edit/"><img class="edit" src="{% static 'img/pencil.png' %}" alt=""></a></p>
+      <p class="created_date"><span>{{created_at}}</span></p>
+    </div>
+    <div class='profile-footer'>
+      <p><span class="user-email">Email: {{email}}</span></p>
+    </div>
+    <div class='sns_login'>
+      <span>Facebook認証済み</span>
+      <span>Google認証済み</span>
+    </div>
+  </div>
+  <!-- <div class='main_content'>
+    <div class="stream">
+      <div class="content">
+        <div class="stream-header">
+          <img src="" alt="">
+          <p>
+            <span class="tweet-time"></span>
+            <span class="user-name"></span>
+          </p>
+
+        </div>
+        <div class="inline">
+
+          <div class="stream-content">
+
+            <p name="comment"></p>
+            <div class='inline_img'>
+              <img src="" alt="">
+            </div>
+          </div>
+        </div>
+        <div class='outline'>
+          <div class='stream-delete'>
+            <div class='delete'>
+              <a href="/mypage/edit/" class="cp_btn"></a>
+            </div>
+          </div>
+          <div class='stream-delete'>
+            <div class='delete'>
+              <a href="/mypage/delete/" class="cp_btn"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> -->
+</div>
+
+{% endblock %}

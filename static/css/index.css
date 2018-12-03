@@ -383,3 +383,207 @@ li.new_account {
 .error_meaasage.login {
   font-size: 18px!important;
 }
+
+/*ユーザー情報編集*/
+
+#main_contents {
+  height: 120vh;
+}
+
+.main.mypage {
+  height: 100vh;
+}
+
+.main.mypage .contents {
+  width: 500px;
+  height: 530px;
+  margin: 50px auto;
+  background-color: rgba(255,255,255);
+  border: 2px solid black;
+  position: relative;
+  float: none;
+}
+
+.title {
+  text-align: center;
+}
+
+.title .text {
+  font-size: 25px;
+  font-weight: 800;
+  text-align: center;
+  color: black;
+}
+
+.row {
+  width: 300px;
+  margin: 0 auto!important;
+}
+
+.row .col.s6 {
+  width: 100%;
+}
+
+.validate.edit {
+  padding-left: 10px!important;
+}
+
+.button {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.button #submit {
+  width: 150px;
+  margin: 0 30px;
+}
+
+.back {
+  width: 150px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 800;
+  color: white;
+  background-color: rgba(0, 133, 201);
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.back:hover {
+  transform: scale(1.1);
+}
+
+.input_file {
+  text-align: center;
+  margin: 0 auto;
+  width: 300px;
+}
+
+.file {
+  margin-bottom: 15px;
+}
+
+.input_file .preview {
+  background-image: url("../img/profile.png");
+}
+
+.preview img {
+  width: 80px;
+}
+
+.file input[type="file"] {
+  font-size: 10px;
+}
+
+/*ユーザーページ*/
+
+.profilecard {
+  width: 45vw;
+  margin: 3vw auto;
+  padding: 1vw;
+  background-color: #EEEEEE;
+  border: solid 10px #f7b52c;
+}
+
+.profile-header {
+  display: flex;
+}
+
+.profile-header img {
+  width: 25%;
+  height: 25%;
+}
+
+.profile-header p {
+  margin-left: 20px;
+  width: 100px;
+}
+
+.created_date {
+  height: 25px;
+  margin: 0!important;
+}
+
+.created_date span {
+  font-size: 5px;
+}
+
+.profile-header p a img {
+  width: 25px;
+  height: 15px;
+  margin-left: 5px;
+}
+
+.profile-header p a img:hover {
+  transform: scale(1.1);
+}
+
+.profile-footer {
+  text-align: center;
+}
+
+p span {
+  display: inline-block;
+}
+
+p span.user-name {
+  font-size: 25px;
+}
+
+a img .edit {
+  margin-left: 1vw;
+  width: 2vw;
+  height: auto;
+}
+
+a:hover {
+  filter: brightness(40%);
+}
+
+.profile-content {
+  margin: 1vw 0;
+  text-align: center;
+}
+
+.profile-content p {
+  padding: 1vw;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.profilecard .fixed {
+  margin-top: 80px;
+}
+
+.stream {
+  width: 38vw;
+  margin: 0 auto;
+}
+
+.content {
+  margin-top: 2vw;
+  background-color: #EEEEEE;
+}
+
+.stream-header {
+  display: flex;
+}
+
+.stream-header img {
+  margin: 1vw 1vw;
+  width: 6vw;
+  height: 6vw;
+}
+
+.stream-header p {
+  margin-left: 5px;
+}
+
+.sns_login {
+  height: 23px;
+  text-align: right;
+}
+
+.sns_login span {
+  font-size: 10px;
+}
