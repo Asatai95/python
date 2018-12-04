@@ -35,15 +35,21 @@
   <title>roomii</title>
 
 </head>
-<body id='main_contents'>
+<body id='main_contents' class='main_contents'>
   <div class='header'>
     <div class='header img'>
       <a href="#"><img src="{% static 'img/wanko.png' %}" alt=""  /></a>
     </div>
     <div class='contents'>
       <ul id='menu' class="menu">
+        {% if name is None %}
         <li class='login'><a href="/login">Login</a></li>
         <li class='sign'><a href="/register">Sign up</a></li>
+        {% else %}
+        <li class='user_name'><a href="/users/mypage">{{name}}</a></li>
+        <li class='login'><a href="/logout">Logout</a></li>
+        <li class='sign'><a href="/register">Sign up</a></li>
+        {% endif %}
       </ul>
     </div>
   </div>

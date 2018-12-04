@@ -99,12 +99,12 @@ class Confirm(CreateView):
                'error': duplicate_error
             }
 
-            return render(request, self.template_name, error)
+            return render(request, self.template_name_error, error)
 
         user = check_form(request.POST)
         users_create(request.POST)
 
-        return render(request, template_name, user)
+        return render(request, self.template_name, user)
 
 Confirm = Confirm.as_view()
 
@@ -151,7 +151,7 @@ class Mypage(View):
     def get(self, request, *args, **kwargs):
 
         user = get_user_info(request)
-
+        
         return render(request, self.template_name, user)
 
 Mypage = Mypage.as_view()

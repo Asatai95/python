@@ -16,7 +16,7 @@ class Social(Base):
     id = Column('id', Integer, primary_key = True)
     user_id = Column('user_id', ForeignKey('users.id',onupdate='CASCADE', ondelete='CASCADE'))
     provider = Column('provider', String(200))
-    provider_id = Column('provider_id', BigInteger)
+    provider_id = Column('provider_id', String(200))
     created_at = Column('created_at', DateTime, default=datetime.now())
 
 def main(args):

@@ -3,11 +3,12 @@
 
 {% block main %}
 
+
 <div class='main'>
   <div class="profilecard">
     <div class="profile-header">
 
-      <img src="{% static 'img/profile.png' %}" alt="">
+      <img src="{{image}}" alt="">
       <p><span class="user-name">{{name}}</span><a href="/users/mypage/edit/"><img class="edit" src="{% static 'img/pencil.png' %}" alt=""></a></p>
       <p class="created_date"><span>{{created_at}}</span></p>
     </div>

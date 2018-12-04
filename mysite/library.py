@@ -1,5 +1,5 @@
 from django import *
-
+from PIL import Image
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -18,6 +18,13 @@ from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from apiclient.discovery import build
 
+SCOPE = 'https://www.googleapis.com/auth/plus.login'
+
+flow = flow_from_clientsecrets(
+   './client_id.json',
+   scope=SCOPE,
+   redirect_uri= "http://127.0.0.1:8000/auth/complete/google-oauth2/")
+
 """
 facebook
 """
@@ -32,12 +39,10 @@ Settingファイル
 """
 import config.settings
 
-SCOPE = 'https://www.googleapis.com/auth/plus.login'
-
-flow = flow_from_clientsecrets(
-   './client_id.json',
-   scope=SCOPE,
-   redirect_uri= "http://127.0.0.1:8000/auth/complete/google-oauth2/")
+"""
+imgファイル保存
+"""
+UPLOAD_FOLDER = '/static/img/'
 
 """
 クッキーの設定
@@ -63,7 +68,9 @@ def get_cookie(request):
 
     user_id = request.COOKIES["cookie"]
     if user_id:
-        return session.query(User).get(user_name)
+        user = session.query(User).filter(User.id == user_id).first()
+        user = {'user_name': user.name}
+        return user
     else:
         return None
 
@@ -81,6 +88,7 @@ def get_user_info(request):
     user_info = {
         'name': user.name,
         'email': user.email,
+        'image': user.image,
         'created_at': user.created_at
     }
 
@@ -141,7 +149,7 @@ def check_email(request, form):
             return True
 
 """
-usersテーブル作成
+ユーザー新規作成
 """
 
 def users_create(form):
@@ -150,6 +158,7 @@ def users_create(form):
            name=form.get('name'),
            email=form.get('email'),
            password=form.get('password'),
+           image='/img/profile.png'
     )
 
     session.add(user)
@@ -203,8 +212,22 @@ def update_users(request, form):
     user = session.query(User).filter(
                 User.id == user_id
           ).first()
+
     user.name = form.get('name')
     user.email = form.get('email')
+
+    img_file = request.FILES['img_file']
+
+    if img_file is None:
+        user.image = '/img/profile.png'
+
+    else:
+        img_file = img_file.name
+        img_filename = Image.open(request.FILES['img_file'])
+        img_filename.save(os.path.join('./static/img/', img_file))
+
+        img_file = os.path.join(UPLOAD_FOLDER, img_file)
+        user.image = img_file
 
     session.commit()
 
@@ -219,6 +242,7 @@ def create_socials_user(data):
 
     user = User(
         name = data['displayName'],
+        image='/img/profile.png',
     )
 
     session.add(user)
@@ -230,6 +254,7 @@ def create_facebook_user(data):
 
     user = User(
         name = data['name'],
+        image='/img/profile.png',
     )
 
     session.add(user)

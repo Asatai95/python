@@ -139,8 +139,9 @@ STATIC_ROOT = '/var/www/{}/static'.format(PROJECT_NAME)
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = '/var/www/{}/media'.format(PROJECT_NAME)
+MEDIA_URL = '/img/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/img')
+MEDIA_ROOT = '/var/www/{}/static/img'.format(PROJECT_NAME)
 
 ENGINE = create_engine(
     DATABASE,

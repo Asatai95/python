@@ -1,26 +1,29 @@
 {% extends 'base_login.html' %}
+
 {% load static %}
 
 {% block main %}
+
 
 <div class='main mypage'>
   <div class="contents mypage">
     <div class='title'>
       <p class='text'>プロフィール編集画面</p>
     </div>
-    <form class="col s12" action="/users/mypage/edit/" method="POST" data-validate/>
+    <form class="col s12" action="/users/mypage/edit/" method="POST" enctype="multipart/form-data" data-validate/>
       {% csrf_token %}
 
-      <div class='error'>
+      <div class='error edit'>
         <span class='error_text'></span>
         <span>{{error}}</span>
       </div>
       <div class="input_file">
+        <p class='input_file_tittle'>プロフィール画像</p>
         <div class="file">
           <div class="preview">
-            <img class='sample_img' src="{% 'static' 'img/profile.png' %}" alt="">
+            <img class='sample_img' src="{{image}}" alt="">
           </div>
-          <input id="imgFile" type="file">
+          <input id="imgFile" type="file" name='img_file' accept="image/png,image/jpeg,image/jpg" required/>
         </div>
       </div>
       <div class="row">
@@ -39,7 +42,13 @@
         <input type="submit" id='submit' value="編集完了" disabled/>
         <button class='back' type="button" onclick="history.back()">戻る</button>
       </div>
+      <div class='point'>
+        <p class='point_title'>【プロフィール画像について】</p>
+        <p class='point_message'>※画像ファイルは、.jpeg, .png, .jpgのみ登録可能です</p>
+      </div>
+
     </form>
   </div>
 </div>
+
 {% endblock %}
