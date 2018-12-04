@@ -34,8 +34,8 @@ from mysite.models.user import *
 """
 facebook
 """
-FACEBOOK_ID = '333564927437881'
-FACEBOOK_SECRET = '99948e0dc25ab9a0a19476bd6e2d4716'
+FACEBOOK_ID = '292183621408680'
+FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
 FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
 
 """
@@ -151,7 +151,7 @@ class Mypage(View):
     def get(self, request, *args, **kwargs):
 
         user = get_user_info(request)
-        
+
         return render(request, self.template_name, user)
 
 Mypage = Mypage.as_view()
@@ -187,7 +187,7 @@ class MypageEdit(View):
 MypageEdit = MypageEdit.as_view()
 
 """
-google、ログイン機能
+Google、ログイン機能
 """
 
 class GoogleLogin(View):
@@ -208,7 +208,7 @@ class GoogleLogin(View):
 GoogleLogin = GoogleLogin.as_view()
 
 """
-google、CallBack
+Google、CallBack
 """
 
 class GoogleCallBack(View):
@@ -248,19 +248,16 @@ class FacebookLogin(View):
     def get(self, request, *args, **kwargs):
 
         import requests
-        import urllib3
 
         url = 'https://www.facebook.com/v3.2/dialog/oauth'
 
         params = {
             'response_type': 'code',
             'redirect_uri': FACEBOOK_CALLBACK_URL,
-            'client_id': FACEBOOK_ID,
+            'client_id': FACEBOOK_ID
         }
 
-        redirect_url = requests.get(url, params=params).url
-        print(redirect_url)
-        print(redirect_url)
+        redirect_url = requests.get(url, params=params, allow_redirects=False).url
 
         return redirect(redirect_url)
 
@@ -277,21 +274,20 @@ class FacebookCallBack(View):
         try:
             if request.GET.get('code'):
                 access_token = get_facebook_access_token(request.GET.get('code'))
-                data = check_facebook_access_tokn(access_token)
+                data = check_facebook_access_token(access_token)
                 if data['is_valid']:
                     data = get_facebook_user_info(access_token, data['user_id'])
                     if check_socials(data, 'facebook'):
-                        login_user(user.id)
-                        return redirect('/users/mypage/')
-
+                        cookie = get_facebook_user(data['id'])
+                        login_redirect = login_user(cookie)
+                        return login_redirect
                     else:
                         user = create_facebook_user(data)
-                        create_socials(user, data, 'facebook')
-                        login_user(user.id)
-                        return redirect('/users/mypage/')
+                        social = create_socials(user, data, 'facebook')
+                        login_redirect = login_user(user.id)
+                        return login_redirect
                 else:
                     return redirect('/login/')
-
         except:
             return redirect('/login/')
 

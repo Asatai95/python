@@ -13,7 +13,7 @@ body {
 }
 
 .contents {
-  width: 340px;
+  width: 400px;
   height: 100px;
   position: absolute;
   top: 10px;
@@ -300,6 +300,11 @@ tr {
 }
 
 /*Login*/
+
+.main.login {
+  height: 100vh;
+}
+
 div.main.loginform {
   position: absolute;
   width: 100%;
@@ -355,6 +360,10 @@ div.main.loginform {
   border-radius: 5px;
 }
 
+.container-button:hover {
+  transform: scale(1.1);
+}
+
 .container-button.google {
   width: 236px;
   margin: auto;
@@ -387,12 +396,25 @@ div.main.loginform {
   width: 232px;
 }
 
+.container.btn:hover {
+  color: white!important;
+  background-color: #1565C0!important;
+}
+
+.container-button.google:hover {
+  transform: scale(1.1);
+}
+
 .container-button.google a {
   font-size: 20px;
   color: white;
   position: absolute;
   margin: 3px;
   margin-left: 5px;
+}
+
+.container-button.google a:hover {
+  color: white!important;
 }
 
 li.forget {

@@ -28,8 +28,8 @@ flow = flow_from_clientsecrets(
 """
 facebook
 """
-FACEBOOK_ID = '333564927437881'
-FACEBOOK_SECRET = '99948e0dc25ab9a0a19476bd6e2d4716'
+FACEBOOK_ID = '292183621408680'
+FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
 FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
 
 import requests
@@ -84,11 +84,15 @@ def get_user_info(request):
     user = session.query(User).filter(
                  User.id == user_id
            ).first()
-
+    social = session.query(Social).filter(
+              Social.user_id == user_id
+            ).first()
+    
     user_info = {
         'name': user.name,
         'email': user.email,
         'image': user.image,
+        'social': social.provider,
         'created_at': user.created_at
     }
 
@@ -254,6 +258,7 @@ def create_facebook_user(data):
 
     user = User(
         name = data['name'],
+        email = data['email'],
         image='/img/profile.png',
     )
 
@@ -286,6 +291,12 @@ def check_socials(data, provider):
                     Social.provider == 'google',
                     Social.provider_id == data
                 ).first()
+    elif provider == 'facebook':
+        social = session.query(Social).filter(
+                    Social.provider == 'facebook',
+                    Social.provider_id == data['id']
+                ).first()
+
     if social is None:
         return False
     else:
@@ -296,6 +307,15 @@ def check_socials(data, provider):
 facebook, ログイン認証
 ユーザーID、ユーザー名取得
 """
+
+def get_facebook_user(facebook_id):
+
+    user = session.query(User).join(
+             Social, User.id == Social.user_id
+          ).filter(
+             Social.provider_id == facebook_id
+          ).first()
+    return user.id
 
 def get_facebook_access_token(code):
 
@@ -309,7 +329,7 @@ def get_facebook_access_token(code):
     r = requests.get(url, params=params)
     return r.json()['access_token']
 
-def check_facebook_access_tokn(access_token):
+def check_facebook_access_token(access_token):
 
     url = 'https://graph.facebook.com/debug_token'
     params = {

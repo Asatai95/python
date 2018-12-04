@@ -16,8 +16,11 @@
       <p><span class="user-email">Email: {{email}}</span></p>
     </div>
     <div class='sns_login'>
+      {% if user.social == facebook %}
       <span>Facebook認証済み</span>
+      {% else %}
       <span>Google認証済み</span>
+      {% endif %}
     </div>
   </div>
   <!-- <div class='main_content'>

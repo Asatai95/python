@@ -50,7 +50,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOpenId',
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.google.GoogleOAuth',
-    'social_core.backends.facebook.FacebookOAuth2',
+    # 'social_core.backends.facebook.FacebookOAuth2',
 ]
 
 SESSION_COOKIE_SAMESITE = None
@@ -164,7 +164,3 @@ Base.query = session.query_property()
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-kqqb70df90scmclga7ure2v1t8502rjb.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '2KuvRwHi0OLoc_h07cIQr7PE'
-#
-# SOCIAL_AUTH_FACEBOOK_KEY = '292183621408680'
-# SOCIAL_AUTH_FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
-# SOCIAL_AUTH_FACEBOOK_CALLBACK_URL = 'http://127.0.0.1:8000/auth/complete/facebook/'
