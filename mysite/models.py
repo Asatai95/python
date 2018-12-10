@@ -1,0 +1,112 @@
+from django.contrib import auth
+from django.conf import settings
+from django.db import models
+from django.core.mail import send_mail
+from django.contrib.auth.models import PermissionsMixin
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
+from django.core.validators import validate_email, EmailValidator
+from django.core.exceptions import ValidationError
+from django.contrib.contenttypes.models import ContentType
+from django.db.models.manager import EmptyManager
+
+SILENCED_SYSTEM_CHECKS = ["auth.W004"]
+
+class UserManager(BaseUserManager):
+    """ユーザーマネージャー."""
+
+    use_in_migrations = True
+
+    def _create_user(self, username, email, password, **extra_fields):
+        """メールアドレスでの登録を必須にする"""
+        if not email:
+            raise ValueError('The given email must be set')
+
+        username = self.model.normalize_username(username, required=True)
+        email = self.normalize_email(email, required=True)
+
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_user(self, email, username=None, password=None, **extra_fields):
+        """is_staff(管理サイトにログインできるか)と、is_superuer(全ての権限)をFalseに"""
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(username, email, password, **extra_fields)
+
+    def create_superuser(self, username, email, password, **extra_fields):
+        """スーパーユーザーは、is_staffとis_superuserをTrueに"""
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(username, email, password, **extra_fields)
+
+class User(AbstractBaseUser, PermissionsMixin):
+    """カスタムユーザーモデル."""
+
+
+    username = models.CharField(_('username'), max_length=150)
+    email = models.EmailField(_('email'), unique=True)
+    first_name = models.CharField(_('first name'), max_length=30, blank=True)
+    last_name = models.CharField(_('last name'), max_length=150, blank=True)
+
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    image = models.ImageField(_('image'), max_length=150)
+
+    objects = UserManager()
+
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+        db_table = 'mysite_user'
+
+    def get_full_name(self):
+        """Return the first_name plus the last_name, with a space in
+        between."""
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_short_name(self):
+        """Return the short name for the user."""
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        """Send an email to this user."""
+        send_mail(subject, message, from_email, [self.email], **kwargs)
+
+
+    #
+    # @property
+    # def username(self):
+    #     """username属性のゲッター
+    #
+    #     他アプリケーションが、username属性にアクセスした場合に備えて定義
+    #     メールアドレスを返す
+    #     """
+    #     return self.email

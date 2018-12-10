@@ -1,306 +1,240 @@
+import os
+import sys
+from PIL import Image
 from django import *
-from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
+from django.conf import settings
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.template import loader
 from django.views.generic import CreateView, ListView
 from django.contrib.auth import login, authenticate
-from django.shortcuts import redirect, render
-from django.views import View
+from django.shortcuts import redirect, render, resolve_url
+from django.views import View, generic
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import (
+    LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView,
+    PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
+)
 
-"""
-Google, ログイン認証
-"""
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.file import Storage
-from apiclient.discovery import build
+from django import forms
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+from django.contrib import messages
+
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.signing import BadSignature, SignatureExpired, loads, dumps
+from django.http import Http404, HttpResponseBadRequest
+from django.template.loader import get_template
+from django.urls import reverse_lazy
+from django.views.decorators.http import require_POST
+
+from .forms import (
+    LoginForm, UserCreateForm, MyPasswordChangeForm, MyPasswordResetForm, MySetPasswordForm,
+    UserUpdateForm
+)
 
 """
 Settingファイル
 """
-from config import settings
+from config.settings import *
 
 """
-ライブラリ
+データベース
 """
-from mysite.library import *
+Get_user = get_user_model()
 
-"""
-modelsファイル
-"""
-from mysite.models.user import *
 
 """
-facebook
+ログイン機能
 """
-FACEBOOK_ID = '292183621408680'
-FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
-FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
+class Login(LoginView):
 
-"""
-Index View(テスト画面)
-"""
-class IndexView(View):
-
-    template_name = 'index.html'
-    def get(self, request, *args, **kwargs):
-
-        return render(request, self.template_name)
-
-Index = IndexView.as_view()
-
-"""
-ユーザー登録
-"""
-class Register(CreateView):
-
-    template_name = 'sign.html'
-
-    def get(self, request, *args, **kwargs):
-
-        return render(request, self.template_name)
-
-    def post(self, request, *args, **kwargs):
-
-        """
-        クッキー
-        """
-        user = login_user_cookie()
-        cookie = login_user(user)
-
-        return cookie
-
-
-Register = Register.as_view()
-
-"""
-登録確認画面
-"""
-class Confirm(CreateView):
-
-    template_name = 'new_confirm.html'
-    template_name_error = 'sign.html'
-
-    def get(self, request, *args, **kwargs):
-
-        user = check_form(request.POST)
-
-        return user
-
-    def post(self, request, *args, **kwargs):
-
-        user = check_form(request.POST)
-
-        mail = check_email(request, request.POST)
-        if mail is False:
-            duplicate_error = 'すでに使用されているEmail('+request.POST.get('email')+')アドレスです'
-            error = {
-               'error': duplicate_error
-            }
-
-            return render(request, self.template_name_error, error)
-
-        user = check_form(request.POST)
-        users_create(request.POST)
-
-        return render(request, self.template_name, user)
-
-Confirm = Confirm.as_view()
-
-"""
-ログイン画面
-"""
-class Login(View):
-
-    template_name = 'login.html'
-
-    def get(self, request, *args, **kwargs):
-
-        return render(request, self.template_name)
-
-    def post(self, request, *args, **kwargs):
-
-        login_form = user_login(request.POST)
-
-        user = login_user_checker(request.POST)
-
-        if login_form == None:
-
-            """
-            クッキー
-            """
-            cookie = login_user(user)
-
-            return cookie
-
-        else:
-
-            return render(request, self.template_name, login_form['error'])
-
-Login = Login.as_view()
-
-"""
-マイページ
-"""
-
-class Mypage(View):
-
-    template_name = 'mypage.html'
-
-    def get(self, request, *args, **kwargs):
-
-        user = get_user_info(request)
-
-        return render(request, self.template_name, user)
-
-Mypage = Mypage.as_view()
-
-"""
-ユーザー情報編集
-"""
-class MypageEdit(View):
-
-    template_name = 'edit.html'
-
-    def get(self, request, *args, **kwargs):
-
-        user = get_user_info(request)
-
-        return render(request, self.template_name, user)
-
-    def post(self, request, *args, **kwargs):
-
-        check = check_email(request, request.POST)
-        if check is False:
-            duplicate_error = 'すでに使用されているEmail('+request.POST.get('email')+')アドレスです'
-            error = {
-               'error': duplicate_error
-            }
-
-            return render(request, self.template_name, error)
-
-        update_users(request, request.POST)
-
-        return redirect('/users/mypage/')
-
-MypageEdit = MypageEdit.as_view()
-
-"""
-Google、ログイン機能
-"""
-
-class GoogleLogin(View):
-
-    def get(self, request, *args, **kwargs):
-
-        SCOPE = 'https://www.googleapis.com/auth/plus.login'
-
-        flow = flow_from_clientsecrets(
-           './client_id.json',
-           scope=SCOPE,
-           redirect_uri= "http://127.0.0.1:8000/auth/complete/google-oauth2/")
-
-        auth_uri = flow.step1_get_authorize_url()
-
-        return redirect(auth_uri)
-
-GoogleLogin = GoogleLogin.as_view()
-
-"""
-Google、CallBack
-"""
-
-class GoogleCallBack(View):
-
-    def get(self, request, *args, **kwargs):
-
-        if request.GET.get('code'):
-            data = google_login_flow(request.GET.get('code'))
-            check = check_socials(data['id'], 'google')
-            if check is not False:
-                social = session.query(User).join(
-                         Social, User.id == Social.user_id).filter(
-                         Social.provider == 'google',
-                         Social.provider_id == data['id']).first()
-
-                if social:
-                    cookie = login_user(social.id)
-                    return cookie
-                else:
-                    pass
-            else:
-                user = create_socials_user(data)
-                create_socials(user.id, data, 'google')
-                cookie = login_user(user.id)
-                return cookie
-        else:
-            return redirect('/login/')
-
-GoogleCallBack = GoogleCallBack.as_view()
-
-"""
-Facebook, ログイン認証
-"""
-
-class FacebookLogin(View):
-
-    def get(self, request, *args, **kwargs):
-
-        import requests
-
-        url = 'https://www.facebook.com/v3.2/dialog/oauth'
-
-        params = {
-            'response_type': 'code',
-            'redirect_uri': FACEBOOK_CALLBACK_URL,
-            'client_id': FACEBOOK_ID
-        }
-
-        redirect_url = requests.get(url, params=params, allow_redirects=False).url
-
-        return redirect(redirect_url)
-
-FacebookLogin = FacebookLogin.as_view()
-
-"""
-Facebook, CallBack
-"""
-
-class FacebookCallBack(View):
-
-    def get(self, request, *args, **kwargs):
-
-        try:
-            if request.GET.get('code'):
-                access_token = get_facebook_access_token(request.GET.get('code'))
-                data = check_facebook_access_token(access_token)
-                if data['is_valid']:
-                    data = get_facebook_user_info(access_token, data['user_id'])
-                    if check_socials(data, 'facebook'):
-                        cookie = get_facebook_user(data['id'])
-                        login_redirect = login_user(cookie)
-                        return login_redirect
-                    else:
-                        user = create_facebook_user(data)
-                        social = create_socials(user, data, 'facebook')
-                        login_redirect = login_user(user.id)
-                        return login_redirect
-                else:
-                    return redirect('/login/')
-        except:
-            return redirect('/login/')
-
-FacebookCallBack = FacebookCallBack.as_view()
+    form_class= LoginForm
+    template_name = 'register/login.html'
 
 """
 ログアウト機能
 """
 
-class Logout(View):
+class Logout(LogoutView):
 
     def get(self, request, *args, **kwargs):
-        log = logout()
 
-        return log
-Logout = Logout.as_view()
+        return redirect('register:login')
+
+
+"""
+ユーザー登録
+"""
+
+class UserCreate(generic.CreateView):
+    """ユーザー仮登録"""
+    template_name = 'register/user_create.html'
+    form_class = UserCreateForm
+
+    def form_valid(self, form):
+        """仮登録と本登録用メールの発行."""
+        # 仮登録と本登録の切り替えは、is_active属性を使うと簡単です。
+        # 退会処理も、is_activeをFalseにするだけにしておくと捗ります。
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
+
+        # アクティベーションURLの送付
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+        context = {
+            'protocol': self.request.scheme,
+            'domain': domain,
+            'token': dumps(user.pk),
+            'user': user,
+        }
+
+        subject = 'テスト'
+
+        message_template = get_template('register/mail_template/create/message.txt')
+        message = message_template.render(context)
+
+        user.email_user(subject, message)
+        return redirect('/user_create/done/')
+
+
+
+class UserCreateDone(generic.TemplateView):
+    """ユーザー仮登録したよ"""
+    template_name = 'register/user_create_done.html'
+
+
+class UserCreateComplete(generic.TemplateView):
+    """メール内URLアクセス後のユーザー本登録"""
+    template_name = 'register/user_create_complte.html'
+    timeout_seconds = getattr(settings, 'ACTIVATION_TIMEOUT_SECONDS', 60*60*24)  # デフォルトでは1日以内
+
+    def get(self, request, **kwargs):
+        """tokenが正しければ本登録."""
+        token = kwargs.get('token')
+        try:
+            user_pk = loads(token, max_age=self.timeout_seconds)
+
+        # 期限切れ
+        except SignatureExpired:
+            return HttpResponseBadRequest()
+
+        # tokenが間違っている
+        except BadSignature:
+            return HttpResponseBadRequest()
+
+        # tokenは問題なし
+        else:
+            try:
+                user = Get_user.objects.get(pk=user_pk)
+            except Get_user.DoesNotExist:
+                return HttpResponseBadRequest()
+
+            if not user.is_active:
+                # 問題なければ本登録とする
+                user.is_active = True
+                user.save()
+
+                return super().get(request, **kwargs)
+
+        return HttpResponseBadRequest()
+
+class PasswordChange(PasswordChangeView):
+    """パスワード変更ビュー"""
+    form_class = MyPasswordChangeForm
+    success_url = reverse_lazy('register:password_change_done')
+    template_name = 'register/password_change.html'
+
+
+class PasswordChangeDone(PasswordChangeDoneView):
+    """パスワード変更しました"""
+    template_name = 'register/password_change_done.html'
+
+
+"""
+パスワード再設定
+"""
+class PasswordReset(PasswordResetView):
+    """パスワード変更用URLの送付ページ"""
+
+    subject_template_name = 'register/mail_template/password_reset/subject.txt'
+    email_template_name = 'register/mail_template/password_reset/message.txt'
+    template_name = 'register/password_reset_form.html'
+    form_class = MyPasswordResetForm
+    success_url = reverse_lazy('register:password_reset_done')
+
+
+class PasswordResetDone(PasswordResetDoneView):
+    """パスワード変更用URLを送りましたページ"""
+    template_name = 'register/password_reset_done.html'
+
+
+class PasswordResetConfirm(PasswordResetConfirmView):
+    """新パスワード入力ページ"""
+    form_class = MySetPasswordForm
+    success_url = reverse_lazy('register:password_reset_complete')
+    template_name = 'register/password_reset_confirm.html'
+
+
+class PasswordResetComplete(PasswordResetCompleteView):
+    """新パスワード設定しましたページ"""
+    template_name = 'register/password_reset_complete.html'
+
+"""
+個人のみ、閲覧可能（バリデーション）
+"""
+class PermissionsMypage(UserPassesTestMixin):
+
+    raise_exception = True
+
+    def test_func(self):
+        user = self.request.user
+
+        return user.pk == self.kwargs['pk'] or user.is_superuser
+
+"""
+マイページ
+"""
+class UserDetail(PermissionsMypage, generic.DetailView):
+    model = Get_user
+    template_name = 'register/user_detail.html'
+
+
+"""
+マイページ更新
+"""
+class UserUpdate(PermissionsMypage, generic.UpdateView):
+    model = Get_user
+    form_class = UserUpdateForm
+    template_name = 'register/user_form.html'
+
+    def get_success_url(self):
+
+        User = Get_user.objects.all().filter(pk=self.kwargs['pk'])
+        img_file = self.request.FILES['img_file'].name
+        img_filename = Image.open(self.request.FILES['img_file'])
+        img_filename.save(os.path.join('./media/img/', img_file))
+
+        img_file = os.path.join('/media/img/', img_file)
+        for user in User:
+            user.image = user
+        user.image = img_file
+        user.save()
+
+        return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+
+"""
+TOPページ View
+"""
+class Main(View):
+
+    template_name = 'apps/index.html'
+
+    def get(self, request, *args, **kwargs):
+
+        return render(request, self.template_name)

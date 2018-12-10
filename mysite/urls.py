@@ -5,20 +5,25 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 
+
 app_name = 'mysite'
 
 urlpatterns = [
-    # path('index/', views.Index, name='index'),
-    path('register/', views.Register, name='register'),
-    path('confirm/', views.Confirm, name='confirm'),
-    path('login/google/', views.GoogleLogin, name='google'),
-    path('auth/complete/google-oauth2/', views.GoogleCallBack, name='GoogleCallBack'),
-    path('facebook/login/', views.FacebookLogin, name='facebook'),
-    path('callback/facebook/', views.FacebookCallBack, name='FacebookCallBack'),
-    path('login/', views.Login, name='login'),
-    path('logout/', views.Logout, name='logout'),
-    path('users/mypage/', views.Mypage, name='mypage'),
-    path('users/mypage/edit/', views.MypageEdit, name='mypageedit'),
+    path('', views.Main.as_view(), name='top'),
+    path('login/', views.Login.as_view(), name='login'),
+    path('logout/', views.Logout.as_view(), name='logout'),
+    path('user_create/', views.UserCreate.as_view(), name='user_create'),
+    path('user_create/done/', views.UserCreateDone.as_view(), name='user_create_done'),
+    path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
+    path('password_change/', views.PasswordChange.as_view(), name='password_change'),
+    path('password_change/done/', views.PasswordChangeDone.as_view(), name='password_change_done'),
+    path('password_reset/', views.PasswordReset.as_view(), name='password_reset'),
+    path('password_reset/done/', views.PasswordResetDone.as_view(), name='password_reset_done'),
+    path('password_reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
+    path('password_reset/complete/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
+    path('user_detail/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
+    path('user_update/<int:pk>/', views.UserUpdate.as_view(), name='user_update'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

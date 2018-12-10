@@ -1,14 +1,13 @@
+import os
+import sys
+
 from django import *
 from PIL import Image
+from django.core.mail import BadHeaderError, send_mail
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
-from config.settings import session
-
 import urllib3
-
-from mysite.models.user import *
-from mysite.models.social import *
 
 """
 Google, ログイン認証
@@ -37,7 +36,8 @@ import requests
 """
 Settingファイル
 """
-import config.settings
+sys.path.append(os.getcwd())
+from config.settings import *
 
 """
 imgファイル保存
@@ -49,7 +49,7 @@ UPLOAD_FOLDER = '/static/img/'
 """
 def login_user_cookie():
 
-    user = session.query(User).order_by(desc(User.created_at)).first()
+    user = session.query(UserAuth).order_by(desc(UserAuth.date_joined)).first()
 
     return user.id
 
@@ -81,20 +81,29 @@ def get_user_info(request):
 
     user_id = request.COOKIES["cookie"]
 
-    user = session.query(User).filter(
-                 User.id == user_id
+    user = session.query(UserAuth).filter(
+                 UserAuth.id == user_id
            ).first()
+
     social = session.query(Social).filter(
               Social.user_id == user_id
             ).first()
-    
-    user_info = {
-        'name': user.name,
-        'email': user.email,
-        'image': user.image,
-        'social': social.provider,
-        'created_at': user.created_at
-    }
+
+    if social == None:
+        user_info = {
+            'username': user.username,
+            'email': user.email,
+            'image': user.image,
+            'date_joined': user.date_joined
+        }
+    else:
+        user_info = {
+            'username': user.username,
+            'email': user.email,
+            'image': user.image,
+            'social': social.provider,
+            'date_joined': user.date_joined
+        }
 
     return user_info
 
@@ -132,19 +141,30 @@ Emailの有、無
 
 def check_email(request, form):
 
-    user_id = request.COOKIES["cookie"]
-    if user_id is not None:
+    try:
+        user_id = request.COOKIES["cookie"]
+        if user_id is not None:
 
-        user_email_cheker = session.query(User).filter(
-                                User.id == user_id,
-                                User.email == form.get('email'),
-                            ).all()
-        if user_email_cheker:
-            pass
-    else:
+            user_email_cheker = session.query(UserAuth).filter(
+                                    UserAuth.id == user_id,
+                                    UserAuth.email == form.get('email'),
+                                ).all()
+            if user_email_cheker:
+                pass
+        else:
 
-        user_email_cheker = session.query(User).filter(
-                                User.email == form.get('email'),
+            user_email_cheker = session.query(UserAuth).filter(
+                                    UserAuth.email == form.get('email'),
+                                ).all()
+
+            if user_email_cheker:
+                return False
+            else:
+                return True
+    except:
+
+        user_email_cheker = session.query(UserAuth).filter(
+                                UserAuth.email == form.get('email'),
                             ).all()
 
         if user_email_cheker:
@@ -213,8 +233,8 @@ def update_users(request, form):
 
     user_id = request.COOKIES["cookie"]
 
-    user = session.query(User).filter(
-                User.id == user_id
+    user = session.query(UserAuth).filter(
+                UserAuth.id == user_id
           ).first()
 
     user.name = form.get('name')
@@ -244,8 +264,8 @@ SNSログイン
 
 def create_socials_user(data):
 
-    user = User(
-        name = data['displayName'],
+    user = UserAuth(
+        username = data['displayName'],
         image='/img/profile.png',
     )
 
@@ -256,11 +276,12 @@ def create_socials_user(data):
 
 def create_facebook_user(data):
 
-    user = User(
-        name = data['name'],
+    user = UserAuth(
+        username = data['name'],
         email = data['email'],
         image='/img/profile.png',
     )
+    print(user)
 
     session.add(user)
     session.commit()
@@ -280,6 +301,7 @@ def create_socials(user_id , data, provider):
            provider = provider,
            provider_id = data['id']
         )
+    print(social)
 
     session.add(social)
     session.commit()
@@ -310,8 +332,8 @@ facebook, ログイン認証
 
 def get_facebook_user(facebook_id):
 
-    user = session.query(User).join(
-             Social, User.id == Social.user_id
+    user = session.query(UserAuth).join(
+             Social, UserAuth.id == Social.user_id
           ).filter(
              Social.provider_id == facebook_id
           ).first()

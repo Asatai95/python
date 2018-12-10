@@ -1,0 +1,47 @@
+{% extends "register/base.html" %}
+{% block content %}
+{% load static %}
+<div class="row_login">
+  <form action="" method="POST">
+      <div class="col-md-6 offset-md-3">
+          <div class="card">
+              <div class="card-body">
+                  {{ form.non_field_errors }}
+                  {% for field in form %}
+                      {{ field }}
+                      {{ field.errors }}
+                      <hr>
+                  {% endfor %}
+                  {{error}}
+                  <button type="submit" class="btn btn-success btn-lg btn-block" >ログイン</button>
+                  <input type="hidden" name="next" value="{{ next }}" />
+                  {% csrf_token %}
+              </div>
+          </div>
+      </div>
+      <div classs='comment'>
+        <ul class='note'>
+
+          <li class='forget'><a href="{% url 'register:password_reset' %}">パスワードをお忘れの方</a></li>
+          <li class='new_account'>ユーザー登録がまだの方は<a href="/user_create/">こちら</a></li>
+
+        </ul>
+      </div>
+      <div class='sns'>
+        <p class='sns_text'><a href="#">SNSでログインする場合</a></p>
+        <div class="container facebook">
+          <div class="container-button">
+            <img src="{% static 'img/facebook_icon.png'%}" alt="">
+            <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
+          </div>
+        </div>
+        <div class='container google'>
+          <div class="container-button google">
+            <img class='google' src="{% static 'img/google.png'%}" alt="">
+            <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+          </p>
+        </div>
+      </div>
+  </form>
+</div>
+{% endblock %}

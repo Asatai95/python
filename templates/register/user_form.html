@@ -1,8 +1,8 @@
-{% extends 'base_login.html' %}
+{% extends 'register/base.html' %}
 
 {% load static %}
 
-{% block main %}
+{% block content %}
 
 
 <div class='main mypage'>
@@ -10,37 +10,40 @@
     <div class='title'>
       <p class='text'>プロフィール編集画面</p>
     </div>
-    <form class="col s12" action="/users/mypage/edit/" method="POST" enctype="multipart/form-data" data-validate/>
-      {% csrf_token %}
-
+    <form class="col s12" action="" method="POST" enctype="multipart/form-data" data-validate/>
       <div class='error edit'>
-        <span class='error_text'></span>
-        <span>{{error}}</span>
+        <span>{{ form.non_field_errors }}</span>
       </div>
       <div class="input_file">
         <p class='input_file_tittle'>プロフィール画像</p>
         <div class="file">
           <div class="preview">
-            <img class='sample_img' src="{{image}}" alt="">
+            <img class='sample_img' src="{{user.image}}" alt="">
           </div>
-          <input id="imgFile" type="file" name='img_file' accept="image/png,image/jpeg,image/jpg" required/>
+          <input id="imgFile" type="file" name='img_file' accept="image/png,image/jpeg,image/jpg" />
         </div>
       </div>
       <div class="row">
         <div class="input-field col s6">
-          <input id="name" name="name" type="text" class="validate edit" value={{name}} required/>
           <label for="edit_name">ユーザー名</label>
+          <input id="name" name="username" type="text" class="validate edit" value={{user.username}} required/>
         </div>
       </div>
       <div class="row">
-        <div class="input-field col s12">
-          <input id="email" name="email" type="email" class="validate edit" value="{{email}}" required/>
+        <div class="input-field col s6">
           <label for="email">Email</label>
+          <input id="email" name="email" type="email" class="validate edit" value="{{user.email}}" required/>
+          <div class='error_fild'>
+          {% for field in form %}
+          {{ field.errors }}
+          {% endfor %}
+        </div>
         </div>
       </div>
+      {% csrf_token %}
       <div class='button'>
         <input type="submit" id='submit' value="編集完了" disabled/>
-        <button class='back' type="button" onclick="history.back()">戻る</button>
+        <button class='back' type="button"><a href="{% url 'register:user_detail' user.pk %}">戻る</a></button>
       </div>
       <div class='point'>
         <p class='point_title'>【プロフィール画像について】</p>

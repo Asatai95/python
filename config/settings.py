@@ -11,6 +11,13 @@ from django import *
 from django.contrib.messages import *
 from django.contrib import *
 
+from django.db import models
+# from django.contrib.auth import get_user_model
+
+sys.path.append(os.getcwd())
+import facebook.custom_backends
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PROJECT_NAME = os.path.basename(BASE_DIR)
@@ -22,14 +29,14 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mysite.apps.WebappConfig',
-    'social.apps.django_app.default',
-    'mysite.models',
+    # 'mysite.apps.WebappConfig',
+    'mysite',
     'social_django',
 ]
 
@@ -45,18 +52,18 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.open_id.OpenIdAuth',
     'social_core.backends.google.GoogleOpenId',
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.google.GoogleOAuth',
-    # 'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    # 'facebook.custom_backends.SettingsBackend',
+    'social_core.backends.facebook.FacebookOAuth2',
+
 ]
 
 SESSION_COOKIE_SAMESITE = None
 
-
-# SESSION_COOKIE_SECURE = True
 
 sys.path.append(os.getcwd())
 
@@ -81,9 +88,10 @@ TEMPLATES = [
         },
     ]
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/index/'
-LOGOUT_URL = '/index/'
+LOGIN_URL = 'register:login'
+
+LOGIN_REDIRECT_URL = 'apps:top'
+LOGOUT_URL = 'register:login'
 
 sys.path.append(os.getcwd())
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -91,20 +99,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'roomii',
+        'NAME': 'roomii_sample',
         'USER': 'root',
         'PASSWORD': 'Asatai951156',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
-
-DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
-       "root",
-       "Asatai951156",
-       "127.0.0.1:3306",
-       "roomii",
-    )
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -139,28 +140,29 @@ STATIC_ROOT = '/var/www/{}/static'.format(PROJECT_NAME)
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 
-MEDIA_URL = '/img/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/img')
-MEDIA_ROOT = '/var/www/{}/static/img'.format(PROJECT_NAME)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = '/var/www/{}/media'.format(PROJECT_NAME)
 
-ENGINE = create_engine(
-    DATABASE,
-    encoding = "utf8",
-    echo = True,
-    pool_pre_ping = True,
-)
+AUTH_USER_MODEL = 'mysite.User'
 
-session = scoped_session(
-        sessionmaker(
-            autocommit = False,
-            autoflush = False,
-            bind = ENGINE,
-            )
-        )
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-c11pj3e6ul0kj7utrj8smt34c3muq5jj.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qGNbZlINKiAeaTxko6JZV-If'
+
+# SOCIAL_AUTH_FACEBOOK_APP_NAMESPACE = 'auth'
+SOCIAL_AUTH_FACEBOOK_KEY = '292183621408680'
+SOCIAL_AUTH_FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
+# SOCIAL_AUTH_FACEBOOK_SCOPE =  ['email', 'public_profile']
+# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+#   'fields': 'id,name,email'
+# }
 
 
-Base = declarative_base()
-Base.query = session.query_property()
+EMAIL_HOST = 'smtp.muumuu-mail.com'
+DEFAULT_FROM_EMAIL = 'official@webapp2.com'
+EMAIL_HOST_USER = 'official@webapp2.com'
+EMAIL_HOST_PASSWORD = 'asatai951156'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = False
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-kqqb70df90scmclga7ure2v1t8502rjb.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '2KuvRwHi0OLoc_h07cIQr7PE'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

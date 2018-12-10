@@ -3,7 +3,20 @@
 body {
   position: absolute;
   width: 100%;
-  height: 1150px;
+}
+
+.bg-light {
+  width: 100%;
+  position: fixed;
+}
+
+.container.mt-3 {
+  margin-top: 5rem!important;
+}
+
+.collapse.navbar-collapse {
+  position: absolute;
+  right: 0;
 }
 
 .header {
@@ -14,13 +27,8 @@ body {
 
 .contents {
   width: 400px;
-  height: 100px;
-  position: absolute;
-  top: 10px;
-  right: 0;
-  margin: 0;
   padding: 0;
-  float: right;
+
 }
 
 .img img {
@@ -118,20 +126,22 @@ footer {
 
 /*register*/
 
+.form-control {
+  padding: .375rem .75rem!important;
+}
+
 .main {
-  position: absolute;
-  width: 100%;
-  height: 140vh;
-  background-color: rgba(123, 128, 132, .1);
+  text-align: center;
+  padding-top: 30px;
+  border: 2px solid black;
+}
+
+.main.create {
+  margin-bottom: 100px;
 }
 
 .form.contents {
-  width: 700px;
-  height: 950px;
-  right: 0;
-  left: 0;
   margin: 10px auto;
-  background-color: rgba(255, 255, 255);
 }
 
 .logo.text {
@@ -295,7 +305,8 @@ tr {
 }
 
 .btn {
-  width: 350px;
+  margin: 20px auto;
+  width: 250px;
   background-color: #42a5f5;
 }
 
@@ -348,7 +359,6 @@ div.main.loginform {
 
 .container {
   text-align: center;
-  margin: 20px auto;
 }
 
 .container-button {
@@ -362,6 +372,10 @@ div.main.loginform {
 
 .container-button:hover {
   transform: scale(1.1);
+}
+
+.container.facebook {
+  display: none;
 }
 
 .container-button.google {
@@ -388,17 +402,16 @@ div.main.loginform {
   margin: 1px;
 }
 
+.container.google {
+  display: none;
+}
+
 .container.btn {
   padding-left: 38px;
   text-decoration: none;
   color: white;
-  font-size: 16px;
+  font-size: 19px;
   width: 232px;
-}
-
-.container.btn:hover {
-  color: white!important;
-  background-color: #1565C0!important;
 }
 
 .container-button.google:hover {
@@ -410,11 +423,12 @@ div.main.loginform {
   color: white;
   position: absolute;
   margin: 3px;
-  margin-left: 5px;
+  margin-left: 15px;
 }
 
 .container-button.google a:hover {
   color: white!important;
+  text-decoration: none;
 }
 
 li.forget {
@@ -435,21 +449,12 @@ li.new_account {
   height: 120vh!important;
 }
 
-.main.mypage {
-  height: 100vh;
-}
-
 .main.mypage .contents {
-  width: 500px;
-  height: 600px;
-  margin: 50px auto;
-  background-color: rgba(255,255,255);
-  border: 2px solid black;
-  position: relative;
-  float: none;
+  width: 100%;
 }
 
 .title {
+  margin: 10px;
   text-align: center;
 }
 
@@ -460,13 +465,20 @@ li.new_account {
   color: black;
 }
 
-.row {
-  width: 300px;
-  margin: 0 auto!important;
+.row .col.s6 {
+  margin: 10px;
 }
 
-.row .col.s6 {
-  width: 100%;
+.row .col.s6 label {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.row .col.s6 input {
+  width: 300px;
+  border-radius: 5px;
+  font-size: 20px;
 }
 
 .validate.edit {
@@ -494,6 +506,11 @@ li.new_account {
   cursor: pointer;
 }
 
+.back a {
+  text-decoration: none;
+  color: white;
+}
+
 .back:hover {
   transform: scale(1.1);
 }
@@ -501,7 +518,7 @@ li.new_account {
 .input_file {
   text-align: center;
   margin: 0 auto;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   width: 300px;
   height: 155px;
 }
@@ -509,7 +526,8 @@ li.new_account {
 .input_file_tittle {
   margin: 0;
   text-align: left;
-  color: #9e9e9e;
+  color: black;
+  font-weight: 800;
   font-size: 1rem;
 }
 
@@ -534,7 +552,30 @@ li.new_account {
   color: red;
 }
 
+.contents.mypage .point {
+  margin-top: 30px;
+}
+
+.error_fild {
+  width: 100%;
+  height: 24px;
+}
+
 /*ユーザーページ*/
+
+.back.change {
+  font-size: 15px!important;
+  border-radius: 20px;
+}
+
+.password_change {
+  text-align: right;
+}
+
+.main_mypage {
+  padding-top: 30px;
+  height: 100vh;
+}
 
 .profilecard {
   width: 50vw;
@@ -542,6 +583,16 @@ li.new_account {
   padding: 1vw;
   background-color: rgba(255,255,255);
   border: solid 10px #f7b52c;
+}
+
+.preview {
+  display: inline-block;
+}
+
+.preview img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50px;
 }
 
 .profile-header {
@@ -558,6 +609,10 @@ li.new_account {
   padding-top: 18px;
 }
 
+.date_joined {
+  float: right;
+}
+
 .created_date {
   height: 25px;
   margin: 0!important;
@@ -565,7 +620,7 @@ li.new_account {
 }
 
 .created_date span {
-  font-size: 5px;
+  font-size: 10px;
 }
 
 .profile-header p a img {
@@ -583,7 +638,15 @@ p span {
 }
 
 p span.user-name {
-  font-size: 20px;
+  font-size: 25px!important;
+}
+
+p span.user-email {
+  font-size: 20px!important;
+}
+
+p span.room-name {
+  padding-left: 10px;
 }
 
 a img .edit {
@@ -593,7 +656,7 @@ a img .edit {
 }
 
 a:hover {
-  filter: brightness(40%);
+  filter: brightness(100%);
 }
 
 .profile-content {
@@ -612,8 +675,11 @@ a:hover {
 }
 
 .stream {
-  width: 38vw;
   margin: 0 auto;
+}
+
+.stream_content {
+  height: 50px;
 }
 
 .content {
@@ -622,7 +688,7 @@ a:hover {
 }
 
 .stream-header {
-  display: flex;
+  display: inline-block;
 }
 
 .stream-header img {
@@ -635,6 +701,22 @@ a:hover {
   margin-left: 5px;
 }
 
+.inline .stream_content .profile_img {
+  display: inline-block;
+  margin-left: 30px;
+}
+
+.inline .stream-content .profile_img img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  margin-left: 50px;
+}
+
+.inline {
+  display: inline-block;
+}
+
 .sns_login {
   height: 23px;
   text-align: right;
@@ -642,4 +724,201 @@ a:hover {
 
 .sns_login span {
   font-size: 10px;
+}
+
+/*パスワード再設定*/
+
+.title_text {
+  font-size: 25px;
+}
+
+.password_main {
+  width: 500px;
+  margin: 100px auto;
+  border: 2px solid black;
+}
+
+.form-group {
+  width: 300px;
+  margin: 10px auto;
+}
+
+#id_email {
+  padding: 0 10px;
+}
+
+.password.btn.btn-primary {
+  width: 200px;
+}
+
+.point.login {
+  margin: 10px auto;
+}
+
+.remake {
+  width: 730px;
+  height: 350px;
+  border: 2px solid black;
+  margin: 100px auto;
+}
+
+.remake p {
+  font-size: 25px;
+  text-align: center;
+  margin: 80px auto;
+}
+
+.remake div {
+  text-align: center;
+}
+
+.create_done {
+  margin-top: 30px;
+}
+
+.commit_text_mail {
+  font-size: 25px;
+  margin-top: 50px;
+}
+
+.errorlist {
+  margin: 10px auto;
+  color: red;
+  list-style: none;
+  padding: 0;
+}
+
+.remake_main {
+  margin: 100px auto;
+  height: 450px;
+  border: 2px solid black;
+  padding-top: 30px;
+}
+
+.row_login {
+  display: -ms-flexbox;
+  display: inline-block;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: 100px!important;
+}
+
+.remake_main_text {
+  margin: 130px;
+  font-size: 25px;
+}
+
+.container.center-align.btn.waves-effect {
+  background-color: rgba(30, 50, 132, .9)!important;
+  margin: 0!important;
+  padding-top: 2px!important;
+}
+
+@media (min-width: 768px){
+  .offset-md-3 {
+    margin-left: 0!important;
+  }
+  .col-md-6 {
+    max-width: 100%!important;
+  }
+}
+
+/*パスワード変更*/
+
+.main_remake_password {
+  text-align: center;
+  padding-top: 30px;
+  border: 2px solid black;
+  margin: auto;
+  margin-top: 100px;
+  width: 800px;
+}
+
+.content_main {
+  width: 930;
+}
+
+.main_container {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: 1.5fr .5fr .5fr 1.5fr;
+  grid-template-rows: 200px 50px 200px 200px 50px 200px auto;
+}
+.item {
+  background: #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  border: 3px solid #ccc;
+}
+.box-big1 {
+  grid-column: 1/3;
+  grid-row: 1/3;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big2 {
+  grid-column: 3/5;
+  grid-row: 1/3;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big3 {
+  grid-row: 3 / 4;
+  background: #fc2;
+  border-color: #fa0;
+  grid-column: 2/4;
+}
+.box-big4 {
+  grid-column: 1 / 2;
+  background: #0ba;
+  border-color: #098;
+}
+.box-big5 {
+  grid-column: 4/5;
+  grid-row: 3/3;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big6 {
+  grid-column: 1/2;
+  grid-row: 4/5;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big7 {
+  grid-column: 4/5;
+  grid-row: 4/5;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big8 {
+  grid-column: 1/3;
+  grid-row: 5/7;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big9 {
+  grid-column: 3/5;
+  grid-row: 5/7;
+  background: #fc2;
+  border-color: #fa0;
+}
+.box-big10 {
+  grid-row: 4 / 5;
+  background: #fc2;
+  border-color: #fa0;
+  grid-column: 2/4;
+}
+@media (max-width: 600px){
+  .container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .box-big1,
+  .box-big2,
+  .box-big3,
+  .box-big4 {
+    grid-column: 1;
+    grid-row: auto;
+  }
 }
