@@ -1,0 +1,57 @@
+{% extends 'apps/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<form method="get" action="" name="filter_form">
+  {% csrf_token %}
+  <legend>絞り込み条件</legend>
+  <div>
+    <span>間取り</span>
+    {%for tmp in room_list%}
+    <input type="checkbox" id="filter_kind_{{ tmp.id }}"
+        name="room"
+        value="{{ tmp.room_id }}"
+        >{{ tmp.room_id }}
+    {% endfor %}
+  </div>
+  <div>
+    <span>階数</span>
+    {%for list in floor_list%}
+    <input type="checkbox" id="filter_kind_{{ list.id }}"
+        name="floor"
+        value="{{ list.floor_id }}"
+        >{{ list.floor_id }}
+    {% endfor %}
+    <button id="filter" >絞り込み</button>
+  </div>
+    <div>
+        <span>名称：</span>
+        <input type="text" id="filter_name" name="name" values="">
+        <button id="filter" >絞り込み</button>
+    </div>
+    <div>
+        <span>住所：</span>
+        <input type="text" id="filter_name" name="article_address" values="">
+        <button id="filter" >絞り込み</button>
+    </div>
+</form>
+{% for view in fab_view %}
+{{view.flag}}
+{%endfor%}
+<div id="main">
+    <h1>結果</h1>
+    <table>
+        <tr>
+            <th>テスト</th>
+        </tr>
+        {% for view in object_list %}
+            <tr>
+                <td>{{ view.article_name }}</td>
+                <td>{{ view.address }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{%endblock%}

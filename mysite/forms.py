@@ -2,15 +2,16 @@
 from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm, PasswordChangeForm,
-    PasswordResetForm, SetPasswordForm,
+    PasswordResetForm, SetPasswordForm
 )
 
 from django.contrib.auth import get_user_model
+from mysite.models import Article, RoomImage, Fab
 from django.db import models
 from django.shortcuts import redirect
 
 User = get_user_model()
-
+# Article = Article.objects.all()
 
 class LoginForm(AuthenticationForm):
     """ログインフォーム"""

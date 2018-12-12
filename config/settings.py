@@ -90,7 +90,7 @@ TEMPLATES = [
 
 LOGIN_URL = 'register:login'
 
-LOGIN_REDIRECT_URL = 'apps:top'
+LOGIN_REDIRECT_URL = 'register:top'
 LOGOUT_URL = 'register:login'
 
 sys.path.append(os.getcwd())
@@ -142,7 +142,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_ROOT = '/var/www/{}/media'.format(PROJECT_NAME)
+MEDIA_ROOT = '/var/www/{}/media/'.format(PROJECT_NAME)
 
 AUTH_USER_MODEL = 'mysite.User'
 

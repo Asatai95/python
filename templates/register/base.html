@@ -26,7 +26,7 @@
         <ul class="navbar-nav mr-auto">
          {% if user.is_authenticated %}
          <li>
-           <a class="nav-item nav-link" href="{% url 'apps:top'%}">TOP</a>
+           <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
          </li>
          <li>
            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
@@ -36,7 +36,7 @@
          </li>
          {% else %}
          <li class="nav-item">
-           <a class="nav-item nav-link" href="/login/">
+           <a class="nav-item nav-link" href="{% url 'register:login'%}">
            ようこそ、ゲスト！ログインはこちら
          </a>
          </li>

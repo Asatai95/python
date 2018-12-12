@@ -30,41 +30,48 @@
     </div>
   </div>
   <div class='main_content'>
-    <div class="stream">
-      <div class="content">
-        <div class='preview'>
-          <img src="{%static 'img/005p2.jpg'%}" alt="">
-        </div>
-        <div class="stream-header">
-          <p>
-            <span class="like-time">お気に入り登録:2018-12-09 15:08:01</span>
-            <span class="room-name">赤丸ビルディング203</span>
-            <div class="stream-content">
-              <span name="comment">※コメント一部表示予定</span>
-            </div>
-          </p>
-        </div>
-        <div class="inline">
-          <div class="stream-content">
-            <div class='profile_img'>
-              <img src="{% static 'img/wanko.png'%}" alt="">
+
+    {% for tmp in list %}
+       {% for fab_list in fab %}
+          {% if tmp.id == fab_list.article %}
+          <div class="stream">
+            <div class="content">
+              <div class='preview'>
+                <img src="{{tmp.image}}" alt="">
+              </div>
+              <div class="stream-header">
+                <p>
+                  <span class="like-time">お気に入り登録:{{fab_list.updated}}</span>
+                  <span class="room-name">{{tmp.name}}</span>
+                  <div class="stream-content">
+                    <span name="comment">{{tmp.comment}}</span>
+                  </div>
+                </p>
+              </div>
+              <div class="inline">
+                <div class="stream-content">
+                  <div class='profile_img'>
+                    <img src="{% static 'img/wanko.png'%}" alt="">
+                  </div>
+                </div>
+              </div>
+              <!-- <div class='outline'>
+                <div class='stream-delete'>
+                  <div class='delete'>
+                    <a href="/mypage/edit/" class="cp_btn"></a>
+                  </div>
+                </div>
+                <div class='stream-delete'>
+                  <div class='delete'>
+                    <a href="/mypage/delete/" class="cp_btn"></a>
+                  </div>
+                </div>
+              </div> -->
             </div>
           </div>
-        </div>
-        <!-- <div class='outline'>
-          <div class='stream-delete'>
-            <div class='delete'>
-              <a href="/mypage/edit/" class="cp_btn"></a>
-            </div>
-          </div>
-          <div class='stream-delete'>
-            <div class='delete'>
-              <a href="/mypage/delete/" class="cp_btn"></a>
-            </div>
-          </div>
-        </div> -->
-      </div>
-    </div>
+          {% endif %}
+       {% endfor %}
+     {% endfor %}
 </div>
 
 {% endblock %}

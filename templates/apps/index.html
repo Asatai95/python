@@ -6,16 +6,35 @@
 <div class='content_main'>
   <div class='topic'>
     <div class="main_container">
-      <div class="item box-big1">A</div>
-      <div class="item box-big2">B</div>
-      <div class="item box-big3">C</div>
-      <div class="item box-big4">D</div>
-      <div class="item box-big5">E</div>
-      <div class="item box-big6">f</div>
-      <div class="item box-big7">g</div>
-      <div class="item box-big8">h</div>
-      <div class="item box-big9">i</div>
-      <div class="item box-big10">j</div>
+      {% for view_list in object_list %}
+        <div class="item box-big{{view_list.id}}">
+          <div class="hide_text">
+            <p class='text'>{{view_list.comments}}</p>
+          </div>
+          <div class='img_item'>
+            <img src="{{view_list.article_image}}" alt="">
+          </div>
+          {% for view in fab_view %}
+           {% if view.article_id == view_list.id %}
+            {% if view.flag == 0 %}
+
+            <div class="heart">
+              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+            </div>
+  
+            {% elif view.flag == 1 %}
+            <div class="heart commit">
+              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+            </div>
+            {% else %}
+            <div class="heart">
+              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+            </div>
+            {% endif %}
+           {% endif %}
+         {% endfor %}
+        </div>
+      {% endfor %}
     </div>
   </div>
 </div>

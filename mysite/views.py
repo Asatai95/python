@@ -5,9 +5,9 @@ from django import *
 from django.conf import settings
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import loader
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, TemplateView
 from django.contrib.auth import login, authenticate
-from django.shortcuts import redirect, render, resolve_url
+from django.shortcuts import redirect, render, resolve_url, render_to_response
 from django.views import View, generic
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -24,6 +24,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 from django.db import models
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -46,6 +47,15 @@ from config.settings import *
 データベース
 """
 Get_user = get_user_model()
+ArticleMain = Article.objects.all()
+ArticleImage = RoomImage.objects.all()
+
+"""
+ログインしていない場合、Loginページ
+"""
+class MyView(LoginRequiredMixin, TemplateView):
+    login_url = '/login/'
+    template_name = 'apps/index.html'
 
 
 """
@@ -55,6 +65,7 @@ class Login(LoginView):
 
     form_class= LoginForm
     template_name = 'register/login.html'
+
 
 """
 ログアウト機能
@@ -204,6 +215,33 @@ class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
     template_name = 'register/user_detail.html'
 
+    def get_context_data(self, **kwargs):
+
+        context = super(IndexView, self).get_context_data(**kwargs)
+        floor_list = ArticleFloor.objects.all().order_by('floor_id')
+        room_list = ArticleRoom.objects.all().order_by('room_id')
+        context['floor_list'] = floor_list
+        context['room_list'] = room_list
+
+        return context
+
+    def get(self, request, **kwargs):
+
+        tmp_fab = []
+        tmp_article = []
+        fab = Fab.objects.filter(user=request.user ,flag=1).values('article', 'updated_at')
+        for tmp in fab:
+            fab_dic = {'article': tmp['article'], 'updated': tmp['updated_at']}
+            tmp_fab.append(fab_dic)
+
+        article = ArticleMain.values('id', 'article_name', 'article_image', 'comments')
+        for tmp in article:
+            article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
+            tmp_article.append(article_dic)
+
+        return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
+
+
 
 """
 マイページ更新
@@ -218,9 +256,9 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
         User = Get_user.objects.all().filter(pk=self.kwargs['pk'])
         img_file = self.request.FILES['img_file'].name
         img_filename = Image.open(self.request.FILES['img_file'])
-        img_filename.save(os.path.join('./media/img/', img_file))
+        img_filename.save(os.path.join('./static/img/', img_file))
 
-        img_file = os.path.join('/media/img/', img_file)
+        img_file = os.path.join('/static/img/', img_file)
         for user in User:
             user.image = user
         user.image = img_file
@@ -229,12 +267,80 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
         return resolve_url('register:user_detail', pk=self.kwargs['pk'])
 
 """
-TOPページ View
+TOPページ, 検索機能
 """
-class Main(View):
-
+class MainView(generic.ListView):
+    model = Article
     template_name = 'apps/index.html'
 
-    def get(self, request, *args, **kwargs):
+    def get_context_data(self, **kwargs):
 
-        return render(request, self.template_name)
+        context = super(MainView, self).get_context_data(**kwargs)
+        floor_list = ArticleFloor.objects.all().order_by('floor_id')
+        room_list = ArticleRoom.objects.all().order_by('room_id')
+        fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
+
+        context['floor_list'] = floor_list
+        context['room_list'] = room_list
+        context['fab_view'] = fab_view
+
+        return context
+
+    def get_queryset(self):
+
+        object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan')
+        article = self.request.GET.get('name')
+        address = self.request.GET.get('article_address')
+        floor = self.request.GET.get('floor')
+        room = self.request.GET.get('room')
+
+        if article is not None:
+            if article != "":
+                object_list = object_list.filter(article_name__contains=article)
+            else:
+                pass
+
+        if address is not None:
+            if article != "":
+                object_list = object_list.filter(address__contains=address)
+            else:
+                pass
+
+
+        if floor is not None:
+            if floor != "":
+                object_list = object_list.filter(floor_number__contains=floor)
+            else:
+                pass
+
+        if room is not None:
+            if room != "":
+                object_list = object_list.filter(floor_plan__contains=room)
+            else:
+                pass
+
+        return object_list
+
+
+"""
+お気に入り機能
+"""
+class Like(generic.View):
+    def get(request, *args, **kwargs):
+        fab_db = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id'])
+        is_fab = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id']).values("flag")
+
+        if not is_fab:
+            Fab(user_id=kwargs['pk'], article_id=kwargs['article_id'], flag=1).save()
+            return redirect('apps:top')
+        for fab in is_fab:
+            is_fab = fab.get("flag")
+
+        # unlike
+        if is_fab > 0:
+            fab_db.update(flag=0)
+            return redirect('apps:top')
+        # like
+        else:
+            fab_db.update(flag=1)
+            return redirect('apps:top')

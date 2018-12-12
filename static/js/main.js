@@ -70,3 +70,28 @@ $(function(){
     $(".sample_img").css("display", "none");
   }
 });
+
+$(function(){
+  $('.item').mouseover(function() {
+    $(this).find("p.text").css('display', 'block');
+    $(this).find("p.text").css('color', 'white');
+  }).mouseout(function(){
+    $(this).find("p.text").css('display', 'none');
+  });
+});
+
+$(function(){
+  $('#fade-in li.first').focusin(function() {
+    $('#fade-in li.first ul li').fadeIn();
+  }).focusout(function(){
+    $('#fade-in li.first ul li').fadeOut();
+  });
+});
+
+$(function(){
+  $('#fade-in li.last').focusin(function() {
+    $(this).find("p.text").fadeIn();
+  }).focusout(function(){
+    $(this).find("p.text").fadeOut();
+  });
+});

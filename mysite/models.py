@@ -52,7 +52,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     """カスタムユーザーモデル."""
 
-
+    id = models.AutoField(primary_key=True)
     username = models.CharField(_('username'), max_length=150)
     email = models.EmailField(_('email'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
@@ -101,12 +101,95 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
-    #
-    # @property
-    # def username(self):
-    #     """username属性のゲッター
-    #
-    #     他アプリケーションが、username属性にアクセスした場合に備えて定義
-    #     メールアドレスを返す
-    #     """
-    #     return self.email
+class Article(models.Model):
+    """カスタム物件モデル."""
+
+    id = models.AutoField(primary_key=True)
+    article_name = models.CharField(_('article name'), max_length=150)
+    comments = models.CharField(_('comments'), max_length=150)
+    article_image = models.ImageField(_('article image'), max_length=150)
+    address = models.CharField(_('address'), max_length=150)
+    rent = models.CharField(_('rent'), max_length=150)
+    park = models.CharField(_('park'), max_length=150)
+    initial_cost = models.CharField(_('initial cost'), max_length=150)
+    floor_plan = models.CharField(_('floor plan'), max_length=150)
+    common_service_expense = models.CharField(_('common service expense'), max_length=150)
+    term_of_contract = models.CharField(_('term of contract'), max_length=150)
+    floor_number = models.CharField(_('floor number'), max_length=150)
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    published_at = models.DateTimeField(_('published at'), default=timezone.now)
+
+
+    class Meta:
+        verbose_name = _('article')
+        verbose_name_plural = _('articles')
+        db_table = 'article'
+
+    def __str__(self):
+        return self.article_name
+
+class RoomImage(models.Model):
+    """部屋の画像"""
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    image = models.ImageField(_('image'), max_length=150)
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+
+    class Meta:
+        verbose_name = _('images')
+        verbose_name_plural = _('images')
+        db_table = 'images'
+
+    def save(self, *args, **kwargs):
+        self.article = article
+        super(RoomImage, self).save(*args, **kwargs)
+
+class Others(models.Model):
+    """概要欄"""
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    comment = models.ImageField(_('comment'), max_length=150)
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+
+    class Meta:
+        verbose_name = _('others')
+        verbose_name_plural = _('others')
+        db_table = 'others'
+
+    def __str__(self):
+        return self.comment
+
+class Fab(models.Model):
+    """お気に入り機能"""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_key")
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="article_key")
+    flag = models.IntegerField()
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
+
+    class Meta:
+        verbose_name = _('fab')
+        verbose_name_plural = _('fab')
+        db_table = 'fab'
+
+class ArticleRoom(models.Model):
+    """サンプル物件モデル(View用)"""
+
+    id = models.AutoField(primary_key=True)
+    room = models.OneToOneField(Article, on_delete=models.CASCADE, related_name="room_key")
+
+    class Meta:
+
+        db_table = 'sample_room'
+
+class ArticleFloor(models.Model):
+    """サンプル物件モデル(View用)"""
+
+    id = models.AutoField(primary_key=True)
+    floor = models.OneToOneField(Article, on_delete=models.CASCADE, related_name="floor_key")
+
+    class Meta:
+
+        db_table = 'sample_floor'
