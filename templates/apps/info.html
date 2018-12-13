@@ -1,0 +1,54 @@
+{% extends 'apps/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class='content_main'>
+  {% for view_list in object_list %}
+  <div class='topic'>
+    <div class='image_field'>
+      <div class='image_contents'>
+        <li><img src="{{view_list.room_images.image}}" alt=""></li>
+      </div>
+    </div>
+      <table class="table">
+        <tbody>
+            <tr>
+                <th>名称</th>
+                <td>{{view_list.article_name}}</td>
+            </tr>
+            <tr>
+                <th>住所</th>
+                <td>{{view_list.address}}</td>
+            </tr>
+            <tr>
+                <th>家賃</th>
+                <td>{{view_list.rent}}</td>
+            </tr>
+            <tr>
+                <th>駐車場</th>
+                <td>{{view_list.park}}</td>
+            </tr>
+            <tr>
+                <th>初期費用</th>
+                <td>{{view_list.initial_cost}}</td>
+            </tr>
+            <tr>
+                <th>間取り</th>
+                <td>{{view_list.floor_plan}}</td>
+            </tr>
+            <tr>
+                <th>共益費用</th>
+                <td>{{view_list.term_of_contract}}</td>
+            </tr>
+            <tr>
+                <th>その他</th>
+                <td>{{view_list.others.comment}}</td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

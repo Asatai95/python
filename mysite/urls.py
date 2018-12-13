@@ -25,6 +25,8 @@ urlpatterns = [
     path('user_detail/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
     path('user_update/<int:pk>/', views.UserUpdate.as_view(), name='user_update'),
     path('fab/<int:pk>/<int:article_id>/', views.Like.as_view(), name='fab'),
+    path('roomii/info/<int:article_id>', views.InfoView.as_view(), name='info'),
+    path('roomii/create/', views.ArticleEdit.as_view(), name='create'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

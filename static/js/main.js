@@ -95,3 +95,9 @@ $(function(){
     $(this).find("p.text").fadeOut();
   });
 });
+
+$(function(){
+  $(document).ready(function(){
+    $('.image_contents img').slick();
+  });
+});

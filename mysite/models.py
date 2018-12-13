@@ -100,39 +100,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+class Others(models.Model):
+    """概要欄"""
 
-class Article(models.Model):
-    """カスタム物件モデル."""
-
-    id = models.AutoField(primary_key=True)
-    article_name = models.CharField(_('article name'), max_length=150)
-    comments = models.CharField(_('comments'), max_length=150)
-    article_image = models.ImageField(_('article image'), max_length=150)
-    address = models.CharField(_('address'), max_length=150)
-    rent = models.CharField(_('rent'), max_length=150)
-    park = models.CharField(_('park'), max_length=150)
-    initial_cost = models.CharField(_('initial cost'), max_length=150)
-    floor_plan = models.CharField(_('floor plan'), max_length=150)
-    common_service_expense = models.CharField(_('common service expense'), max_length=150)
-    term_of_contract = models.CharField(_('term of contract'), max_length=150)
-    floor_number = models.CharField(_('floor number'), max_length=150)
+    article_id = models.CharField(_('article id'), max_length=45)
+    comment = models.CharField(_('comment'), max_length=150)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-    published_at = models.DateTimeField(_('published at'), default=timezone.now)
-
 
     class Meta:
-        verbose_name = _('article')
-        verbose_name_plural = _('articles')
-        db_table = 'article'
+        verbose_name = _('others')
+        verbose_name_plural = _('others')
+        db_table = 'others'
 
     def __str__(self):
-        return self.article_name
+        return self.comment
 
 class RoomImage(models.Model):
     """部屋の画像"""
 
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    article_id = models.CharField(_('floor number'), max_length=45)
     image = models.ImageField(_('image'), max_length=150)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
 
@@ -145,20 +131,35 @@ class RoomImage(models.Model):
         self.article = article
         super(RoomImage, self).save(*args, **kwargs)
 
-class Others(models.Model):
-    """概要欄"""
+class Article(models.Model):
+    """カスタム物件モデル."""
 
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    comment = models.ImageField(_('comment'), max_length=150)
+    id = models.AutoField(primary_key=True)
+    article_name = models.CharField(_('article name'), max_length=150)
+    comments = models.CharField(_('comments'), max_length=150)
+    room_images = models.ForeignKey(RoomImage, on_delete=models.CASCADE, related_name="image_key")
+    article_image = models.ImageField(_('article image'), max_length=150)
+    address = models.CharField(_('address'), max_length=150)
+    rent = models.CharField(_('rent'), max_length=150)
+    park = models.CharField(_('park'), max_length=150)
+    initial_cost = models.CharField(_('initial cost'), max_length=150)
+    floor_plan = models.CharField(_('floor plan'), max_length=150)
+    common_service_expense = models.CharField(_('common service expense'), max_length=150)
+    term_of_contract = models.CharField(_('term of contract'), max_length=150)
+    floor_number = models.CharField(_('floor number'), max_length=150)
+    others = models.ForeignKey(Others, on_delete=models.CASCADE, related_name="comment_key")
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    published_at = models.DateTimeField(_('published at'), default=timezone.now)
+
 
     class Meta:
-        verbose_name = _('others')
-        verbose_name_plural = _('others')
-        db_table = 'others'
+        verbose_name = _('article')
+        verbose_name_plural = _('articles')
+        db_table = 'article'
 
     def __str__(self):
-        return self.comment
+        return self.article_name
 
 class Fab(models.Model):
     """お気に入り機能"""

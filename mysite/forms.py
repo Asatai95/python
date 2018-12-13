@@ -97,3 +97,19 @@ class UserUpdateForm(forms.ModelForm):
     #     super().__init__(*args, **kwargs)
     #     for field in self.fields.values():
     #         field.widget.attrs['class'] = 'form-control'
+
+class Createform(forms.ModelForm):
+    """物件登録"""
+
+    others = forms.CharField()
+    article_image = forms.ImageField(required=False)
+
+    class Meta:
+        model = Article
+        fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan",  "term_of_contract")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+
+            field.widget.attrs['class'] = 'form-control'

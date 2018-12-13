@@ -12,7 +12,7 @@
             <p class='text'>{{view_list.comments}}</p>
           </div>
           <div class='img_item'>
-            <img src="{{view_list.article_image}}" alt="">
+            <a href="{%url 'apps:info' view_list.id %}"><img src="{{view_list.article_image}}" alt="">
           </div>
           {% for view in fab_view %}
            {% if view.article_id == view_list.id %}
@@ -21,7 +21,7 @@
             <div class="heart">
               <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
             </div>
-  
+
             {% elif view.flag == 1 %}
             <div class="heart commit">
               <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
@@ -38,5 +38,6 @@
     </div>
   </div>
 </div>
+
 
 {% endblock %}

@@ -35,7 +35,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import (
     LoginForm, UserCreateForm, MyPasswordChangeForm, MyPasswordResetForm, MySetPasswordForm,
-    UserUpdateForm
+    UserUpdateForm, Createform
 )
 
 """
@@ -344,3 +344,47 @@ class Like(generic.View):
         else:
             fab_db.update(flag=1)
             return redirect('apps:top')
+
+"""
+詳細情報
+"""
+class InfoView(generic.ListView):
+    model = Article
+    template_name = 'apps/info.html'
+
+    def get_context_data(self, **kwargs):
+
+        context = super(InfoView, self).get_context_data(**kwargs)
+        floor_list = ArticleFloor.objects.all().order_by('floor_id')
+        room_list = ArticleRoom.objects.all().order_by('room_id')
+        fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
+
+        context['floor_list'] = floor_list
+        context['room_list'] = room_list
+        context['fab_view'] = fab_view
+
+        return context
+
+    def get_queryset(self, **kwargs):
+        get = self.request.path.replace('/roomii/info/', '')
+        context = super(InfoView, self).get_queryset()
+        object_list = self.model.objects.filter(id=get)
+
+
+        return object_list
+
+"""
+物件登録、編集
+"""
+class ArticleEdit(generic.CreateView):
+    model = Article
+    form_class= Createform
+    template_name = 'company/create_form.html'
+
+    def form_valid(self, form):
+
+        article = form.save(commit=False)
+        article.is_active = True
+        article.save()
+
+        return redirect("/roomii/")
