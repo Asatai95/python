@@ -76,6 +76,7 @@ header {
 .dropmenu li ul li{
   width: 100%;
   display: none;
+  /*opacity: 0;*/
 }
 
 .dropmenu li ul li a{
@@ -981,125 +982,112 @@ a:hover {
   margin-top: 100px;
 }
 
-.main_container {
-  display: grid;
-  grid-gap: 10px;
-  grid-template-columns: 1.5fr .5fr .5fr 1.5fr;
-  grid-template-rows: 310px 50px 310px 310px 50px 310px auto;
-}
-
 .item img {
   width: 100%;
   height: 100%;
 }
 
-.img_item:hover {
-  filter: brightness(50%);
-  color: white;
-}
-
 .hide_text {
   z-index: 10;
-  display: table-cell;
-  vertical-align: middle;
+  width: 260px;
+  height: 200px;
+  position: absolute;
+  margin: 10px;
   cursor: pointer;
 }
 
 .text {
+  top: 30px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
   position: absolute;
   z-index: 10;
-  width: 47%;
   font-size: 25px;
   font-weight: 600;
   display: none;
 }
 
 .item {
+  float: left;
+  margin: 20px;
+  width: 300px;
+  height: 330px;
   background: #ddd;
   padding: 10px;
   border-radius: 8px;
   border: 3px solid #ccc;
   display: table;
-  width: 100%;
-  height: 450px;
 }
 
 .box-big1 {
-  grid-column: 1/3;
-  grid-row: 1/3;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big2 {
-  grid-column: 3/5;
-  grid-row: 1/3;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big3 {
-  grid-row: 3 / 4;
+
   background: #fc2;
   border-color: #fa0;
-  grid-column: 2/4;
+
 }
 
 .box-big4 {
-  grid-column: 1 / 2;
+
   background: #0ba;
   border-color: #098;
 }
 
 .box-big5 {
-  grid-column: 4/5;
-  grid-row: 3/3;
+
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big6 {
-  grid-column: 1/2;
-  grid-row: 4/5;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big7 {
-  grid-column: 4/5;
-  grid-row: 4/5;
+
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big8 {
-  grid-column: 1/3;
-  grid-row: 5/7;
+
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big9 {
-  grid-column: 3/5;
-  grid-row: 5/7;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big10 {
-  grid-row: 4 / 5;
+
   background: #fc2;
   border-color: #fa0;
-  grid-column: 2/4;
+
 }
 
 .heart {
+  position: absolute;
+  z-index: 20;
   width: 100px;
   height: 100px;
   background: url('http://nelog.jp/wp-content/uploads/2016/03/heart_animation.png') no-repeat;
   background-position: 0 0;
   cursor: pointer;
 }
+
 .heart:hover {
   background-position: -2800px 0;
   -webkit-transition: background 1s steps(28);
@@ -1107,6 +1095,8 @@ a:hover {
 }
 
 .heart.commit {
+  position: absolute;
+  z-index: 20;
   background-position: -2800px 0;
   -webkit-transition: background 1s steps(28);
   transition: background 1s steps(28);

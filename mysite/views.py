@@ -10,7 +10,7 @@ from django.contrib.auth import login, authenticate
 from django.shortcuts import redirect, render, resolve_url, render_to_response
 from django.views import View, generic
 from django.urls import reverse
-from django.contrib.auth.decorators import login_required
+
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import (
@@ -24,7 +24,8 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 from django.db import models
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor
+from django.db.models import Q
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -67,6 +68,7 @@ class Login(LoginView):
     template_name = 'register/login.html'
 
 
+
 """
 ログアウト機能
 """
@@ -91,7 +93,10 @@ class UserCreate(generic.CreateView):
         """仮登録と本登録用メールの発行."""
         # 仮登録と本登録の切り替えは、is_active属性を使うと簡単です。
         # 退会処理も、is_activeをFalseにするだけにしておくと捗ります。
+
         user = form.save(commit=False)
+        img_file = os.path.join('/static/img/profile.png')
+        user.image = img_file
         user.is_active = False
         user.save()
 
@@ -211,6 +216,7 @@ class PermissionsMypage(UserPassesTestMixin):
 """
 マイページ
 """
+
 class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
     template_name = 'register/user_detail.html'
@@ -275,14 +281,18 @@ class MainView(generic.ListView):
 
     def get_context_data(self, **kwargs):
 
+        tmp_list = []
+
         context = super(MainView, self).get_context_data(**kwargs)
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id')
         fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
+        live = ArticleLive.objects.all()
 
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
+        context['live'] = live
 
         return context
 
@@ -290,34 +300,29 @@ class MainView(generic.ListView):
 
         object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan')
         article = self.request.GET.get('name')
+        if article is "" or article is None:
+            article = "選択なし"
         address = self.request.GET.get('article_address')
-        floor = self.request.GET.get('floor')
-        room = self.request.GET.get('room')
+        if address is "" or address is None:
+            address = '選択なし'
+        floor = self.request.GET.getlist('floor')
+        if floor is None:
+            floor = '選択なし'
+        room = self.request.GET.getlist('room')
+        if room is None:
+            room = '選択なし'
 
-        if article is not None:
-            if article != "":
-                object_list = object_list.filter(article_name__contains=article)
-            else:
-                pass
+        if article is not None or address is not None or floor is not None or room is not None:
+            object_list = object_list.filter(
+                   Q(article_name__contains=article) | Q(address__contains=address)
+            )
+            if not object_list:
+                object_list = object_list.filter(
+                      Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                )
 
-        if address is not None:
-            if article != "":
-                object_list = object_list.filter(address__contains=address)
-            else:
-                pass
-
-
-        if floor is not None:
-            if floor != "":
-                object_list = object_list.filter(floor_number__contains=floor)
-            else:
-                pass
-
-        if room is not None:
-            if room != "":
-                object_list = object_list.filter(floor_plan__contains=room)
-            else:
-                pass
+        if not object_list:
+            object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan')
 
         return object_list
 
@@ -329,21 +334,19 @@ class Like(generic.View):
     def get(request, *args, **kwargs):
         fab_db = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id'])
         is_fab = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id']).values("flag")
-
+        print(is_fab)
         if not is_fab:
             Fab(user_id=kwargs['pk'], article_id=kwargs['article_id'], flag=1).save()
-            return redirect('apps:top')
-        for fab in is_fab:
-            is_fab = fab.get("flag")
-
+            return redirect("apps:top")
         # unlike
-        if is_fab > 0:
-            fab_db.update(flag=0)
-            return redirect('apps:top')
-        # like
-        else:
-            fab_db.update(flag=1)
-            return redirect('apps:top')
+        for fab in is_fab:
+            if fab['flag']> 0:
+                fab_db.update(flag=0)
+                return redirect("apps:top")
+            # like
+            else:
+                fab_db.update(flag=1)
+                return redirect("apps:top")
 
 """
 詳細情報
@@ -369,8 +372,9 @@ class InfoView(generic.ListView):
         get = self.request.path.replace('/roomii/info/', '')
         context = super(InfoView, self).get_queryset()
         object_list = self.model.objects.filter(id=get)
-
-
+        
+        for test in object_list:
+            print(test.live_flag.vacancy_info)
         return object_list
 
 """
@@ -381,10 +385,11 @@ class ArticleEdit(generic.CreateView):
     form_class= Createform
     template_name = 'company/create_form.html'
 
-    def form_valid(self, form):
-
-        article = form.save(commit=False)
-        article.is_active = True
+    def get_success_url(self):
+        form = Createform(self.POST, self.FIELS)
+        print(form.cleaned_data['article_image'])
+        article = Article
+        article.article_image = form.cleaned_data['article_image']
         article.save()
 
-        return redirect("/roomii/")
+        return resolve_url('apps:top')

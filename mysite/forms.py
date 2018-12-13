@@ -101,15 +101,28 @@ class UserUpdateForm(forms.ModelForm):
 class Createform(forms.ModelForm):
     """物件登録"""
 
-    others = forms.CharField()
-    article_image = forms.ImageField(required=False)
+    article_image = forms.ImageField()
 
     class Meta:
         model = Article
-        fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan",  "term_of_contract")
+        fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan", "comments", "term_of_contract", "common_service_expense", "floor_number", "others")
+        label_tag = ("名称", "住所", "家賃", "駐車場", "初期費用", "間取り", "コメント", "契約期間", "共益費用", "階数", "その他")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
 
             field.widget.attrs['class'] = 'form-control'
+#
+# class Updateform(forms.ModelForm):
+#     """物件更新"""
+#
+#     class Meta:
+#         model = Article
+#         fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan", "comments", "term_of_contract", "common_service_expense", "floor_number", "others")
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         for field in self.fields.values():
+#
+#             field.widget.attrs['class'] = 'form-control'

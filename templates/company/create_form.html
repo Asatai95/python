@@ -7,6 +7,7 @@
         <p class='logo text'>roomii <br/> 【物件登録】</p>
       </div>
       <form action="" method="POST">
+        {% csrf_token %}
         <div class='error'>
           <span class="error_meaasage" id="username_error"></span>
         </div>

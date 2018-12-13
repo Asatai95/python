@@ -131,14 +131,32 @@ class RoomImage(models.Model):
         self.article = article
         super(RoomImage, self).save(*args, **kwargs)
 
+class ArticleLive(models.Model):
+    """カスタム物件モデル"""
+
+    id = models.AutoField(primary_key=True)
+    article_id = models.CharField(_('article id'), max_length=45)
+    vacancy_info = models.CharField(_('vacancy live'), max_length=45)
+    vacancy_live = models.CharField(_('vacancy live'), max_length=45)
+    start_date = models.CharField(_('start date'), max_length=45)
+    update_date = models.CharField(_('update date'), max_length=45)
+    cancel_date = models.CharField(_('cancel date'), max_length=45)
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
+
+    class Meta:
+        verbose_name = _('article live')
+        verbose_name_plural = _('article live')
+        db_table = 'article_live'
+
 class Article(models.Model):
-    """カスタム物件モデル."""
+    """カスタム物件モデル"""
 
     id = models.AutoField(primary_key=True)
     article_name = models.CharField(_('article name'), max_length=150)
     comments = models.CharField(_('comments'), max_length=150)
     room_images = models.ForeignKey(RoomImage, on_delete=models.CASCADE, related_name="image_key")
-    article_image = models.ImageField(_('article image'), max_length=150)
+    article_image = models.ImageField(_('article image'), upload_to='media')
     address = models.CharField(_('address'), max_length=150)
     rent = models.CharField(_('rent'), max_length=150)
     park = models.CharField(_('park'), max_length=150)
@@ -148,6 +166,7 @@ class Article(models.Model):
     term_of_contract = models.CharField(_('term of contract'), max_length=150)
     floor_number = models.CharField(_('floor number'), max_length=150)
     others = models.ForeignKey(Others, on_delete=models.CASCADE, related_name="comment_key")
+    live_flag = models.ForeignKey(ArticleLive, on_delete=models.CASCADE, related_name="article_live_key")
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
     published_at = models.DateTimeField(_('published at'), default=timezone.now)

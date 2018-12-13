@@ -12,25 +12,56 @@
             <p class='text'>{{view_list.comments}}</p>
           </div>
           <div class='img_item'>
-            <a href="{%url 'apps:info' view_list.id %}"><img src="{{view_list.article_image}}" alt="">
+            <a href="{%url 'apps:info' view_list.id %}">
+              <img src="{{view_list.article_image}}" alt="">
+            </a>
           </div>
+          {%for article_live in live %}
+            {% if article_live.live_flag.article_id == view_list.id %}
+            <!-- {{article_live.live_flag.vacancy_info}} -->
+              {% if article_live.live_flag.vacancy_info == '0' %}
+              <div class='empty_flag'>
+                <span>空室あり</span>
+              </div>
+              {% else %}
+              <div class='empty_flag'>
+                <span>空室なし</span>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+          {% if not fab_view %}
+          <!-- <form action="" method="get"> -->
+            <div class="heart">
+              <!-- <input id="heart" type="submit" value="" /> -->
+              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+            </div>
+          <!-- </form> -->
+          {%endif%}
           {% for view in fab_view %}
            {% if view.article_id == view_list.id %}
+
             {% if view.flag == 0 %}
+            <!-- <form action="" method="get"> -->
+              <div class="heart">
+                <!-- <input id="heart" type="submit" value="" /> -->
+                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
 
-            <div class="heart">
-              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-            </div>
-
-            {% elif view.flag == 1 %}
-            <div class="heart commit">
-              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-            </div>
+              </div>
+            <!-- </form> -->
             {% else %}
-            <div class="heart">
-              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-            </div>
+            <!-- <form action="" method="get"> -->
+              <div class="heart commit">
+                <!-- <input id="heart" type="submit" value="" /> -->
+                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+
+              </div>
             {% endif %}
+           {% else %}
+              <div class="heart">
+                <!-- <input id="heart" type="submit" value="" /> -->
+                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+              </div>
            {% endif %}
          {% endfor %}
         </div>

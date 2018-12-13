@@ -2,6 +2,7 @@
 from django.urls import path, include
 from django.conf.urls import url
 from . import views
+from django.contrib.auth.decorators import login_required
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -10,9 +11,9 @@ from django.conf.urls.static import static
 app_name = 'mysite'
 
 urlpatterns = [
-    path('roomii/', views.MainView.as_view(), name='top'),
+    path('roomii/', login_required(views.MainView.as_view()), name='top'),
     path('login/', views.Login.as_view(), name='login'),
-    path('logout/', views.Logout.as_view(), name='logout'),
+    path('logout/', login_required(views.Logout.as_view()), name='logout'),
     path('user_create/', views.UserCreate.as_view(), name='user_create'),
     path('user_create/done/', views.UserCreateDone.as_view(), name='user_create_done'),
     path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
@@ -22,11 +23,11 @@ urlpatterns = [
     path('password_reset/done/', views.PasswordResetDone.as_view(), name='password_reset_done'),
     path('password_reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
     path('password_reset/complete/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
-    path('user_detail/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
-    path('user_update/<int:pk>/', views.UserUpdate.as_view(), name='user_update'),
-    path('fab/<int:pk>/<int:article_id>/', views.Like.as_view(), name='fab'),
-    path('roomii/info/<int:article_id>', views.InfoView.as_view(), name='info'),
-    path('roomii/create/', views.ArticleEdit.as_view(), name='create'),
+    path('user_detail/<int:pk>/', login_required(views.UserDetail.as_view()), name='user_detail'),
+    path('user_update/<int:pk>/', login_required(views.UserUpdate.as_view()), name='user_update'),
+    path('fab/<int:pk>/<int:article_id>/', login_required(views.Like.as_view()), name='fab'),
+    path('roomii/info/<int:article_id>', login_required(views.InfoView.as_view()), name='info'),
+    path('roomii/create/', login_required(views.ArticleEdit.as_view()), name='create'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

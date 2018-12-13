@@ -72,7 +72,15 @@ $(function(){
 });
 
 $(function(){
-  $('.item').mouseover(function() {
+  $('.image_item').mouseover(function() {
+    $(this).css('filter', 'brightness(50%)');
+  }).mouseout(function(){
+    $(this).css('filter', 'brightness(100%)');
+  });
+});
+
+$(function(){
+  $('.hide_text').mouseover(function() {
     $(this).find("p.text").css('display', 'block');
     $(this).find("p.text").css('color', 'white');
   }).mouseout(function(){
@@ -80,24 +88,28 @@ $(function(){
   });
 });
 
-$(function(){
-  $('#fade-in li.first').focusin(function() {
-    $('#fade-in li.first ul li').fadeIn();
-  }).focusout(function(){
-    $('#fade-in li.first ul li').fadeOut();
+$(function() {
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.last ul a').length) {
+      $('#fade-in li.last ul li').fadeOut();
+    } else if ($(e.target).closest('li.last ul').length) {
+
+      if ($('#fade-in li.last ul li').css('display') == 'none') {
+        $('#fade-in li.last ul li').fadeIn();
+
+      }
+    }
   });
 });
+$(function() {
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.first ul a').length) {
+      $('#fade-in li.first ul li').fadeOut();
+    } else if ($(e.target).closest('li.first ul').length) {
 
-$(function(){
-  $('#fade-in li.last').focusin(function() {
-    $(this).find("p.text").fadeIn();
-  }).focusout(function(){
-    $(this).find("p.text").fadeOut();
-  });
-});
-
-$(function(){
-  $(document).ready(function(){
-    $('.image_contents img').slick();
+      if ($('#fade-in li.first ul li').css('display') == 'none') {
+        $('#fade-in li.first ul li').fadeIn();
+      }
+    }
   });
 });
