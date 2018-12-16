@@ -13,58 +13,67 @@
           </div>
           <div class='img_item'>
             <a href="{%url 'apps:info' view_list.id %}">
-              <img src="{{view_list.article_image}}" alt="">
+              <img src="/media/{{view_list.article_image}}" alt="">
             </a>
           </div>
+          {% if user.is_staff is False%}
           {%for article_live in live %}
-            {% if article_live.live_flag.article_id == view_list.id %}
-            <!-- {{article_live.live_flag.vacancy_info}} -->
-              {% if article_live.live_flag.vacancy_info == '0' %}
+            {% if article_live.article_id == view_list.id %}
+              {% if article_live.vacancy_info == '0' %}
               <div class='empty_flag'>
                 <span>空室あり</span>
               </div>
               {% else %}
               <div class='empty_flag'>
-                <span>空室なし</span>
+                <span>空室なし<br/>{{article_live.vacancy_live}}</span>
               </div>
               {% endif %}
             {% endif %}
           {% endfor %}
           {% if not fab_view %}
           <!-- <form action="" method="get"> -->
-            <div class="heart">
-              <!-- <input id="heart" type="submit" value="" /> -->
-              <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-            </div>
+          <div class="heart">
+            <!-- <input id="heart" type="submit" value="" /> -->
+            <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+          </div>
           <!-- </form> -->
-          {%endif%}
-          {% for view in fab_view %}
-           {% if view.article_id == view_list.id %}
-
-            {% if view.flag == 0 %}
-            <!-- <form action="" method="get"> -->
-              <div class="heart">
-                <!-- <input id="heart" type="submit" value="" /> -->
-                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-
-              </div>
-            <!-- </form> -->
-            {% else %}
-            <!-- <form action="" method="get"> -->
-              <div class="heart commit">
-                <!-- <input id="heart" type="submit" value="" /> -->
-                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-
-              </div>
-            {% endif %}
-           {% else %}
-              <div class="heart">
-                <!-- <input id="heart" type="submit" value="" /> -->
-                <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-              </div>
-           {% endif %}
-         {% endfor %}
+          {% endif %}
+            {% for view in fab_view %}
+              {% if view.article_id != view_list.id %}
+               <!-- <form action="" method="get"> -->
+               <div class="heart">
+                 <!-- <input id="heart" type="submit" value="" /> -->
+                 <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+               </div>
+               <!-- </form> -->
+               {% endif %}
+                {% if view.article_id == view_list.id %}
+                 {% if view.flag == 0 %}
+                 <!-- <form action="" method="get"> -->
+                   <div class="heart">
+                     <!-- <input id="heart" type="submit" value="" /> -->
+                     <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+                   </div>
+                 <!-- </form> -->
+                 {% else %}
+                 <!-- <form action="" method="get"> -->
+                   <div class="heart commit">
+                     <!-- <input id="heart" type="submit" value="" /> -->
+                     <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+                   </div>
+                 {% endif %}
+               {% endif %}
+              {% endfor %}
+             {%else%}
+             <div class='create'>
+               <button type="button" name="button"><a href="{%url 'apps:create' %}">物件登録</a></button>
+             </div>
+             <div class='update'>
+               <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
+             </div>
+             {%endif%}
         </div>
+
       {% endfor %}
     </div>
   </div>

@@ -1,0 +1,43 @@
+{% extends 'company/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class='content_main'>
+  <div class='topic'>
+    <div class="main_container">
+      {% for view_list in object_list %}
+        <div class="item box-big{{view_list.id}}">
+          <div class="hide_text">
+            <p class='text'>{{view_list.comments}}</p>
+          </div>
+          <div class='img_item'>
+            <a href="{%url 'apps:info' view_list.id %}">
+              <img src="/media/{{view_list.article_image}}" alt="">
+            </a>
+          </div>
+          {%for article_live in live %}
+            {% if article_live.article_id == view_list.id %}
+              {% if article_live.vacancy_info == '0' %}
+              <div class='empty_flag'>
+                <span>空室あり</span>
+              </div>
+              {% else %}
+              <div class='empty_flag'>
+                <span>空室なし<br/>{{article_live.vacancy_live}}</span>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+
+        </div>
+        <!-- <div class='info_id'>
+          <a href="{%url 'apps:update' view_list.id %}">物件更新</a>
+        </div> -->
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

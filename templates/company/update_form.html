@@ -1,0 +1,198 @@
+{% extends "apps/base.html" %}
+{% block content %}
+{% load static %}
+<div class="article">
+  <div class="form contents">
+    <main id="profile_edit">
+      <div class="logo">
+        <p class="logo text">roomii <br> 【物件情報更新】</p>
+      </div>
+      {% for view in list_view %}
+      <form action="" method="POST" enctype="multipart/form-data">
+        <div class="error">
+          <span class="error_meaasage" id="username_error"></span>
+        </div>
+
+
+        <div class="form-group">
+          <label for="id_article_image"><label for="id_article_image">メイン画像</label></label>
+          <img class='media_img' src="/media/{{view.article_image}}" alt="">
+          <input type="file" name="article_image" required="" class="form-control" id="id_article_image">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_article_name"><label for="id_article_name">名称</label></label>
+          <input type="text" name="article_name" required="" class="form-control" id="id_article_name" maxlength="150" value='{{view.article_name}}'>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_comments"><label for="id_comments">キャッチコピー</label></label>
+          <input type="text" name="comments" required="" class="form-control" id="id_comments" maxlength="150" value='{{view.comments}}'>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_address"><label for="id_address">住所</label></label>
+          <input type="text" name="address" required="" class="form-control" id="id_address" maxlength="150" value='{{view.address}}'>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_rent"><label for="id_rent">家賃</label></label>
+          <input type="text" name="rent" required="" class="form-control" id="id_rent" maxlength="150" value="{{view.rent}}">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_park"><label for="id_park">駐車場</label></label>
+          <select name="park" required="" class="form-control" id="id_park">
+            <option value="" selected="">選択肢から選んでください</option>
+
+            <option value="駐車場あり">あり</option>
+
+            <option value="駐車場なし">なし</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_floor_plan"><label for="id_floor_plan">間取り</label></label>
+          <select name="floor_plan" required="" class="form-control" id="id_floor_plan">
+            <option value="" selected="">選択肢から選んでください</option>
+
+            <option value="1L">1L</option>
+
+            <option value="1DK">1DK</option>
+
+            <option value="1LDK">1LDK</option>
+
+            <option value="1D">1D</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_floor_number"><label for="id_floor_number">階数</label></label>
+          <select name="floor_number" required="" class="form-control" id="id_floor_number">
+            <option value="" selected="">選択肢から選んでください</option>
+
+            <option value="1F">1F</option>
+
+            <option value="2F">2F</option>
+
+            <option value="3F">3F</option>
+
+            <option value="4F">4F</option>
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_initial_cost"><label for="id_initial_cost">初期費用</label></label>
+          <input type="text" name="initial_cost" required="" class="form-control" id="id_initial_cost" maxlength="150" value="{{view.initial_cost}}">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_common_service_expense"><label for="id_common_service_expense">共益費</label></label>
+          <input type="text" name="common_service_expense" required="" class="form-control" id="id_common_service_expense" maxlength="150" value="{{view.common_service_expense}}">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_term_of_contract"><label for="id_term_of_contract">契約期間</label></label>
+          <input type="text" name="term_of_contract" required="" class="form-control" id="id_term_of_contract" maxlength="150" value="{{view.term_of_contract}}">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_column"><label for="id_column">備考</label></label>
+          <textarea name="column" class="form-control" required="" cols="40" id="id_column" rows="10" maxlength="150">{{view.column}}</textarea>
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_files"><label for="id_files">その他の画像</label></label>
+          <input type="file" name="files" required="" class="form-control" id="id_files" multiple="">
+
+        </div>
+
+        <div class="form-group">
+          <label for="id_live_flag"><label for="id_live_flag">空室情報</label></label>
+          <select name="live_flag" required="" class="form-control" id="id_live_flag">
+            <option value="" selected="">選択肢から選んでください</option>
+
+            <option value="0">空室です</option>
+
+            <option value="1">空室ではないです</option>
+
+          </select>
+
+        </div>
+        {% for live in live_list %}
+        {% if live.start_date %}
+        <div class="vacant">
+          <div class="calendar">
+            <div class="start_date">
+              <label for="start_date">契約開始日</label>
+              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.start_date}}" required=False>
+            </div>
+            <div class="update_date">
+              <label for="update_date">更新予定日</label>
+              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.update_date}}" required=False>
+            </div>
+            <div class="cancel_date">
+              <label for="cancel_date">解約予定日</label>
+              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.cancel_date}}" required=False>
+            </div>
+          </div>
+          <div class="vacant_live">
+            <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
+            <input type="text" name="info" value="" required=False>
+          </div>
+        </div>
+        {%else%}
+        <div class="vacant">
+          <div class="calendar">
+            <div class="start_date">
+              <label for="start_date">契約開始日</label>
+              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False>
+            </div>
+            <div class="update_date">
+              <label for="update_date">更新予定日</label>
+              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False >
+            </div>
+            <div class="cancel_date">
+              <label for="cancel_date">解約予定日</label>
+              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False />
+            </div>
+          </div>
+          <div class="vacant_live">
+            <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
+            <input type="text" name="info" value="{{live.vacancy_live}}" required=False>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% csrf_token %}
+
+        <button type="submit" class="btn btn-success btn-lg btn-block">更新</button>
+        <!-- <div classs="comment">
+          <ul class="note">
+            <li class="title">【ご登録に関して、注意事項】</li>
+            <li>全ての項目入力してください</li>
+          </ul>
+        </div> -->
+      </form>
+      {% endfor %}
+    </main>
+  </div>
+</div>
+
+
+{% endblock %}

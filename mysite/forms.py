@@ -1,4 +1,4 @@
-
+import os
 from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm, UserCreationForm, PasswordChangeForm,
@@ -6,9 +6,10 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, Imagetest, ArticleLive
 from django.db import models
 from django.shortcuts import redirect
+
 
 User = get_user_model()
 # Article = Article.objects.all()
@@ -21,6 +22,21 @@ class LoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.pop("autofocus", None)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = field.label
+
+class LoginCustomerForm(AuthenticationForm):
+    """業者専用ログインフォーム"""
+
+    class Meta:
+        model = User
+        # fields = ('username', 'password',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__( *args, **kwargs)
+
         self.fields['username'].widget.attrs.pop("autofocus", None)
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
@@ -93,36 +109,182 @@ class UserUpdateForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     for field in self.fields.values():
-    #         field.widget.attrs['class'] = 'form-control'
-
 class Createform(forms.ModelForm):
     """物件登録"""
 
-    article_image = forms.ImageField()
+    CHOICE_Room = (
+              ('', '選択肢から選んでください'),
+              ('1L', '1L'),
+              ('1DK', '1DK'),
+              ('1LDK', '1LDK'),
+              ('1D', '1D'),
+            )
+
+    CHOICE_Floor = (
+              ('', '選択肢から選んでください'),
+              ('1F', '1F'),
+              ('2F', '2F'),
+              ('3F', '3F'),
+              ('4F', '4F'),
+            )
+
+    CHOICE_Park = (
+              ('', '選択肢から選んでください'),
+              ('駐車場あり', 'あり'),
+              ('駐車場なし', 'なし'),
+            )
+
+    CHOICE_Vacant = (
+              ('', '選択肢から選んでください'),
+              ('0', '空室です'),
+              ('1', '空室ではないです'),
+            )
+
+    park = forms.ChoiceField(
+           label='駐車場',
+           widget=forms.Select,
+           choices=CHOICE_Park)
+
+    floor_plan = forms.ChoiceField(
+           label="間取り",
+           widget=forms.Select,
+           choices=CHOICE_Room)
+
+    floor_number = forms.ChoiceField(
+           label="階数",
+           widget=forms.Select,
+           choices=CHOICE_Floor)
+
+    initial_cost = forms.CharField(
+           label='初期費用', max_length=150)
+
+    common_service_expense = forms.CharField(
+           label='共益費', max_length=150)
+
+    term_of_contract = forms.CharField(
+           label='契約期間', max_length=150)
+
+    column = forms.CharField(
+           label='備考',
+           widget=forms.Textarea,
+           max_length=150)
+
+    files = forms.FileField(
+           label='その他の画像',
+           widget=forms.ClearableFileInput(attrs={'multiple':True}),
+    )
+
+    live_flag = forms.ChoiceField(
+           label="空室情報",
+           widget=forms.Select,
+           choices=CHOICE_Vacant)
 
     class Meta:
-        model = Article
-        fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan", "comments", "term_of_contract", "common_service_expense", "floor_number", "others")
-        label_tag = ("名称", "住所", "家賃", "駐車場", "初期費用", "間取り", "コメント", "契約期間", "共益費用", "階数", "その他")
+        model = ArticleCreate
+        fields = ("article_image","article_name", "comments", "address", "rent",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
 
             field.widget.attrs['class'] = 'form-control'
-#
-# class Updateform(forms.ModelForm):
-#     """物件更新"""
-#
-#     class Meta:
-#         model = Article
-#         fields = ("article_name", "address", "rent", "park", "initial_cost", "floor_plan", "comments", "term_of_contract", "common_service_expense", "floor_number", "others")
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         for field in self.fields.values():
-#
-#             field.widget.attrs['class'] = 'form-control'
+
+    def save(self, commit=True):
+
+        upload_files = self.files.getlist('files')
+        self.instance.files = upload_files[0]
+        self.instance.others = []
+        other_files = upload_files[1:]
+        file_id = Article.objects.order_by('id').reverse()[0]
+        for file_image in other_files:
+            file_obj = RoomImage.objects.create(article_id=file_id.id, image=file_image)
+            if commit:
+                file_obj.save()
+            self.instance.others.append(file_obj)
+        return super().save(commit)
+
+UploadModelFormSet = forms.modelformset_factory(
+    ArticleCreate, form=Createform,
+    extra=10
+)
+
+class ArticleUpdateForm(forms.ModelForm):
+    """物件更新"""
+
+    # CHOICE_Room = (
+    #           ('', '選択肢から選んでください'),
+    #           ('1L', '1L'),
+    #           ('1DK', '1DK'),
+    #           ('1LDK', '1LDK'),
+    #           ('1D', '1D'),
+    #         )
+    #
+    # CHOICE_Floor = (
+    #           ('', '選択肢から選んでください'),
+    #           ('1F', '1F'),
+    #           ('2F', '2F'),
+    #           ('3F', '3F'),
+    #           ('4F', '4F'),
+    #         )
+    #
+    # CHOICE_Park = (
+    #           ('', '選択肢から選んでください'),
+    #           ('駐車場あり', 'あり'),
+    #           ('駐車場なし', 'なし'),
+    #         )
+    #
+    # CHOICE_Vacant = (
+    #           ('', '選択肢から選んでください'),
+    #           ('0', '空室です'),
+    #           ('1', '空室ではないです'),
+    #         )
+    #
+    # park = forms.ChoiceField(
+    #        label='駐車場',
+    #        widget=forms.Select,
+    #        choices=CHOICE_Park)
+    #
+    # floor_plan = forms.ChoiceField(
+    #        label="間取り",
+    #        widget=forms.Select,
+    #        choices=CHOICE_Room)
+    #
+    # floor_number = forms.ChoiceField(
+    #        label="階数",
+    #        widget=forms.Select,
+    #        choices=CHOICE_Floor)
+    #
+    # initial_cost = forms.CharField(
+    #        label='初期費用', max_length=150)
+    #
+    # common_service_expense = forms.CharField(
+    #        label='共益費', max_length=150)
+    #
+    # term_of_contract = forms.CharField(
+    #        label='契約期間', max_length=150)
+    #
+    # column = forms.CharField(
+    #        label='備考',
+    #        widget=forms.Textarea,
+    #        max_length=150)
+    #
+    # files = forms.FileField(
+    #        label='その他の画像',
+    #        widget=forms.ClearableFileInput(attrs={'multiple':True}),
+    # )
+    #
+    # live_flag = forms.ChoiceField(
+    #        label="空室情報",
+    #        widget=forms.Select,
+    #        choices=CHOICE_Vacant)
+
+    class Meta:
+        model = Article
+        fields = ("article_image","article_name", "comments", "address", "rent",
+                  "park", "floor_plan", "floor_number", "initial_cost", "common_service_expense",
+                  "term_of_contract", "column", "room_images_id", "live_flag", "customer")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'

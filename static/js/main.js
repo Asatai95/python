@@ -113,3 +113,42 @@ $(function() {
     }
   });
 });
+
+$(function(){
+  $("#id_live_flag").change(function(){
+    var val = $(this).val();
+    if (val === '1') {
+      $('.vacant').fadeIn();
+      $('.vacant_live').fadeIn();
+      $('.vacant_live input').attr("required", true);
+      $('.calendar').fadeOut();
+    } else if (val === "0")  {
+      $('.vacant').fadeIn();
+      $('.vacant_live').fadeOut();
+      $('.calendar').fadeIn();
+      $('.calendar input').attr("required", true);
+    }
+  });
+});
+
+$(function(){
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('#id_live_flag option[value=1]').length && !$(e.target).closest('.article').length) {
+      $('.vacant').fadeOut();
+    } else if ($(e.target).closest('#id_live_flag option[value=2]').length) {
+
+      if ($('.vacant').css('display') == 'none') {
+        $('#fade-in li.first ul li').fadeIn();
+      } else {
+        $('#fade-in li.first ul li').fadeOut();
+      }
+    }
+  });
+});
+
+$(function(){
+  $('form').find('.cancel_date input').removeAttr('required');
+  $('form').find('.update_date input').removeAttr('required');
+  $('form').find('.start_date input').removeAttr('required');
+  $('form').find('.vacant_live input').removeAttr('required');
+});

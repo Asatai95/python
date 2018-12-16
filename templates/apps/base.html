@@ -36,9 +36,12 @@
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-item nav-link" href="/login/">
-         ようこそ、ゲスト！ログインはこちら
-       </a>
+          <a class="nav-item nav-link" href="{% url 'register:login' %}">
+             ゲストログインはこちら
+          </a>
+          <a class="nav-item nav-link" href="{% url 'register:customer_login' %}">
+             業者の方はこちら
+          </a>
         </li>
         {% endif %}
       </ul>
@@ -63,6 +66,20 @@
             <ul>
               <a href="#">階数</a> {%for list in floor_list%}
               <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="floor" value="{{ list.floor_id }}">{{ list.floor_id }}</a></li>
+              {% endfor %}
+            </ul>
+          </li>
+          <li class='last'>
+            <ul>
+              <a href="#">空室状況</a>
+              {%for list in room_list%}
+                {% if list.room_live_id == '空室あり' %}
+                   <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="0">{{ list.room_live_id }}</a></li>
+                {% elif list.room_live_id == Nene %}
+
+                {% else %}
+                   <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="1">{{ list.room_live_id }}</a></li>
+                {% endif %}
               {% endfor %}
             </ul>
           </li>

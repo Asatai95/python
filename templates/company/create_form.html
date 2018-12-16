@@ -1,13 +1,12 @@
 {% extends "apps/base.html" %}
 {% block content %}
-<div class='main create'>
+<div class='article'>
   <div class='form contents'>
     <main id="profile_edit">
       <div class='logo'>
         <p class='logo text'>roomii <br/> 【物件登録】</p>
       </div>
-      <form action="" method="POST">
-        {% csrf_token %}
+      <form action="" method="POST" enctype="multipart/form-data">
         <div class='error'>
           <span class="error_meaasage" id="username_error"></span>
         </div>
@@ -19,8 +18,28 @@
           {{ field.errors }}
         </div>
         {% endfor %}
+        <div class='vacant'>
+          <div class="calendar">
+            <div class='start_date'>
+              <label for="start_date">契約開始日</label>
+              <input name='start_date' type="date" min="2019-01-01" max="2020-12-31" value="">
+            </div>
+            <div class='update_date'>
+              <label for="update_date">更新予定日</label>
+              <input name='update_date' type="date" min="2019-01-01" max="2020-12-31" value="">
+            </div>
+            <div class='cancel_date'>
+              <label for="cancel_date">解約予定日</label>
+              <input name='cancel_date' type="date" min="2019-01-01" max="2020-12-31" value="">
+            </div>
+          </div>
+          <div class='vacant_live'>
+            <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
+            <input type="text" name="info" value="">
+          </div>
+        </div>
         {% csrf_token %}
-        <button type="submit" class="btn btn-success btn-lg btn-block">メール送信</button>
+        <button type="submit" class="btn btn-success btn-lg btn-block">登録</button>
       <div classs='comment'>
         <ul class='note'>
           <li class='title'>【ご登録に関して、注意事項】</li>

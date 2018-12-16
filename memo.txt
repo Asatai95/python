@@ -1,0 +1,24 @@
+name = self.cleaned_data.get('article_name')
+        comments = self.cleaned_data.get('comments')
+        address = self.cleaned_data.get('address')
+        rent = self.cleaned_data.get('rent')
+        park = self.cleaned_data.get('park')
+        initial_cost = self.cleaned_data.get('initial_cost')
+        common_service_expense = self.cleaned_data.get('common_service_expense')
+        term_of_contract = self.cleaned_data.get('term_of_contract')
+        column = self.cleaned_data.get('column')
+        room = self.cleaned_data.get('floor_plan')
+        floor = self.cleaned_data.get('floor_number')
+
+file_id.article_name = name
+            file_id.comments = comments
+            file_id.address = address
+            file_id.rent = rent
+            file_id.park = park
+            file_id.initial_cost = initial_cost
+            file_id.common_service_expense = common_service_expense
+            file_id.column = column
+file_id.floor_plan = room
+            file_id.floor_number = floor
+            file_id.article_image = files
+            file_id.save()

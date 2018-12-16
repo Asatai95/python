@@ -11,9 +11,12 @@ from django.conf.urls.static import static
 app_name = 'mysite'
 
 urlpatterns = [
-    path('roomii/', login_required(views.MainView.as_view()), name='top'),
+    path('test/', views.Test.as_view(), name='test'),
     path('login/', views.Login.as_view(), name='login'),
+    # path('customer/login/', views.LoginCustomer.as_view(), name='customer_login'),
     path('logout/', login_required(views.Logout.as_view()), name='logout'),
+    path('roomii/', login_required(views.MainView.as_view()), name='top'),
+    # path('customer/roomii/', login_required(views.MainCustomerView.as_view()), name='customer_top'),
     path('user_create/', views.UserCreate.as_view(), name='user_create'),
     path('user_create/done/', views.UserCreateDone.as_view(), name='user_create_done'),
     path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
@@ -28,6 +31,9 @@ urlpatterns = [
     path('fab/<int:pk>/<int:article_id>/', login_required(views.Like.as_view()), name='fab'),
     path('roomii/info/<int:article_id>', login_required(views.InfoView.as_view()), name='info'),
     path('roomii/create/', login_required(views.ArticleEdit.as_view()), name='create'),
+    path('roomii/update/<int:pk>', login_required(views.ArticleUpdate.as_view()), name='update'),
+    # path('roomii/confirm/', login_required(views.ArticleEdit.as_view()), name='confirm'),
+
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

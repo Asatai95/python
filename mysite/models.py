@@ -54,6 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     id = models.AutoField(primary_key=True)
     username = models.CharField(_('username'), max_length=150)
+    password = models.CharField(_('password'), max_length=150)
     email = models.EmailField(_('email'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
@@ -127,14 +128,11 @@ class RoomImage(models.Model):
         verbose_name_plural = _('images')
         db_table = 'images'
 
-    def save(self, *args, **kwargs):
-        self.article = article
-        super(RoomImage, self).save(*args, **kwargs)
 
 class ArticleLive(models.Model):
     """カスタム物件モデル"""
 
-    id = models.AutoField(primary_key=True)
+    id = models.AutoField(_('id'), primary_key=True)
     article_id = models.CharField(_('article id'), max_length=45)
     vacancy_info = models.CharField(_('vacancy live'), max_length=45)
     vacancy_live = models.CharField(_('vacancy live'), max_length=45)
@@ -150,12 +148,13 @@ class ArticleLive(models.Model):
         db_table = 'article_live'
 
 class Article(models.Model):
-    """カスタム物件モデル"""
+    """カスタム物件モデル(View専用)"""
 
     id = models.AutoField(primary_key=True)
+    customer = models.IntegerField(_('customer'))
     article_name = models.CharField(_('article name'), max_length=150)
     comments = models.CharField(_('comments'), max_length=150)
-    room_images = models.ForeignKey(RoomImage, on_delete=models.CASCADE, related_name="image_key")
+    room_images_id = models.CharField(_('room images id'), max_length=150)
     article_image = models.ImageField(_('article image'), upload_to='media')
     address = models.CharField(_('address'), max_length=150)
     rent = models.CharField(_('rent'), max_length=150)
@@ -165,8 +164,8 @@ class Article(models.Model):
     common_service_expense = models.CharField(_('common service expense'), max_length=150)
     term_of_contract = models.CharField(_('term of contract'), max_length=150)
     floor_number = models.CharField(_('floor number'), max_length=150)
-    others = models.ForeignKey(Others, on_delete=models.CASCADE, related_name="comment_key")
-    live_flag = models.ForeignKey(ArticleLive, on_delete=models.CASCADE, related_name="article_live_key")
+    column = models.CharField(_('column'), max_length=150)
+    live_flag = models.ForeignKey(ArticleLive, on_delete=models.CASCADE, related_name="article_live")
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
     published_at = models.DateTimeField(_('published at'), default=timezone.now)
@@ -199,6 +198,7 @@ class ArticleRoom(models.Model):
 
     id = models.AutoField(primary_key=True)
     room = models.OneToOneField(Article, on_delete=models.CASCADE, related_name="room_key")
+    room_live_id = models.CharField(_('room live id'), max_length=150)
 
     class Meta:
 
@@ -213,3 +213,40 @@ class ArticleFloor(models.Model):
     class Meta:
 
         db_table = 'sample_floor'
+
+class ArticleCreate(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    article_name = models.CharField(u'名称', max_length=150)
+    comments = models.CharField(u'キャッチコピー', max_length=150)
+    room_images_id = models.CharField(u'メイン画像', max_length=150)
+    article_image = models.FileField(u'メイン画像')
+    address = models.CharField(u'住所', max_length=150)
+    rent = models.CharField(u'家賃', max_length=150)
+    park = models.CharField(u'駐車場', max_length=150)
+    initial_cost = models.CharField(u'初期費用', max_length=150)
+    floor_plan = models.CharField(u'間取り', max_length=150)
+    common_service_expense = models.CharField(u'共益費用', max_length=150)
+    term_of_contract = models.CharField(u'契約期間', max_length=150)
+    floor_number = models.CharField(u'階数', max_length=150)
+    column = models.TextField(u"備考", max_length=150)
+    live_flag = models.OneToOneField(ArticleLive, verbose_name="vacancy_live", on_delete=models.CASCADE, related_name="live")
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
+    published_at = models.DateTimeField(_('published at'), default=timezone.now)
+
+    class Meta:
+        verbose_name = _('article_name')
+        verbose_name_plural = _('article_name')
+        db_table = 'article'
+
+class Imagetest(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    test_file = models.FileField()
+
+    class Meta:
+        db_table = 'new_table'
+
+    def __str__(self):
+        return self.test_file.url
