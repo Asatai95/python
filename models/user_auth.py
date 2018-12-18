@@ -13,7 +13,7 @@ class UserAuth(Base):
     """
     ユーザモデル
     """
-    __tablename__ = 'auth_user'
+    __tablename__ = 'mysite_user'
     id = Column('id', Integer, primary_key = True)
     username = Column('username', String(150))
     email = Column('email', String(150))
@@ -25,7 +25,7 @@ class UserAuth(Base):
     date_joined = Column('date_joined', DATETIME, default=datetime.now())
     last_login = Column('last_login', DATETIME(6))
     is_superuser = Column('is_superuser', Integer)
-    image = Column('image', String(45))
+    image = Column('image', String(150))
 
 def main(args):
     """

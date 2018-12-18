@@ -32,13 +32,13 @@
         <div class="container facebook">
           <div class="container-button">
             <img src="{% static 'img/facebook_icon.png'%}" alt="">
-            <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="{% url 'social:begin' 'facebook' %}">Login with Facebook</a>
+            <a class="container center-align btn waves-effect #1565c0 blue darken-3" href="{%url 'apps:facebook_login'%}">Login with Facebook</a>
           </div>
         </div>
         <div class='container google'>
           <div class="container-button google">
             <img class='google' src="{% static 'img/google.png'%}" alt="">
-            <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+            <a href="{% url 'apps:google_login' %}">Login with Google</a>
           </p>
         </div>
       </div>

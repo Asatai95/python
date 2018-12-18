@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.core.validators import validate_email, EmailValidator
+from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.manager import EmptyManager
@@ -23,7 +24,8 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The given email must be set')
 
-        username = self.model.normalize_username(username, required=True)
+        username_validator = ASCIIUsernameValidator()
+        username = self.model.normalize_username(username, required=True, validators=[username_validator])
         email = self.normalize_email(email, required=True)
 
         user = self.model(username=username, email=email, **extra_fields)
@@ -217,6 +219,7 @@ class ArticleFloor(models.Model):
 class ArticleCreate(models.Model):
 
     id = models.AutoField(primary_key=True)
+    customer = models.IntegerField(_('customer'))
     article_name = models.CharField(u'名称', max_length=150)
     comments = models.CharField(u'キャッチコピー', max_length=150)
     room_images_id = models.CharField(u'メイン画像', max_length=150)
@@ -239,14 +242,3 @@ class ArticleCreate(models.Model):
         verbose_name = _('article_name')
         verbose_name_plural = _('article_name')
         db_table = 'article'
-
-class Imagetest(models.Model):
-
-    id = models.AutoField(primary_key=True)
-    test_file = models.FileField()
-
-    class Meta:
-        db_table = 'new_table'
-
-    def __str__(self):
-        return self.test_file.url

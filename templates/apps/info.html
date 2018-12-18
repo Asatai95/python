@@ -8,7 +8,14 @@
   <div class='topic'>
     <div class='image_field'>
       <div class='image_contents'>
-        <li><img src="/media/{{view_list.article_image}}" alt=""></li>
+      {% for images in room_view %}
+        <li><img src="/media/{{images.image}}" alt=""></li>
+      {% endfor %}
+      </div>
+      <div class='image_sub_contents'>
+      {% for images in room_view %}
+        <li><img src="/media/{{images.image}}" alt=""></li>
+      {% endfor %}
       </div>
     </div>
       <table class="table">

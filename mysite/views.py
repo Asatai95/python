@@ -3,6 +3,7 @@ import sys
 from PIL import Image
 from django import *
 from django.conf import settings
+from importlib import import_module
 from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
 from django.template import loader
 from django.views.generic import CreateView, ListView, TemplateView
@@ -26,7 +27,7 @@ from django.contrib import messages
 
 from django.db import models
 from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, Imagetest, ArticleCreate
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -40,10 +41,14 @@ from .forms import (
     UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm
 )
 
+import requests
+
+
 """
 Settingファイル
 """
 from config.settings import *
+from mysite.library import *
 
 """
 データベース
@@ -67,29 +72,6 @@ class Login(LoginView):
 
     form_class= LoginForm
     template_name = 'register/login.html'
-
-#
-# """
-# ログイン機能（業者）
-# """
-# class LoginCustomer(LoginView):
-#
-#     form_class= LoginCustomerForm
-#     template_name = 'company/login_form.html'
-#     success_url = reverse_lazy('apps:customer_top')
-#
-#     def login_user(request):
-#         if request.method == 'POST':
-#             email = request.POST['username']
-#             user = Get_user.objects.filter(email=email)
-#             print(user)
-#             password = request.POST['password']
-#             print(password)
-#             user = authenticate(request, username=user.username, password=password)
-#             if user is not None:
-#                 django_login(request, user)
-#                 return django.http.HttpResponseRedirect('/customer/roomii/')
-#
 
 """
 ログアウト機能
@@ -442,14 +424,17 @@ class InfoView(generic.ListView):
 
     def get_context_data(self, **kwargs):
 
+        get = self.request.path.replace('/roomii/info/', '')
         context = super(InfoView, self).get_context_data(**kwargs)
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id')
         fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
+        room_view = RoomImage.objects.all().filter(article_id=get).order_by("id" ,"image")
 
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
+        context["room_view"] = room_view
 
         return context
 
@@ -467,11 +452,12 @@ class ArticleEdit(generic.CreateView):
     model = ArticleCreate
     form_class= Createform
     template_name = 'company/create_form.html'
-    success_url = reverse_lazy('apps:create')
+    success_url = reverse_lazy('apps:top')
 
     def form_valid(self, form):
         tmp_list = []
         live_id = ArticleLive.objects.order_by('id').reverse()[0]
+        user = self.request.user.id
         main_file = form.save(commit=False)
         vacant = self.request.POST["live_flag"]
         info = self.request.POST["info"]
@@ -491,7 +477,7 @@ class ArticleEdit(generic.CreateView):
                 cancel_date = "選択なし"
 
         file_id = Article.objects.order_by('id').reverse()[0]
-        count = file_id + 1
+        count = file_id.id + 1
         vacant_info = ArticleLive.objects.create(article_id=count, vacancy_info=vacant, vacancy_live=info,
                                                  start_date=start_date, update_date=update_date, cancel_date=cancel_date)
 
@@ -506,10 +492,9 @@ class ArticleEdit(generic.CreateView):
         main_file.customer = self.request.user.id
 
         for other_file in main_file.others:
-            file_image = other_file.image
-            tmp_list.append(file_image.name)
+            tmp_list.append(other_file.id)
             other_file.save()
-        main_file.room_images_id = str(tmp_list)
+        main_file.room_images_id = tmp_list
         main_file.save()
         vacant_info.save()
 
@@ -605,10 +590,11 @@ class ArticleUpdate(generic.UpdateView):
             img_filename.save(os.path.join('./media/', files.name))
             other_files.append(files.name)
 
+        tmp_room_images_id = []
         for file_image in other_files:
             RoomImage(article_id=self.request.path.replace('/roomii/update/', ''), image=file_image).save()
-
-        main.room_images_id = str(other_files)
+            tmp_room_images_id.append(RoomImage.id)
+        main.room_images_id = str(tmp_room_id)
 
         img_file = self.request.FILES['article_image'].name
         img_filename = Image.open(self.request.FILES['article_image'])
@@ -620,18 +606,120 @@ class ArticleUpdate(generic.UpdateView):
         return redirect('apps:top')
 
 """
-test
+Googleログイン
 """
-class Test(generic.View):
-    template_name = 'company/test.html'
+
+class RedirectGoogle(View):
+
+    def get(self, request, *args, **kwargs):
+        SCOPE = [
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "https://www.googleapis.com/auth/userinfo.email"
+        ]
+
+
+        flow = flow_from_clientsecrets(
+           './client_id.json',
+           scope=SCOPE,
+           redirect_uri= "http://localhost:8000/auth/complete/google-oauth2/")
+
+        auth_uri = flow.step1_get_authorize_url()
+
+        return redirect(auth_uri)
+
+class Accesstoken(View):
 
     def get(self, request, **kwargs):
 
-        return render(request, self.template_name)
+        if request.GET.get('code'):
+            data = google_login_flow(request.GET.get('code'))
+            if data['id']:
+                check = check_socials(data['id'], 'google')
+                if check is not False:
+                    social = session.query(UserAuth).join(
+                             Social, UserAuth.id == Social.user_id).filter(
+                             Social.provider == 'google',
+                             Social.provider_id == data['id']).first()
+                    if social:
+                        check_user = Get_user.objects.filter(username=social.username, password=social.password)
+                        for user in check_user:
+                            if social.is_active:
+                                login(self.request, user)
+                                return redirect("apps:top")
+                            else:
+                                return redirect("apps:login")
+                    else:
+                        return redirect("apps:login")
 
-    def post(self, request, **kwargs):
+                else:
+                    user = create_socials_user(data)
+                    create_socials(user.id, data, 'google')
 
-        test = request.POST["date"]
-        print(test)
+                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
+                    for user in check_user:
+                        if user.is_active:
+                            login(self.request, user)
+                            return redirect("apps:top")
+                        else:
+                            return redirect("apps:login")
+            else:
+                return redirect('apps:login')
+        else:
+            return redirect('apps:login')
 
-        return render(request, self.template_name)
+"""
+Facebook, ログイン認証
+"""
+class RedirectFacebook(View):
+
+    def get(self, request, **kwargs):
+
+        url = 'https://www.facebook.com/v3.2/dialog/oauth'
+        params = {
+            'response_type': 'code',
+            'redirect_uri': FACEBOOK_CALLBACK_URL,
+            'client_id': SOCIAL_AUTH_FACEBOOK_KEY,
+        }
+
+        redirect_url = requests.get(url, params=params).url
+        print(redirect_url)
+
+        return redirect(redirect_url)
+
+class CallbackFacebook(View):
+
+    def get(self, request, **kwargs):
+        if request.GET.get('code'):
+            print(request.GET.get('code'))
+            access_token = get_facebook_access_token(request.GET.get('code'))
+            data = check_facebook_access_token(access_token)
+            print(data['user_id'])
+            if data['is_valid']:
+                data = get_facebook_user_info(access_token, data['user_id'])
+                print(data)
+                social = check_socials(data, 'facebook')
+                if social is not False:
+                    print()
+                    check_user = Get_user.objects.filter(id=social.user_id)
+                    print(check_user)
+                    if check_user:
+                        for user in check_user:
+                            if user.is_active:
+                                login(self.request, user)
+                                return redirect("apps:top")
+                            else:
+                                return redirect("apps:login")
+                    else:
+                        return redirect("apps:login")
+                else:
+                    user = create_facebook_user(data)
+                    social = create_socials(user, data, 'facebook')
+                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
+                    for user in check_user:
+                        if user.is_active:
+                            login(self.request, user)
+                            return redirect("apps:top")
+                        else:
+                            return redirect("apps:login")
+            else:
+                return redirect('apps:login')

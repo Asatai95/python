@@ -21,12 +21,24 @@ $(function(){
   });
 });
 
-$(function(){
-  $(".sns_text").on("click", function(){
-    $('.container.facebook').fadeIn(800);
-    $('.container.google').fadeIn(800);
+$(function() {
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.sns_text a').length && !$(e.target).closest('.container').length) {
+      $('.container.facebook').fadeOut();
+      $('.container.google').fadeOut();
+    } else if ($(e.target).closest('.sns_text a').length) {
+
+      if ($('.container.facebook').css('display') == 'none') {
+        $('.container.facebook').fadeIn();
+        $('.container.google').fadeIn();
+      } else {
+        $('.container.facebook').fadeOut();
+        $('.container.google').fadeOut();
+      }
+    }
   });
 });
+
 
 $(function(){
   $('form[data-validate]').on('input', function () {
@@ -35,24 +47,18 @@ $(function(){
 });
 
 $(function(){
-  //画像ファイルプレビュー表示のイベント追加 fileを選択時に発火するイベントを登録
   $('form').on('change', 'input[type="file"]', function(e) {
     var file = e.target.files[0],
         reader = new FileReader(),
         $preview = $(".preview");
         t = this;
-
-    // 画像ファイル以外の場合は何もしない
     if(file.type.indexOf("image") < 0){
       return false;
     }
 
-    // ファイル読み込みが完了した際のイベント登録
     reader.onload = (function(file) {
       return function(e) {
-        //既存のプレビューを削除
         $preview.empty();
-        // .prevewの領域の中にロードした画像を表示するimageタグを追加
         $preview.append($('<img>').attr({
                   src: e.target.result,
                   class: "img_preview",
@@ -72,19 +78,12 @@ $(function(){
 });
 
 $(function(){
-  $('.image_item').mouseover(function() {
-    $(this).css('filter', 'brightness(50%)');
+  $('.img_item').mouseover(function() {
+    $(this).find(".hide_text").css('display', 'block');
+    $(this).find("img").css('filter', 'brightness(50%)');
   }).mouseout(function(){
-    $(this).css('filter', 'brightness(100%)');
-  });
-});
-
-$(function(){
-  $('.hide_text').mouseover(function() {
-    $(this).find("p.text").css('display', 'block');
-    $(this).find("p.text").css('color', 'white');
-  }).mouseout(function(){
-    $(this).find("p.text").css('display', 'none');
+    $(this).find(".hide_text").css('display', 'none');
+    $(this).find("img").css('filter', 'brightness(100%)');
   });
 });
 
@@ -101,6 +100,21 @@ $(function() {
     }
   });
 });
+
+$(function() {
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.middle ul a').length) {
+      $('#fade-in li.middle ul li').fadeOut();
+    } else if ($(e.target).closest('li.middle ul').length) {
+
+      if ($('#fade-in li.middle ul li').css('display') == 'none') {
+        $('#fade-in li.middle ul li').fadeIn();
+
+      }
+    }
+  });
+});
+
 $(function() {
   $(document).on('click', function(e) {
     if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.first ul a').length) {
@@ -114,6 +128,30 @@ $(function() {
   });
 });
 
+$(function() {
+  $('#fade-in li ul li a').click(function(){
+
+    if ($(this).find('input[name="room"]').prop('checked')) {
+      $(this).find('input[name="room"]').prop('checked', false);
+    } else {
+      $(this).find('input[name="room"]').prop('checked', true);
+    }
+
+    if ($(this).find('input[name="live"]').prop('checked')) {
+      $(this).find('input[name="live"]').prop('checked', false);
+    } else {
+      $(this).find('input[name="live"]').prop('checked', true);
+    }
+
+    if ($(this).find('input[name="floor"]').prop('checked')) {
+      $(this).find('input[name="floor"]').prop('checked', false);
+    } else {
+      $(this).find('input[name="floor"]').prop('checked', true);
+    }
+
+  });
+});
+
 $(function(){
   $("#id_live_flag").change(function(){
     var val = $(this).val();
@@ -122,11 +160,13 @@ $(function(){
       $('.vacant_live').fadeIn();
       $('.vacant_live input').attr("required", true);
       $('.calendar').fadeOut();
+      $('.calendar input').removeAttr("required");
     } else if (val === "0")  {
       $('.vacant').fadeIn();
       $('.vacant_live').fadeOut();
       $('.calendar').fadeIn();
       $('.calendar input').attr("required", true);
+      $('.vacant_live input').removeAttr("required");
     }
   });
 });
@@ -147,8 +187,31 @@ $(function(){
 });
 
 $(function(){
-  $('form').find('.cancel_date input').removeAttr('required');
-  $('form').find('.update_date input').removeAttr('required');
-  $('form').find('.start_date input').removeAttr('required');
-  $('form').find('.vacant_live input').removeAttr('required');
+  $(document).ready(function(){
+    $('div.image_contents').slick({
+     accessibility: true,
+     autoplay: true,
+     arrows: true,
+     slidesToShow: 1,
+     slidesToScroll: 1,
+     arrows: false,
+     fade: true,
+     asNavFor: 'div.image_sub_contents'
+    });
+  });
+});
+$(function(){
+  $(document).ready(function(){
+    $('div.image_sub_contents').slick({
+     accessibility: true,
+     autoplay: true,
+     arrows: true,
+     slidesToShow: 3,
+     slidesToScroll: 1,
+     asNavFor: 'div.image_contents',
+     dots: true,
+     centerMode: true,
+     focusOnSelect: true
+    });
+  });
 });

@@ -6,13 +6,14 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab, ArticleCreate, Imagetest, ArticleLive
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive
 from django.db import models
 from django.shortcuts import redirect
 
 
 User = get_user_model()
 # Article = Article.objects.all()
+
 
 class LoginForm(AuthenticationForm):
     """ログインフォーム"""
@@ -177,11 +178,12 @@ class Createform(forms.ModelForm):
     live_flag = forms.ChoiceField(
            label="空室情報",
            widget=forms.Select,
-           choices=CHOICE_Vacant)
+           choices=CHOICE_Vacant
+     )
 
     class Meta:
         model = ArticleCreate
-        fields = ("article_image","article_name", "comments", "address", "rent",)
+        fields = ( "article_image", "article_name", "comments", "address", "rent",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -191,6 +193,7 @@ class Createform(forms.ModelForm):
 
     def save(self, commit=True):
 
+        tmp_image_id = []
         upload_files = self.files.getlist('files')
         self.instance.files = upload_files[0]
         self.instance.others = []
@@ -198,6 +201,8 @@ class Createform(forms.ModelForm):
         file_id = Article.objects.order_by('id').reverse()[0]
         for file_image in other_files:
             file_obj = RoomImage.objects.create(article_id=file_id.id, image=file_image)
+            tmp_image_id.append(file_obj.id)
+
             if commit:
                 file_obj.save()
             self.instance.others.append(file_obj)
@@ -211,72 +216,6 @@ UploadModelFormSet = forms.modelformset_factory(
 class ArticleUpdateForm(forms.ModelForm):
     """物件更新"""
 
-    # CHOICE_Room = (
-    #           ('', '選択肢から選んでください'),
-    #           ('1L', '1L'),
-    #           ('1DK', '1DK'),
-    #           ('1LDK', '1LDK'),
-    #           ('1D', '1D'),
-    #         )
-    #
-    # CHOICE_Floor = (
-    #           ('', '選択肢から選んでください'),
-    #           ('1F', '1F'),
-    #           ('2F', '2F'),
-    #           ('3F', '3F'),
-    #           ('4F', '4F'),
-    #         )
-    #
-    # CHOICE_Park = (
-    #           ('', '選択肢から選んでください'),
-    #           ('駐車場あり', 'あり'),
-    #           ('駐車場なし', 'なし'),
-    #         )
-    #
-    # CHOICE_Vacant = (
-    #           ('', '選択肢から選んでください'),
-    #           ('0', '空室です'),
-    #           ('1', '空室ではないです'),
-    #         )
-    #
-    # park = forms.ChoiceField(
-    #        label='駐車場',
-    #        widget=forms.Select,
-    #        choices=CHOICE_Park)
-    #
-    # floor_plan = forms.ChoiceField(
-    #        label="間取り",
-    #        widget=forms.Select,
-    #        choices=CHOICE_Room)
-    #
-    # floor_number = forms.ChoiceField(
-    #        label="階数",
-    #        widget=forms.Select,
-    #        choices=CHOICE_Floor)
-    #
-    # initial_cost = forms.CharField(
-    #        label='初期費用', max_length=150)
-    #
-    # common_service_expense = forms.CharField(
-    #        label='共益費', max_length=150)
-    #
-    # term_of_contract = forms.CharField(
-    #        label='契約期間', max_length=150)
-    #
-    # column = forms.CharField(
-    #        label='備考',
-    #        widget=forms.Textarea,
-    #        max_length=150)
-    #
-    # files = forms.FileField(
-    #        label='その他の画像',
-    #        widget=forms.ClearableFileInput(attrs={'multiple':True}),
-    # )
-    #
-    # live_flag = forms.ChoiceField(
-    #        label="空室情報",
-    #        widget=forms.Select,
-    #        choices=CHOICE_Vacant)
 
     class Meta:
         model = Article

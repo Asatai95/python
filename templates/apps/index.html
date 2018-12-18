@@ -8,10 +8,10 @@
     <div class="main_container">
       {% for view_list in object_list %}
         <div class="item box-big{{view_list.id}}">
-          <div class="hide_text">
-            <p class='text'>{{view_list.comments}}</p>
-          </div>
           <div class='img_item'>
+            <div class="hide_text">
+              <p class='text'>{{view_list.comments}}</p>
+            </div>
             <a href="{%url 'apps:info' view_list.id %}">
               <img src="/media/{{view_list.article_image}}" alt="">
             </a>
@@ -65,9 +65,6 @@
                {% endif %}
               {% endfor %}
              {%else%}
-             <div class='create'>
-               <button type="button" name="button"><a href="{%url 'apps:create' %}">物件登録</a></button>
-             </div>
              <div class='update'>
                <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
              </div>

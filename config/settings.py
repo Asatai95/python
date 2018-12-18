@@ -12,10 +12,6 @@ from django.contrib.messages import *
 from django.contrib import *
 
 from django.db import models
-# from django.contrib.auth import get_user_model
-
-sys.path.append(os.getcwd())
-import facebook.custom_backends
 
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +22,8 @@ SECRET_KEY = '75c6@w6i1c=xsb$($_117$zk-v!@n*5r9(@tgcj+n=jj+ff*g!'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
 
@@ -37,7 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # 'mysite.apps.WebappConfig',
     'mysite',
-    'social_django',
+    # 'social_django',
 ]
 
 MIDDLEWARE = [
@@ -48,21 +45,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'social_django.middleware.SocialAuthExceptionMiddleware',
+    # 'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'social_core.backends.open_id.OpenIdAuth',
-    'social_core.backends.google.GoogleOpenId',
-    'social_core.backends.google.GoogleOAuth2',
-    'social_core.backends.google.GoogleOAuth',
-    'django.contrib.auth.backends.ModelBackend',
-    # 'facebook.custom_backends.SettingsBackend',
-    'social_core.backends.facebook.FacebookOAuth2',
+# AUTHENTICATION_BACKENDS = [
+#     'social_core.backends.open_id.OpenIdAuth',
+#     'social_core.backends.google.GoogleOpenId',
+#     'social_core.backends.google.GoogleOAuth2',
+#     'social_core.backends.google.GoogleOAuth',
+#     'django.contrib.auth.backends.ModelBackend',
+#     # 'facebook.custom_backends.SettingsBackend',
+#     # 'social_core.backends.facebook.FacebookOAuth2',
+#
+# ]
 
-]
-
-SESSION_COOKIE_SAMESITE = None
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 
 sys.path.append(os.getcwd())
@@ -81,8 +78,8 @@ TEMPLATES = [
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
                     'django.template.context_processors.static',
-                    'social_django.context_processors.backends',
-                    'social_django.context_processors.login_redirect',
+                    # 'social_django.context_processors.backends',
+                    # 'social_django.context_processors.login_redirect',
                 ],
             },
         },
@@ -91,7 +88,7 @@ TEMPLATES = [
 LOGIN_URL = 'register:login'
 
 LOGIN_REDIRECT_URL = 'register:top'
-LOGOUT_URL = 'register:login'
+LOGOUT_URL = 'register:logout'
 
 sys.path.append(os.getcwd())
 WSGI_APPLICATION = 'config.wsgi.application'
@@ -148,9 +145,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'mysite.User'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '296444933687-c11pj3e6ul0kj7utrj8smt34c3muq5jj.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'qGNbZlINKiAeaTxko6JZV-If'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '991249997158-ns651fs80kdi05dtbaq6e9if081ubq9k.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'eodCVb8XjTTR_sf-41XkJt8g'
 
+
+FACEBOOK_CALLBACK_URL='http://localhost:8000/auth/complete/facebook/'
 # SOCIAL_AUTH_FACEBOOK_APP_NAMESPACE = 'auth'
 SOCIAL_AUTH_FACEBOOK_KEY = '292183621408680'
 SOCIAL_AUTH_FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
@@ -168,3 +167,29 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
+    "root",
+    "Asatai951156",
+    "127.0.0.1:3306",
+    "roomii_sample",
+)
+
+ENGINE = create_engine(
+     DATABASE,
+     encoding = "utf8",
+     echo=True,
+     pool_pre_ping=True
+)
+
+session = scoped_session(
+    sessionmaker(
+        autocommit = False,
+        autoflush = False,
+        bind = ENGINE
+        )
+    )
+
+Base = declarative_base()
+Base.query = session.query_property()

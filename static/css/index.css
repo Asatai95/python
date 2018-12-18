@@ -16,6 +16,7 @@ header {
   position: absolute;
 }
 
+
 .form-inline {
   max-width: 250px;
   position: absolute;
@@ -46,6 +47,10 @@ header {
 }
 
 .dropmenu li.first{
+  margin-right: 15px;
+}
+
+.dropmenu li.middle {
   margin-right: 15px;
 }
 
@@ -122,6 +127,10 @@ header {
   height: 40px;
 }
 
+#fade-in li ul li a input {
+  margin-right: 20px;
+}
+
 #form1{
   float: right;
   position:relative;/*フォームの相対位置*/
@@ -158,11 +167,6 @@ header {
 
 .container.mt-3 {
   margin-top: 5rem!important;
-}
-
-.collapse.navbar-collapse {
-  position: absolute;
-  right: 0;
 }
 
 .contents {
@@ -277,6 +281,7 @@ footer {
 }
 
 .main.create {
+  position: relative;
   margin-bottom: 100px;
 }
 
@@ -285,6 +290,7 @@ footer {
 }
 
 .logo.text {
+  color: black!important;
   text-align: center;
   font-size: 30px;
   font-weight: 800;
@@ -987,24 +993,18 @@ a:hover {
 }
 
 .hide_text {
-  z-index: 10;
-  width: 260px;
-  height: 200px;
   position: absolute;
-  margin: 10px;
+  margin: 45px;
   cursor: pointer;
+  display: none;
+  z-index: 1;
 }
 
 .text {
-  top: 30px;
-  right: 0px;
-  left: 0px;
-  bottom: 0px;
-  position: absolute;
-  z-index: 10;
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 600;
-  display: none;
+  margin: 0;
+  color: white;
 }
 
 .item {
@@ -1197,6 +1197,16 @@ a:hover {
   margin: 30px auto;
 }
 
+.create button.mail {
+  width: 250px;
+  height: 50px;
+  border-style: none;
+  background-color: rgba(67, 135, 233);
+  border: 2px solid blue;
+  border-radius: 10px;
+  margin: 30px auto;
+}
+
 .create button:hover {
   transform: scale(1.1);
   box-shadow: 0 0 8px rgba(67, 135, 233);
@@ -1234,4 +1244,20 @@ a:hover {
 .form-group .media_img {
   width: 100px;
   margin: 10px;
+}
+
+.slick-slide img {
+  margin: 0 auto;
+}
+
+.image_sub_contents {
+  margin-top: 30px;
+}
+
+.image_sub_contents li img {
+  width: 277px;
+}
+
+.topic .table {
+  margin-top: 80px;
 }

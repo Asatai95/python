@@ -9,6 +9,16 @@ from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
 import urllib3
 
+from models.social import *
+from models.user_auth import *
+from django.db import models
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate
+from django.contrib.auth import get_user_model
+
+import requests
+
+User = get_user_model()
+
 """
 Google, ログイン認証
 """
@@ -16,13 +26,15 @@ from httplib2 import Http
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.file import Storage
 from apiclient.discovery import build
+import hmac
+import hashlib
 
-SCOPE = 'https://www.googleapis.com/auth/plus.login'
+SCOPE = 'https://www.googleapis.com/auth/plus.profile.emails.read'
 
 flow = flow_from_clientsecrets(
    './client_id.json',
    scope=SCOPE,
-   redirect_uri= "http://127.0.0.1:8000/auth/complete/google-oauth2/")
+   redirect_uri= "http://localhost:8000/auth/complete/google-oauth2/")
 
 """
 facebook
@@ -30,8 +42,6 @@ facebook
 FACEBOOK_ID = '292183621408680'
 FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
 FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
-
-import requests
 
 """
 Settingファイル
@@ -45,248 +55,59 @@ imgファイル保存
 UPLOAD_FOLDER = '/static/img/'
 
 """
-クッキーの設定
-"""
-def login_user_cookie():
-
-    user = session.query(UserAuth).order_by(desc(UserAuth.date_joined)).first()
-
-    return user.id
-
-def login_user(user_id):
-
-    response = redirect('/users/mypage/')
-    response.set_cookie(key='cookie', value=user_id, max_age= 360 * 24 * 365 * 2, path='/')
-
-    return response
-
-"""
-クッキーの取得
-"""
-
-def get_cookie(request):
-
-    user_id = request.COOKIES["cookie"]
-    if user_id:
-        user = session.query(User).filter(User.id == user_id).first()
-        user = {'user_name': user.name}
-        return user
-    else:
-        return None
-
-"""
-ユーザー情報
-"""
-def get_user_info(request):
-
-    user_id = request.COOKIES["cookie"]
-
-    user = session.query(UserAuth).filter(
-                 UserAuth.id == user_id
-           ).first()
-
-    social = session.query(Social).filter(
-              Social.user_id == user_id
-            ).first()
-
-    if social == None:
-        user_info = {
-            'username': user.username,
-            'email': user.email,
-            'image': user.image,
-            'date_joined': user.date_joined
-        }
-    else:
-        user_info = {
-            'username': user.username,
-            'email': user.email,
-            'image': user.image,
-            'social': social.provider,
-            'date_joined': user.date_joined
-        }
-
-    return user_info
-
-"""
-ログインしていれば、リダイレクト
-"""
-
-def is_logged_in_redirect(user):
-    if user is not None:
-        return redirect('/index/')
-
-"""
-ユーザー登録確認画面用のチェック項目
-"""
-
-def check_form(form):
-
-    user = User(
-         name=form.get('name'),
-         email=form.get('email'),
-         password=form.get('password'),
-    )
-
-    user_form = {
-         'id': user.id,
-         'name': user.name,
-         'email': user.email,
-    }
-
-    return user_form
-
-"""
-Emailの有、無
-"""
-
-def check_email(request, form):
-
-    try:
-        user_id = request.COOKIES["cookie"]
-        if user_id is not None:
-
-            user_email_cheker = session.query(UserAuth).filter(
-                                    UserAuth.id == user_id,
-                                    UserAuth.email == form.get('email'),
-                                ).all()
-            if user_email_cheker:
-                pass
-        else:
-
-            user_email_cheker = session.query(UserAuth).filter(
-                                    UserAuth.email == form.get('email'),
-                                ).all()
-
-            if user_email_cheker:
-                return False
-            else:
-                return True
-    except:
-
-        user_email_cheker = session.query(UserAuth).filter(
-                                UserAuth.email == form.get('email'),
-                            ).all()
-
-        if user_email_cheker:
-            return False
-        else:
-            return True
-
-"""
-ユーザー新規作成
-"""
-
-def users_create(form):
-
-    user = User(
-           name=form.get('name'),
-           email=form.get('email'),
-           password=form.get('password'),
-           image='/img/profile.png'
-    )
-
-    session.add(user)
-    session.commit()
-
-    return user
-
-"""
-ログイン画面
-"""
-
-def user_login(form):
-
-    mail = session.query(User).filter(
-                User.email == form.get('email')
-           ).first()
-
-    if mail == None:
-        error = {
-            'error': 'メールアドレスの内容が異なります'
-        }
-        return error
-
-    password = session.query(User).filter(
-                  User.password == form.get('password')
-               ).first()
-
-    if password == None:
-        error = {
-            'error': 'パスワードの内容が異なります'
-        }
-        return error
-
-def login_user_checker(form):
-
-    user_name_check = session.query(User).filter(
-            User.email == form.get('email')
-          ).first()
-
-    return user_name_check.id
-
-
-"""
-ユーザー編集画面
-"""
-
-def update_users(request, form):
-
-    user_id = request.COOKIES["cookie"]
-
-    user = session.query(UserAuth).filter(
-                UserAuth.id == user_id
-          ).first()
-
-    user.name = form.get('name')
-    user.email = form.get('email')
-
-    img_file = request.FILES['img_file']
-
-    if img_file is None:
-        user.image = '/img/profile.png'
-
-    else:
-        img_file = img_file.name
-        img_filename = Image.open(request.FILES['img_file'])
-        img_filename.save(os.path.join('./static/img/', img_file))
-
-        img_file = os.path.join(UPLOAD_FOLDER, img_file)
-        user.image = img_file
-
-    session.commit()
-
-    return user
-
-
-"""
 SNSログイン
 """
 
 def create_socials_user(data):
 
-    user = UserAuth(
-        username = data['displayName'],
-        image='/img/profile.png',
+    secret = 'google'
+    password = hmac.new(
+                secret.encode('UTF-8'),
+                SECRET_KEY.encode('UTF-8'),
+                hashlib.sha256
+           ).hexdigest()
+
+    user = User.objects.create(
+        username = data["displayName"],
+        email = data["emails"][0]['value'],
+        password = password,
+        is_staff = 0,
+        is_active = 1,
+        image='/static/img/profile.png',
     )
 
-    session.add(user)
-    session.commit()
+    if user:
+        user.save()
 
-    return user
+        return user
+    else:
+        return redirect("apps:login")
+
 
 def create_facebook_user(data):
 
-    user = UserAuth(
+    secret = 'facebook'
+    password = hmac.new(
+                secret.encode('UTF-8'),
+                SECRET_KEY.encode('UTF-8'),
+                hashlib.sha256
+           ).hexdigest()
+
+    user = User.objects.create(
         username = data['name'],
         email = data['email'],
-        image='/img/profile.png',
+        password = password,
+        is_staff = 0,
+        is_active = 1,
+        image='/static/img/profile.png',
     )
-    print(user)
 
-    session.add(user)
-    session.commit()
+    if user:
+        user.save()
 
-    return user
+        return user
+    else:
+        return redirect("apps:login")
 
 def create_socials(user_id , data, provider):
     if provider == 'google':
@@ -301,7 +122,6 @@ def create_socials(user_id , data, provider):
            provider = provider,
            provider_id = data['id']
         )
-    print(social)
 
     session.add(social)
     session.commit()
@@ -322,12 +142,10 @@ def check_socials(data, provider):
     if social is None:
         return False
     else:
-        login_user(social.user_id)
-        return True
+        return social
 
 """
-facebook, ログイン認証
-ユーザーID、ユーザー名取得
+Facebook, ログイン認証
 """
 
 def get_facebook_user(facebook_id):
@@ -344,8 +162,8 @@ def get_facebook_access_token(code):
     url = 'https://graph.facebook.com/v3.2/oauth/access_token'
     params = {
             'redirect_uri': FACEBOOK_CALLBACK_URL,
-            'client_id': FACEBOOK_ID,
-            'client_secret': FACEBOOK_SECRET,
+            'client_id': SOCIAL_AUTH_FACEBOOK_KEY,
+            'client_secret': SOCIAL_AUTH_FACEBOOK_SECRET,
             'code': code,
     }
     r = requests.get(url, params=params)
@@ -356,7 +174,7 @@ def check_facebook_access_token(access_token):
     url = 'https://graph.facebook.com/debug_token'
     params = {
         'input_token': access_token,
-        'access_token': '%s|%s' % (FACEBOOK_ID, FACEBOOK_SECRET)
+        'access_token': '%s|%s' % (SOCIAL_AUTH_FACEBOOK_KEY, SOCIAL_AUTH_FACEBOOK_SECRET)
     }
     r = requests.get(url, params=params)
     return r.json()['data']
@@ -371,11 +189,11 @@ def get_facebook_user_info(access_token, user_id):
     return requests.get(url, params=params).json()
 
 """
-google, ログイン認証
-ユーザーID、ユーザー名の取得
+Google, ログイン認証
 """
 
 def google_login_flow(code):
+
 
     credentials = flow.step2_exchange(code)
 
@@ -389,13 +207,3 @@ def google_login_flow(code):
     result = service.people().get(userId='me').execute()
 
     return result
-
-"""
-クッキーの削除、ログアウト
-"""
-def logout():
-
-    response = redirect('/login/')
-    response.delete_cookie(key='cookie')
-
-    return response

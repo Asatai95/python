@@ -11,7 +11,6 @@ from django.conf.urls.static import static
 app_name = 'mysite'
 
 urlpatterns = [
-    path('test/', views.Test.as_view(), name='test'),
     path('login/', views.Login.as_view(), name='login'),
     # path('customer/login/', views.LoginCustomer.as_view(), name='customer_login'),
     path('logout/', login_required(views.Logout.as_view()), name='logout'),
@@ -32,8 +31,10 @@ urlpatterns = [
     path('roomii/info/<int:article_id>', login_required(views.InfoView.as_view()), name='info'),
     path('roomii/create/', login_required(views.ArticleEdit.as_view()), name='create'),
     path('roomii/update/<int:pk>', login_required(views.ArticleUpdate.as_view()), name='update'),
-    # path('roomii/confirm/', login_required(views.ArticleEdit.as_view()), name='confirm'),
-
+    path('google/login/', views.RedirectGoogle.as_view(), name='google_login'),
+    path('auth/complete/google-oauth2/', views.Accesstoken.as_view(), name='google_callback'),
+    path('facebook/login/', views.RedirectFacebook.as_view(), name='facebook_login'),
+    path('auth/complete/facebook/', views.CallbackFacebook.as_view(), name='facebook_callback'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

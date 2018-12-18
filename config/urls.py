@@ -16,7 +16,7 @@ urlpatterns = [
     path('', include('mysite.urls', namespace='register')),
     path('register/', include('django.contrib.auth.urls')),
     path('index/', mysite.views.Index, name='index' ),
-    path('auth/', include('social_django.urls', namespace='social')),
+    # path('auth/', include('social_django.urls', namespace='social')),
 
 ]
 
