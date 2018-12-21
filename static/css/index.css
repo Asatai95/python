@@ -11,8 +11,23 @@ li {
 
 /*header*/
 
-header {
+li.info {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 20;
+  margin: auto;
+  font-size: 25px;
+  border: 2px solid blue;
+  border-radius: 10px;
+  height: 80px;
+  padding: 17px;
+  background-color: rgba(255, 255, 255);
+}
+
+header {
+  z-index: 5;
   position: absolute;
 }
 
@@ -24,7 +39,7 @@ header {
 .dropmenu{
   *zoom: 1;
   list-style-type: none;
-  width: 960px;
+  width: 1110px;
   margin: 5px auto 30px;
   padding: 0;
 }
@@ -39,7 +54,7 @@ header {
 
 .dropmenu li{
   position: relative;
-  width: 15%;
+  width: 13%;
   float: left;
   margin: 0;
   padding: 0;
@@ -55,6 +70,10 @@ header {
 }
 
 .dropmenu li.last{
+  margin-right: 15px;
+}
+
+.dropmenu li.price {
   margin-right: 15px;
 }
 
@@ -89,6 +108,10 @@ header {
   border-top: 1px solid #7c8c0e;
   background: #6e7c0c;
   text-align: left;
+}
+
+.dropmenu li.price ul li a {
+  font-size: 13px;
 }
 
 .dropmenu li:hover > a{
@@ -131,6 +154,45 @@ header {
   margin-right: 20px;
 }
 
+/*
+#fade-in li ul li a input {
+	position: relative;
+	margin: 0 1rem 0 0;
+	cursor: pointer;
+}*/
+
+#fade-in li ul li a input:before {
+	position: absolute;
+	z-index: 1;
+  bottom: 1.0rem;
+	left:  1.1rem;
+	width: 0.75rem;
+	height: 0.375rem;
+	content: '';
+	-webkit-transition: -webkit-transform 0.4s cubic-bezier(0.45, 1.8, 0.5, 0.75);
+	        transition:         transform 0.4s cubic-bezier(0.45, 1.8, 0.5, 0.75);
+	-webkit-transform: rotate(-45deg) scale(0, 0);
+	        transform: rotate(-45deg) scale(0, 0);
+	border: 2px solid #da3c41;
+	border-top-style: none;
+	border-right-style: none;
+}
+
+#fade-in li ul li a input:checked:before {
+	-webkit-transform: rotate(-45deg) scale(1, 1);
+	        transform: rotate(-45deg) scale(1, 1);
+}
+
+#fade-in li ul li a input:after {
+	position: absolute;
+	width: 1rem;
+	height: 1rem;
+	content: '';
+	cursor: pointer;
+	border: 2px solid #f2f2f2;
+	background: #ffffff;
+}
+
 #form1{
   float: right;
   position:relative;/*フォームの相対位置*/
@@ -162,7 +224,7 @@ header {
 .bg-light {
   width: 100%;
   position: fixed;
-  z-index: 30;
+  z-index: 10;
 }
 
 .container.mt-3 {
@@ -741,6 +803,16 @@ li.new_account {
   border-radius: 50px;
 }
 
+.preview_files {
+  display: none;
+}
+
+.preview_files img {
+    height: 100px;
+    width: 100px;
+    margin: 10px;
+}
+
 .profile-header {
   display: flex;
 }
@@ -983,7 +1055,7 @@ a:hover {
 .content_main {
   z-index: 5;
   position: absolute;
-  max-width: 940px;
+  max-width: 1100px;
   margin-top: 100px;
 }
 
@@ -1092,23 +1164,35 @@ a:hover {
   position: relative;
   float: right;
   z-index: 20;
+}
+
+.dark {
+  display: none;
+  position: relative;
+  float: right;
+  z-index: 20;
+}
+
+#heart {
   width: 100px;
   height: 100px;
-  background: url('http://nelog.jp/wp-content/uploads/2016/03/heart_animation.png') no-repeat;
+  background: url(http://nelog.jp/wp-content/uploads/2016/03/heart_animation.png) no-repeat;
   background-position: 0 0;
   cursor: pointer;
 }
 
-.heart:hover {
+#heart:hover {
   background-position: -2800px 0;
   -webkit-transition: background 1s steps(28);
   transition: background 1s steps(28);
 }
 
-.heart.commit {
-  position: relative;
-  float: right;
-  z-index: 20;
+#commit {
+  width: 100px;
+  height: 100px;
+  background: url(http://nelog.jp/wp-content/uploads/2016/03/heart_animation.png) no-repeat;
+  background-position: 0 0;
+  cursor: pointer;
   background-position: -2800px 0;
   -webkit-transition: background 1s steps(28);
   transition: background 1s steps(28);
@@ -1130,9 +1214,6 @@ a:hover {
 }
 
 /*詳細情報*/
-.topic {
-  width: 930px;
-}
 
 .image_field {
   margin-bottom: 30px;

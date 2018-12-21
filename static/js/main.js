@@ -6,6 +6,18 @@ $(document).ready(function() {
   });
 });
 
+$(function() {
+  $('input[id=commit]').on("click", function(){
+    $(this).attr('id', 'heart');
+  });
+});
+
+$(function() {
+  $('input[id=heart]').on("click", function(){
+    $(this).attr('id', 'commit');
+  });
+});
+
 $(function(){
   $('label').each(function(){
     var divText = $(this).html();
@@ -16,6 +28,20 @@ $(function(){
                            .replace("Email:", "Email")
                            .replace("新しいパスワード:", "新しいパスワード")
                            .replace("新しいパスワード(確認用):", "新しいパスワード(確認用)")
+                           .replace("メイン画像:", "メイン画像")
+                           .replace("名称:", "名称")
+                           .replace("キャッチコピー:", "キャッチコピー")
+                           .replace("住所:", "住所")
+                           .replace("駐車場:", "駐車場")
+                           .replace("家賃:", "家賃")
+                           .replace("間取り:", "間取り")
+                           .replace("階数:", "階数")
+                           .replace("初期費用:", "初期費用")
+                           .replace("共益費:", "共益費")
+                           .replace("契約期間:", "契約期間")
+                           .replace("備考:", "備考")
+                           .replace("その他の画像:", "その他の画像")
+                           .replace("空室情報:", "空室情報")
 
     );
   });
@@ -72,6 +98,32 @@ $(function(){
 });
 
 $(function(){
+  $('#id_files').change(function(){
+    if ( !this.files.length ) {
+      return;
+    }
+    $('.preview_files').text('');
+
+    var $files = $(this).prop('files');
+    var len = $files.length;
+    for ( var i = 0; i < len; i++ ) {
+      var file = $files[i];
+      var fr = new FileReader();
+
+      fr.onload = function(e) {
+        var src = e.target.result;
+        var img = '<img src="'+ src +'">';
+        $('.preview_files').append(img);
+      }
+
+      fr.readAsDataURL(file);
+    }
+
+    $('.preview_files').css('display','block');
+  });
+});
+
+$(function(){
   if($('.img_preview').length){
     $(".sample_img").css("display", "none");
   }
@@ -95,7 +147,6 @@ $(function() {
 
       if ($('#fade-in li.last ul li').css('display') == 'none') {
         $('#fade-in li.last ul li').fadeIn();
-
       }
     }
   });
@@ -109,7 +160,6 @@ $(function() {
 
       if ($('#fade-in li.middle ul li').css('display') == 'none') {
         $('#fade-in li.middle ul li').fadeIn();
-
       }
     }
   });
@@ -127,6 +177,20 @@ $(function() {
     }
   });
 });
+
+$(function() {
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.first ul a').length) {
+      $('#fade-in li.price ul li').fadeOut();
+    } else if ($(e.target).closest('li.price ul').length) {
+
+      if ($('#fade-in li.price ul li').css('display') == 'none') {
+        $('#fade-in li.price ul li').fadeIn();
+      }
+    }
+  });
+});
+
 
 $(function() {
   $('#fade-in li ul li a').click(function(){
@@ -149,6 +213,11 @@ $(function() {
       $(this).find('input[name="floor"]').prop('checked', true);
     }
 
+    if ($(this).find('input[name="price"]').prop('checked')) {
+      $(this).find('input[name="price"]').prop('checked', false);
+    } else {
+      $(this).find('input[name="price"]').prop('checked', true);
+    }
   });
 });
 
@@ -167,6 +236,11 @@ $(function(){
       $('.calendar').fadeIn();
       $('.calendar input').attr("required", true);
       $('.vacant_live input').removeAttr("required");
+    } else {
+      $('.vacant_live input').removeAttr("required");
+      $('.vacant_live').fadeOut();
+      $('.calendar input').removeAttr("required");
+      $('.calendar').fadeOut();
     }
   });
 });
@@ -200,6 +274,7 @@ $(function(){
     });
   });
 });
+
 $(function(){
   $(document).ready(function(){
     $('div.image_sub_contents').slick({

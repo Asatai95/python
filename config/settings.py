@@ -22,7 +22,6 @@ SECRET_KEY = '75c6@w6i1c=xsb$($_117$zk-v!@n*5r9(@tgcj+n=jj+ff*g!'
 
 DEBUG = True
 
-
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -139,9 +138,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-
-# MEDIA_ROOT = '/var/www/{}/media'.format(PROJECT_NAME)
 
 AUTH_USER_MODEL = 'mysite.User'
 

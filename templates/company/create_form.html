@@ -10,6 +10,9 @@
         <div class='error'>
           <span class="error_meaasage" id="username_error"></span>
         </div>
+        <div class="preview">
+          <img class='sample_img' src="/media/living.jpg" alt="">
+        </div>
         {{ form.non_field_errors }}
         {% for field in form %}
         <div class="form-group">
@@ -37,6 +40,8 @@
             <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
             <input type="text" name="info" value="">
           </div>
+        </div>
+        <div class="preview_files">
         </div>
         {% csrf_token %}
         <button type="submit" class="btn btn-success btn-lg btn-block">登録</button>

@@ -12,7 +12,7 @@
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
     <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
-    <link rel="shortcut icon" href="{% static 'img/wanko.png' %}">
+
     <title>roomii</title>
 </head>
 <body>
@@ -31,6 +31,9 @@
          </li>
          <li>
            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+         </li>
+         <li>
+           <a class="nav-item nav-link" href="#">メッセージBox</a>
          </li>
          <li>
            <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>

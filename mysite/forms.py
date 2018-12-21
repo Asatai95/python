@@ -141,6 +141,11 @@ class Createform(forms.ModelForm):
               ('1', '空室ではないです'),
             )
 
+    rent = forms.CharField(
+           label='家賃',
+           max_length=150,
+           widget=forms.TextInput(attrs={'placeholder':'例: 3万円, 3.5万円'}))
+
     park = forms.ChoiceField(
            label='駐車場',
            widget=forms.Select,
@@ -157,17 +162,21 @@ class Createform(forms.ModelForm):
            choices=CHOICE_Floor)
 
     initial_cost = forms.CharField(
-           label='初期費用', max_length=150)
+           widget=forms.TextInput(attrs={'placeholder':'例: 4万円, 5.5万円'}),
+           label='初期費用',
+           max_length=150)
 
     common_service_expense = forms.CharField(
+           widget=forms.TextInput(attrs={'placeholder':'例: 1千円, 1千円'}),
            label='共益費', max_length=150)
 
     term_of_contract = forms.CharField(
+           widget=forms.TextInput(attrs={'placeholder':'例: 2年'}),
            label='契約期間', max_length=150)
 
     column = forms.CharField(
            label='備考',
-           widget=forms.Textarea,
+           widget=forms.Textarea(attrs={'placeholder':'例: ペットOK！'}),
            max_length=150)
 
     files = forms.FileField(
@@ -183,12 +192,11 @@ class Createform(forms.ModelForm):
 
     class Meta:
         model = ArticleCreate
-        fields = ( "article_image", "article_name", "comments", "address", "rent",)
+        fields = ( "article_image", "article_name", "comments", "address", )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
-
             field.widget.attrs['class'] = 'form-control'
 
     def save(self, commit=True):
@@ -202,7 +210,6 @@ class Createform(forms.ModelForm):
         for file_image in other_files:
             file_obj = RoomImage.objects.create(article_id=file_id.id, image=file_image)
             tmp_image_id.append(file_obj.id)
-
             if commit:
                 file_obj.save()
             self.instance.others.append(file_obj)

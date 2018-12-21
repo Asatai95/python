@@ -1,22 +1,24 @@
 {% extends 'apps/base.html' %}
 {% load static %}
-
 {% block content %}
 
+{{message}}
 <div class='content_main'>
   <div class='topic'>
     <div class="main_container">
-      {% for view_list in object_list %}
-        <div class="item box-big{{view_list.id}}">
-          <div class='img_item'>
-            <div class="hide_text">
-              <p class='text'>{{view_list.comments}}</p>
-            </div>
-            <a href="{%url 'apps:info' view_list.id %}">
+      {% for object_list_view in tmp_list %}
+        {% for view_list in object_list_view %}
+      <div class="item box-big{{view_list.id}}">
+        <div class='img_item'>
+          <div class="hide_text">
+            <p class='text'>{{view_list.comments}}</p>
+          </div>
+          <a href="{%url 'apps:info' view_list.id %}">
               <img src="/media/{{view_list.article_image}}" alt="">
             </a>
-          </div>
-          {% if user.is_staff is False%}
+          <div class='test'></div>
+        </div>
+        {% if user.is_staff is False%}
           {%for article_live in live %}
             {% if article_live.article_id == view_list.id %}
               {% if article_live.vacancy_info == '0' %}
@@ -30,51 +32,119 @@
               {% endif %}
             {% endif %}
           {% endfor %}
-          {% if not fab_view %}
-          <!-- <form action="" method="get"> -->
+        {% if not fab_view %}
+        <form id="fab_id" action="{% url 'apps:get_ajax' %}" method="POST">
+          {% csrf_token %}
           <div class="heart">
-            <!-- <input id="heart" type="submit" value="" /> -->
-            <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
+            <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+            <input id="heart" class='fab_bt' type="submit" value="" />
           </div>
-          <!-- </form> -->
+        </form>
+        {% endif %}
+        {% for view in fab_view %}
+          {% if view.article_id == view_list.id %}
+            {% if view.user_id == user.id %}
+              {% if view.flag == 1 %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST" >
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="commit" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% elif view.flag == 0 %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="heart" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% else %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="heart" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% endif %}
+            {% endif %}
           {% endif %}
-            {% for view in fab_view %}
-              {% if view.article_id != view_list.id %}
-               <!-- <form action="" method="get"> -->
-               <div class="heart">
-                 <!-- <input id="heart" type="submit" value="" /> -->
-                 <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-               </div>
-               <!-- </form> -->
-               {% endif %}
-                {% if view.article_id == view_list.id %}
-                 {% if view.flag == 0 %}
-                 <!-- <form action="" method="get"> -->
-                   <div class="heart">
-                     <!-- <input id="heart" type="submit" value="" /> -->
-                     <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-                   </div>
-                 <!-- </form> -->
-                 {% else %}
-                 <!-- <form action="" method="get"> -->
-                   <div class="heart commit">
-                     <!-- <input id="heart" type="submit" value="" /> -->
-                     <a href="{% url 'apps:fab' user.pk view_list.id%}"></a>
-                   </div>
-                 {% endif %}
-               {% endif %}
-              {% endfor %}
-             {%else%}
-             <div class='update'>
-               <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
-             </div>
-             {%endif%}
-        </div>
+        {% endfor %}
+        <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+          {% csrf_token %}
+          <div class="dark">
+            <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+            <input id="heart" class='fab_bt' type="submit" value="" />
+          </div>
+        </form>
 
+        {%else%}
+        <div class='update'>
+          <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
+        </div>
+        {% endif %}
+      </div>
       {% endfor %}
+    {% endfor %}
     </div>
   </div>
 </div>
 
 
+{% endblock %}
+
+{% block extrajs %}
+
+<script type="text/javascript">
+function getCookie(name) {
+  var cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = jQuery.trim(cookies[i]);
+      // Does this cookie string begin with the name we want?
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+$.ajaxSetup({
+    beforeSend: function (xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+
+// var token = '{{csrf_token}}';
+
+// 送信ボタンで呼ばれる
+$('form[method="POST"]').on('submit', function(e) {
+  // デフォルトのイベントをキャンセルし、ページ遷移しないように!
+  e.preventDefault();
+  $.ajax({
+    'url': "{% url 'apps:get_ajax' %}",
+    'type': 'POST',
+    'data': {
+      'fab': $(this).find('#heart').val(),
+    },
+    'dataType': 'json',
+  });
+  return false;
+});
+
+</script>
 {% endblock %}

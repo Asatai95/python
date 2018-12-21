@@ -1,0 +1,207 @@
+"""
+ajax
+"""
+{% block extrajs %}
+
+<script>
+  // function getCookie(name) {
+  //   var cookieValue = null;
+  //   if (document.cookie && document.cookie !== '') {
+  //     var cookies = document.cookie.split(';');
+  //     for (var i = 0; i < cookies.length; i++) {
+  //       var cookie = jQuery.trim(cookies[i]);
+  //       // Does this cookie string begin with the name we want?
+  //       if (cookie.substring(0, name.length + 1) === (name + '=')) {
+  //         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+  //         break;
+  //       }
+  //     }
+  //   }
+  //   return cookieValue;
+  // }
+  //
+  // var csrftoken = getCookie('csrftoken');
+  //
+  // function csrfSafeMethod(method) {
+  //     // these HTTP methods do not require CSRF protection
+  //     return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  // }
+  //
+  // $.ajaxSetup({
+  //     beforeSend: function (xhr, settings) {
+  //         if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+  //             xhr.setRequestHeader("X-CSRFToken", csrftoken);
+  //         }
+  //     }
+  // });
+
+
+
+
+</script>
+
+{% endblock %}
+
+
+
+
+"""
+検索部分, 保存用
+"""
+
+# def get_queryset(self):
+  #     tmp_list = []
+
+      # if self.request.user.is_staff is False:
+      #     object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag')
+      #     tmp_list.append(object_list)
+      # else:
+      #     object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag')
+      #     tmp_list.append(object_list)
+
+      # article = self.request.GET.get('name')
+      # if article is "" or article is None:
+      #     article = "選択なし"
+      #
+      # address = self.request.GET.get('article_address')
+      # if address is "" or address is None:
+      #     address = '選択なし'
+      #
+      # floor_list = self.request.GET.getlist('floor')
+      # if floor_list == []:
+      #     floor = '選択なし'
+      # else:
+      #     for list_value in floor_list:
+      #         floor = list_value
+      #
+      # room_list = self.request.GET.getlist('room')
+      # if room_list == []:
+      #     room = '選択なし'
+      # else:
+      #     for list_value in room_list:
+      #         room = list_value
+      #
+      # live_list = self.request.GET.getlist('live')
+      # if live_list == [] :
+      #     live = '選択なし'
+      # else:
+      #     for list_value in live_list:
+      #         live = list_value
+      #
+      # price_list = self.request.GET.getlist('price')
+      # if price_list == []:
+      #     price = '選択なし'
+      # else:
+      #     for list_value in price_list:
+      #         price = price_list
+      #
+      # if self.request.user.is_staff is True:
+      #     if article is not None or address is not None or floor is not None or room is not None:
+      #         object_list = object_list.order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag').filter(
+      #                 Q(article_name__contains=article) | Q(address__contains=address)
+      #         ).filter(customer=self.request.user.id)
+      #         if not object_list:
+      #             object_list = object_list.order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag').filter(
+      #                 Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+      #             ).filter(customer=self.request.user.id)
+      #
+      #         if not object_list:
+      #             articlelive_list = ArticleLive.objects.all()
+      #             for check_live in live:
+      #                 if check_live == '0':
+      #                     tmp_live = []
+      #                     articlelive_list = articlelive_list.filter(vacancy_info=check_live)
+      #                     for article_list in articlelive_list:
+      #                         print(article_list)
+      #                         object_list = self.model.objects.all().filter(
+      #                                 customer=self.request.user.id, live_flag=article_list.id
+      #                         )
+      #
+      #
+      #                 else:
+      #                     articlelive_list = articlelive_list.order_by("id").filter(vacancy_info=check_live)
+      #
+      #                     for article_list in articlelive_list:
+      #                         object_list = self.model.objects.all().filter(
+      #                                  customer=self.request.user.id, live_flag=article_list.id
+      #                         )
+      # else:
+      #     if article is not None or address is not None or floor is not None or room is not None:
+      #         articlelive_list = ArticleLive.objects.filter(vacancy_info=live)
+      #         for article_list in articlelive_list:
+      #
+      #             object_list = Article.objects.distinct().filter(
+      #                     Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+      #             )
+      #
+      #             tmp_list.append(object_list)
+      #         print(tmp_list)
+      #
+      #     return object_list
+      #     # else:
+      #     #     articlelive_list = articlelive_list.filter(vacancy_info=check_live)
+      #     #     for article_list in articlelive_list:
+      #     #         object_list = Article.objects.filter(
+      #     #                  Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+      #     #         )
+      #     #         tmp_list.append(object_list)
+      #     #     print(tmp_list)
+      #     # else:
+      #     #     for price_list in price:
+      #     #         if price_list == "1":
+      #     #             object_list = Article.objects.filter(
+      #     #                      Q(rent__istartswith='1') | Q(rent__istartswith='2')
+      #     #             )
+      #     #
+      #     #         elif price_list == "2":
+      #     #             for article_list in articlelive_list:
+      #     #                 object_list |= Article.objects.filter(
+      #     #                          Q(rent__startswith='3') | Q(rent__startswith='4')
+      #     #                 )
+      #     #         elif price_list == "3":
+      #     #             for article_list in articlelive_list:
+      #     #                 object_list |= Article.objects.filter(
+      #     #                          Q(rent__startswith='5') | Q(rent__startswith='6')
+      #     #                 )
+      #     #         elif price_list == "4":
+      #     #             for article_list in articlelive_list:
+      #     #                 object_list |= Article.objects.filter(
+      #     #                          Q(rent__startswith='7') | Q(rent__startswith='8')
+      #     #                 )
+      #
+      #     if self.request.user.is_staff is False:
+      #
+      #         object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+      #         tmp_list.append(object_list)
+      #
+      #         return object_list
+      #
+      #     else:
+      #         object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+      #         tmp_list.append(object_list)
+      #
+      #         return object_list
+
+
+      else:
+                for price_list in price:
+                    if price_list == "1":
+                        object_list = Article.objects.filter(
+                                 Q(rent__istartswith='1') | Q(rent__istartswith='2')
+                        )
+
+                    elif price_list == "2":
+                        for article_list in articlelive_list:
+                            object_list |= Article.objects.filter(
+                                     Q(rent__startswith='3') | Q(rent__startswith='4')
+                            )
+                    elif price_list == "3":
+                        for article_list in articlelive_list:
+                            object_list |= Article.objects.filter(
+                                     Q(rent__startswith='5') | Q(rent__startswith='6')
+                            )
+                    elif price_list == "4":
+                        for article_list in articlelive_list:
+                            object_list |= Article.objects.filter(
+                                     Q(rent__startswith='7') | Q(rent__startswith='8')
+                            )

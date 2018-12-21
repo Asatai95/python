@@ -4,7 +4,7 @@ from PIL import Image
 from django import *
 from django.conf import settings
 from importlib import import_module
-from django.http import HttpResponse, HttpRequest, HttpResponseRedirect
+from django.http import HttpResponse, HttpRequest, HttpResponseRedirect, JsonResponse
 from django.template import loader
 from django.views.generic import CreateView, ListView, TemplateView
 from django.contrib.auth import login, authenticate
@@ -43,6 +43,8 @@ from .forms import (
 
 import requests
 
+import re
+
 
 """
 Settingファイル
@@ -56,6 +58,28 @@ from mysite.library import *
 Get_user = get_user_model()
 ArticleMain = Article.objects.all()
 ArticleImage = RoomImage.objects.all()
+
+
+"""
+エラーページ
+"""
+
+def error_404(request):
+
+    contexts = {
+        'request_url': request.path,
+    }
+
+    return render(request, '404.html', contexts, status=404)
+
+def error_500(request):
+
+    contexts = {
+        'request_url': request.path,
+    }
+
+    return render(request, '500.html', contexts, status=500)
+
 
 """
 ログインしていない場合、Loginページ
@@ -175,7 +199,6 @@ class PasswordChangeDone(PasswordChangeDoneView):
     """パスワード変更しました"""
     template_name = 'register/password_change_done.html'
 
-
 """
 パスワード再設定
 """
@@ -276,51 +299,90 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
 
         return resolve_url('register:user_detail', pk=self.kwargs['pk'])
 
+"""
+不適切な入力、トップページにリダイレクト
+"""
+
+def Redirect(request, location=None):
+
+    return redirect('apps:top')
+
+
+"""
+お気に入り機能
+"""
 
 
 """
 TOPページ, 検索機能
 """
+
 class MainView(generic.ListView):
     model = Article
     template_name = 'apps/index.html'
+    success_url = 'apps:top'
 
     def get_context_data(self, **kwargs):
+
+
+        """
+        トップ画面表示(一部)
+        """
 
         context = super(MainView, self).get_context_data(**kwargs)
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
-        fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
+        fab_view = Fab.objects.all()
+
+        fab_test = Article.objects.all()
+
         live = ArticleLive.objects.all()
 
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
         context['live'] = live
+        context['fab_test'] = fab_test
 
-        return context
+        """
+        検索部分
+        """
 
-    def get_queryset(self):
-
-        if self.request.user.is_staff is False:
-            object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag')
-        else:
-            object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag')
         article = self.request.GET.get('name')
         if article is "" or article is None:
             article = "選択なし"
+
         address = self.request.GET.get('article_address')
         if address is "" or address is None:
             address = '選択なし'
-        floor = self.request.GET.getlist('floor')
-        if floor is None:
+
+        floor_list = self.request.GET.getlist('floor')
+        if floor_list == []:
             floor = '選択なし'
-        room = self.request.GET.getlist('room')
-        if room is None:
+        else:
+            for list_value in floor_list:
+                floor = list_value
+
+        room_list = self.request.GET.getlist('room')
+        if room_list == []:
             room = '選択なし'
-        live = self.request.GET.getlist('live')
-        if live is None:
+        else:
+            for list_value in room_list:
+                room = list_value
+
+        live_list = self.request.GET.getlist('live')
+        if live_list == [] :
             live = '選択なし'
+        else:
+            for list_value in live_list:
+                live = list_value
+
+        price_list = self.request.GET.getlist('price')
+        if price_list == []:
+            price = '選択なし'
+        else:
+            for list_value in price_list:
+                price = list_value
 
         if self.request.user.is_staff is True:
             if article is not None or address is not None or floor is not None or room is not None:
@@ -340,7 +402,7 @@ class MainView(generic.ListView):
                             articlelive_list = articlelive_list.filter(vacancy_info=check_live)
                             for article_list in articlelive_list:
                                 print(article_list)
-                                object_list |= self.model.objects.all().filter(
+                                object_list = self.model.objects.all().filter(
                                         customer=self.request.user.id, live_flag=article_list.id
                                 )
 
@@ -349,72 +411,112 @@ class MainView(generic.ListView):
                             articlelive_list = articlelive_list.order_by("id").filter(vacancy_info=check_live)
 
                             for article_list in articlelive_list:
-                                object_list |= self.model.objects.all().filter(
+                                object_list = self.model.objects.all().filter(
                                          customer=self.request.user.id, live_flag=article_list.id
                                 )
         else:
-            if article is not None or address is not None or floor is not None or room is not None:
-                object_list = self.model.objects.all().filter(
-                       Q(article_name__contains=article) | Q(address__contains=address)
-                )
-                if not object_list:
-                    object_list = object_list.filter(
-                       Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                    )
+            tmp_list = []
+            if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
+                if live == '選択なし':
+                    if price == '選択なし':
+                        object_list = Article.objects.distinct().filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '1':
+                        object_list = Article.objects.distinct().filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '2':
 
-                if not object_list:
-                    articlelive_list = ArticleLive.objects.all()
-                    for check_live in live:
-                        if check_live == '0':
-                            tmp_live = []
-                            articlelive_list = articlelive_list.filter(vacancy_info=check_live)
-                            for article_list in articlelive_list:
-                                print(article_list)
-                                object_list |= self.model.objects.all().filter(
-                                        live_flag=article_list.id
-                                )
+                        object_list = Article.objects.distinct().filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5") , Q(rent__gte="3")
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.distinct().filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "7") , Q(rent__gte="5")
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.distinct().filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        )
+                        tmp_list.append(object_list)
+                else:
+                    articlelive_list = ArticleLive.objects.filter(vacancy_info=live)
+                    for article_list in articlelive_list:
+                        if price == '選択なし':
+                            object_list = Article.objects.all().filter(
+                                    Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                            ).distinct()
+                            print(object_list)
+                            tmp_list.append(object_list)
 
+                        elif price == '1':
+                            object_list = Article.objects.distinct().filter(
+                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                    Q(rent__lte="3")
+                            )
+                            tmp_list.append(object_list)
+                        elif price == '2':
+                            object_list = Article.objects.distinct().filter(
+                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                    Q(rent__lte= "5"), Q(rent__gte="3")
+                            )
+                            tmp_list.append(object_list)
+                        elif price == '3':
+                            object_list = Article.objects.distinct().filter(
+                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                    Q(rent__lte= "5"), Q(rent__gte="7")
+                            )
+                            tmp_list.append(object_list)
+                        elif price == '4':
+                            object_list = Article.objects.distinct().filter(
+                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                    Q(rent__gte="7")
+                            )
+                            tmp_list.append(object_list)
+            if not tmp_list[0] :
+                if self.request.user.is_staff is False:
 
-                        else:
-                            articlelive_list = articlelive_list.order_by("id").filter(vacancy_info=check_live)
+                    object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                    tmp_list.append(object_list)
+                else:
+                    object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                    tmp_list.append(object_list)
 
-                            for article_list in articlelive_list:
-                                object_list |= self.model.objects.all().filter(
-                                         live_flag=article_list.id
-                                )
-        if self.request.user.is_staff is False:
-            if not object_list:
-                object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+            context["tmp_list"] = tmp_list
+            return context
 
-            return object_list
-        else:
-            if not object_list:
-                object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+    def post(self, request, *args, **kwargs):
 
-            return object_list
-
-
-"""
-お気に入り機能
-"""
-class Like(generic.View):
-    def get(request, *args, **kwargs):
-        fab_db = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id'])
-        is_fab = Fab.objects.filter(user_id=kwargs['pk'], article_id=kwargs['article_id']).values("flag")
-        print(is_fab)
-        if not is_fab:
-            Fab(user_id=kwargs['pk'], article_id=kwargs['article_id'], flag=1).save()
-            return redirect("apps:top")
-        # unlike
-        for fab in is_fab:
-            if fab['flag']> 0:
-                fab_db.update(flag=0)
-                return redirect("apps:top")
-            # like
-            else:
-                fab_db.update(flag=1)
-                return redirect("apps:top")
-
+        if request.POST.get("fab"):
+            print(request.POST.get("fab"))
+            fab_db = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab"))
+            is_fab = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab")).values("flag")
+            if not is_fab:
+                Fab(user_id=request.user.id, article_id=request.POST.get("fab"), flag=1).save()
+            # unlike
+            for fab in is_fab:
+                if fab['flag']> 0:
+                    fab_db.update(flag=0)
+                    context = [{
+                       'message': 'test'
+                    }]
+                    return HttpResponse(context)
+                # like
+                else:
+                    fab_db.update(flag=1)
+                    context = [{
+                       'message': 'test'
+                    }]
+                    return HttpResponse(context)
 """
 詳細情報
 """
@@ -682,7 +784,6 @@ class RedirectFacebook(View):
         }
 
         redirect_url = requests.get(url, params=params).url
-        print(redirect_url)
 
         return redirect(redirect_url)
 
@@ -690,18 +791,14 @@ class CallbackFacebook(View):
 
     def get(self, request, **kwargs):
         if request.GET.get('code'):
-            print(request.GET.get('code'))
             access_token = get_facebook_access_token(request.GET.get('code'))
             data = check_facebook_access_token(access_token)
-            print(data['user_id'])
             if data['is_valid']:
                 data = get_facebook_user_info(access_token, data['user_id'])
-                print(data)
+
                 social = check_socials(data, 'facebook')
                 if social is not False:
-                    print()
                     check_user = Get_user.objects.filter(id=social.user_id)
-                    print(check_user)
                     if check_user:
                         for user in check_user:
                             if user.is_active:
