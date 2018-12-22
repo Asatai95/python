@@ -6,6 +6,54 @@ $(document).ready(function() {
   });
 });
 
+$(function(){
+  $(document).ready(function(){
+    $('.login_after_title').fadeIn();
+  });
+});
+
+$(function(){
+  $('.main_topic_1').on("click", function(){
+    $('.sample_selection.rent').fadeOut();
+    $('.sample_selection.park').fadeIn();
+    $('.form-1 a input').attr('value', '0');
+  });
+  $('.main_topic_2').on("click", function(){
+    $('.sample_selection.rent').fadeOut();
+    $('.sample_selection.park').fadeIn();
+    $('.form-2 a input').attr('value', '1');
+  });
+  $('.main_topic_3').on("click", function(){
+    $('.sample_selection.park').fadeOut();
+    $('.sample_selection.address').fadeIn();
+    $('.form-3 a input').attr('value', '0');
+  });
+  $('.main_topic_4').on("click", function(){
+    $('.sample_selection.park').fadeOut();
+    $('.sample_selection.address').fadeIn();
+    $('.form-4 a input').attr('value', '1');
+  });
+  $(".form-5 input").focusin(function(){
+    $(".form-5 input").css('box-shadow', '0 0 8px blue');
+  });
+  $(".form-5 input").focusout(function(){
+    $(".form-5 input").css('box-shadow', '0 0 0');
+  });
+});
+
+$(function() {
+  $('.item').each(function(){
+    $(this).find(".ribbon12").hover(function(){
+      $(this).find(".ribbon").css("display", 'none');
+      $(this).find(".balloon1-top").css("display", 'block');
+    },
+    function(){
+      $(this).find(".ribbon").css("display", 'block');
+      $(this).find(".balloon1-top").css("display", 'none');
+    });
+  });
+});
+
 $(function() {
   $('input[id=commit]').on("click", function(){
     $(this).attr('id', 'heart');
@@ -15,35 +63,6 @@ $(function() {
 $(function() {
   $('input[id=heart]').on("click", function(){
     $(this).attr('id', 'commit');
-  });
-});
-
-$(function(){
-  $('label').each(function(){
-    var divText = $(this).html();
-    $(this).html(divText.replace("ユーザー名:", "ユーザー名")
-                           .replace("メールアドレス:", "メールアドレス")
-                           .replace("パスワード:", "パスワード")
-                           .replace("パスワードの確認:", "パスワードの確認")
-                           .replace("Email:", "Email")
-                           .replace("新しいパスワード:", "新しいパスワード")
-                           .replace("新しいパスワード(確認用):", "新しいパスワード(確認用)")
-                           .replace("メイン画像:", "メイン画像")
-                           .replace("名称:", "名称")
-                           .replace("キャッチコピー:", "キャッチコピー")
-                           .replace("住所:", "住所")
-                           .replace("駐車場:", "駐車場")
-                           .replace("家賃:", "家賃")
-                           .replace("間取り:", "間取り")
-                           .replace("階数:", "階数")
-                           .replace("初期費用:", "初期費用")
-                           .replace("共益費:", "共益費")
-                           .replace("契約期間:", "契約期間")
-                           .replace("備考:", "備考")
-                           .replace("その他の画像:", "その他の画像")
-                           .replace("空室情報:", "空室情報")
-
-    );
   });
 });
 
@@ -288,5 +307,34 @@ $(function(){
      centerMode: true,
      focusOnSelect: true
     });
+  });
+});
+
+$(function(){
+  $('label').each(function(){
+    var divText = $(this).html();
+    $(this).html(divText.replace("ユーザー名:", "ユーザー名")
+                           .replace("メールアドレス:", "メールアドレス")
+                           .replace("パスワード:", "パスワード")
+                           .replace("パスワードの確認:", "パスワードの確認")
+                           .replace("Email:", "Email")
+                           .replace("新しいパスワード:", "新しいパスワード")
+                           .replace("新しいパスワード(確認用):", "新しいパスワード(確認用)")
+                           .replace("メイン画像:", "メイン画像")
+                           .replace("名称:", "名称")
+                           .replace("キャッチコピー:", "キャッチコピー")
+                           .replace("住所:", "住所")
+                           .replace("駐車場:", "駐車場")
+                           .replace("家賃:", "家賃")
+                           .replace("間取り:", "間取り")
+                           .replace("階数:", "階数")
+                           .replace("初期費用:", "初期費用")
+                           .replace("共益費:", "共益費")
+                           .replace("契約期間:", "契約期間")
+                           .replace("備考:", "備考")
+                           .replace("その他の画像:", "その他の画像")
+                           .replace("空室情報:", "空室情報")
+
+    );
   });
 });

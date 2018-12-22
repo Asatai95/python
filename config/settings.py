@@ -86,7 +86,7 @@ TEMPLATES = [
 
 LOGIN_URL = 'register:login'
 
-LOGIN_REDIRECT_URL = 'register:top'
+LOGIN_REDIRECT_URL = 'register:login_after'
 LOGOUT_URL = 'register:logout'
 
 sys.path.append(os.getcwd())

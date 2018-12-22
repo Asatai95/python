@@ -1,0 +1,100 @@
+<!doctype html>
+{% load static %}
+<html lang="ja">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+
+
+  <title>roomii</title>
+</head>
+
+
+<body>
+  <div class='login_after'>
+    <div class='login_after_title'>
+      <p>ようこそ！、roomiiへ！！</p>
+      <p>あなたがお探しのお部屋の特徴を教えてください</p>
+    </div>
+    <form action="" method="POST">
+      {% csrf_token %}
+      <div class='sample_selection rent'>
+        <ul>
+          <div>
+            <p>家賃</p>
+          </div>
+          <li class='form-1'>
+            <a href="#">
+              <img src="{%static 'img/top2.jpg'%}" alt="" class='main_topic_1'>
+              <input type="hidden" name='rent_selection_1' value="">
+            </a>
+          </li>
+          <li class='form-2'>
+            <a href="#">
+              <img src="{% static 'img/top3.jpg' %}" alt="" class='main_topic_2'>
+              <input type="hidden" name='rent_selection_2' value="">
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='sample_selection park'>
+        <ul>
+          <div>
+            <p>駐車場</p>
+          </div>
+          <li class='form-3'>
+            <a href="#">
+              <img src="{% static 'img/perking.jpeg' %}" alt="" class="main_topic_3">
+              <input type="hidden" name='park_selection_1' value="">
+            </a>
+          </li>
+          <li class='form-4'>
+            <a href="#">
+              <img src="{% static 'img/perking_not.jpeg' %}" alt="" class="main_topic_4">
+              <input type="hidden" name='park_selection_2' value="">
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='sample_selection address'>
+        <ul>
+          <div>
+            <p>お住いの地域</p>
+          </div>
+          <li class='form-5'>
+            <input type="text" name='address' maxlength="20" placeholder="例：那覇、小禄etc">
+          </li>
+          <div class='form-login-after'>
+            <input type="submit" class='button' value="検索">
+          </div>
+        </ul>
+      </div>
+    </form>
+  </div>
+
+  </div>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+  <!-- <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  {% block extrajs %}{% endblock %}
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick.css' %}" />
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.woff' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.ttf' %}"/>
+<link rel="stylesheet" type="text/css" href="{% static 'js/ajax-loader.gif' %}"/> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick-theme.css' %}" />
+  <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

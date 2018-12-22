@@ -309,9 +309,60 @@ def Redirect(request, location=None):
 
 
 """
-お気に入り機能
+個人のおすすめ項目
 """
+class LoginAfter(generic.ListView):
 
+    template_name = 'apps/login_after.html'
+
+    def get(self, request, *args, **kwargs):
+
+        if request.user.fab_selection_id:
+            return redirect('apps:top')
+
+        return render(request, 'apps/login_after.html')
+
+    def post(self, request, *args, **kwargs):
+
+        rent = request.POST.get('rent_selection_1')
+        if rent == '':
+            rent = request.POST.get('rent_selection_2')
+        park = request.POST.get("park_selection_1")
+        if park == '':
+            park = request.POST.get("park_selection_2")
+
+        if rent == '0' and park == '0':
+            address = request.POST.get("address")
+            tmp = '1' +','+ ''+address+''
+            user_query = User.objects.filter(id=request.user.id)
+            for user in user_query:
+                user.fab_selection_id = tmp
+                user.save()
+        elif rent == '0' and park == '1':
+            address = request.POST.get("address")
+            tmp = '2' +','+ ''+address+''
+            user_query = User.objects.filter(id=request.user.id)
+            for user in user_query:
+                user.fab_selection_id = tmp
+                user.save()
+        elif rent == '1' and park == '0':
+            address = request.POST.get("address")
+            tmp = '3' +','+ ''+address+''
+            user_query = User.objects.filter(id=request.user.id)
+            for user in user_query:
+                user.fab_selection_id = tmp
+                user.save()
+        elif rent == '1' and park == '1':
+            address = request.POST.get("address")
+            tmp = '4' +','+ ''+address+''
+            user_query = User.objects.filter(id=request.user.id)
+            for user in user_query:
+                user.fab_selection_id = tmp
+                user.save()
+        else:
+            return redirect("apps:login_after")
+
+        return redirect("apps:login_after")
 
 """
 TOPページ, 検索機能
@@ -324,17 +375,25 @@ class MainView(generic.ListView):
 
     def get_context_data(self, **kwargs):
 
-
         """
         トップ画面表示(一部)
         """
 
         context = super(MainView, self).get_context_data(**kwargs)
+        user = User.objects.all().filter(id=self.request.user.id).order_by("fab_selection_id")
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
         fab_view = Fab.objects.all()
 
-        fab_test = Article.objects.all()
+        """
+        現在の日付取得、最新の記事情報を開示する
+        """
+        import datetime
+
+        dt = datetime.datetime.utcnow()
+        month_first = dt.date() - datetime.timedelta(days=dt.day - 1)
+        today = datetime.date.today()
+        fab_article = Article.objects.all().filter(created_at__range=(month_first, today))
 
         live = ArticleLive.objects.all()
 
@@ -342,7 +401,32 @@ class MainView(generic.ListView):
         context['room_list'] = room_list
         context['fab_view'] = fab_view
         context['live'] = live
-        context['fab_test'] = fab_test
+        context['fab_article'] = fab_article
+
+        """
+        おすすめ表記
+        """
+        fab_selection_list = []
+        for user_list in user:
+            if '1' in user_list.fab_selection_id:
+                user_fab = Article.objects.distinct().filter(
+                       address__contains=user_list.fab_selection_id.replace("1,", ""), park="駐車場あり", rent__lte='5'
+                )
+            elif '2' in user_list.fab_selection_id:
+                user_fab = Article.objects.distinct().filter(
+                       address__contains=user_list.fab_selection_id.replace("2,", ""), park="駐車場なし", rent__lte='5'
+                )
+            elif '3' in user_list.fab_selection_id:
+                user_fab = Article.objects.distinct().filter(
+                       address__contains=user_list.fab_selection_id.replace("3,", ""), park="駐車場あり", rent__gte='5'
+                )
+            elif '4' in user_list.fab_selection_id:
+                user_fab = Article.objects.distinct().filter(
+                       address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
+                )
+            fab_selection_list.append(user_fab)
+            print(fab_selection_list)
+        context["fab_selection_list"] = fab_selection_list
 
         """
         検索部分

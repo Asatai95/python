@@ -9,6 +9,258 @@ li {
   list-style: none;
 }
 
+.balloon1-top {
+  display: none;
+  z-index: 10;
+	position: absolute;
+ 	margin: .3em 5px;
+	padding: 7px 10px;
+	min-width: 120px;
+ 	max-width: 100%;
+ 	color: white;
+	font-size: 20px;
+  font-weight: 800;
+  border-radius: 10px;
+	background: rgba(30, 144, 255, .8);
+}
+
+.balloon1-top:before{
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+ 	margin-left: -40px;
+	border: 15px solid transparent;
+	border-top: 15px solid #1E90FF;
+  opacity: .8;
+}
+
+.balloon1-top p {
+	margin: 0;
+	padding: 0;
+}
+
+.ribbon {
+  display: block;
+  position: absolute;
+  margin-left: 30px;
+}
+
+.ribbon12 {
+  cursor: pointer;
+  position: absolute;
+  margin: 0;
+  padding: 10px 0;
+  z-index: 2;
+  width: 40px;
+  text-align: center;
+  font-size: 17px;
+  color: white;
+  background: #ff785b;
+}
+
+.ribbon12:after{
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 100%;
+  height: 0;
+  width: 0;
+  border-left: 20px solid #ff785b;
+  border-right: 20px solid #ff785b;
+  border-bottom: 10px solid transparent;
+}
+
+.ribbon_area {
+  position: absolute;
+  z-index: 10;
+  width: 89px;
+  height: 91px;
+  overflow: hidden;
+  margin-left: 185px;
+}
+
+.ribbon14 {
+  display: inline-block;
+  position: absolute;
+  padding: 7px 0;
+  left: -26px;
+  top: 20px;
+  width: 160px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 16px;
+  background: #ffa520;
+  color: #fff;
+  letter-spacing: 0.05em;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ribbon14:before,.ribbon14:after{
+  position: absolute;
+  content: "";
+  border-top: 4px solid #b2751b;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.ribbon14:before{
+  left: 14px;
+}
+
+.ribbon14:after{
+  right: 18px;
+}
+
+.login_after_title {
+  top: 50px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+  background-color: rgba(255, 255, 255, .6);
+  border-radius: 10px;
+  display: none;
+}
+
+.login_after_title p {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.login_after {
+  height: 100vh;
+  background-image: url('../img/top4.jpg');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.sample_selection {
+  position: absolute;
+  width: 650px;
+  height: 350px;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  background: rgba(255, 255, 255, .8);
+  border-radius: 10px;
+}
+
+.sample_selection ul {
+  padding: 0;
+}
+
+.sample_selection.park {
+  display: none;
+}
+
+.sample_selection.address {
+  display: none;
+}
+
+.sample_selection ul div p {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 800;
+  margin: 10px;
+}
+
+.form-1 {
+  width: 270px;
+  position: absolute;
+  margin: 20px;
+}
+
+.form-1 img {
+  width: 270px;
+  cursor: pointer;
+}
+
+.form-1 img:hover {
+  transform: scale(1.1);
+}
+
+.form-2 {
+  float: right;
+  margin: 20px;
+}
+
+.form-2 img {
+  width: 270px;
+}
+
+.form-2 img:hover {
+  transform: scale(1.1);
+}
+
+.form-3 {
+  width: 190px;
+  position: absolute;
+  margin: 30px;
+  margin-left: 80px;
+}
+
+.form-3 img {
+  width: 190px;
+}
+
+.form-3 img:hover {
+  transform: scale(1.1);
+}
+
+.form-4 {
+  float: right;
+  margin: 30px;
+  margin-right: 80px;
+}
+
+.form-4 img {
+  width: 200px;
+}
+
+.form-4 img:hover {
+  transform: scale(1.1);
+}
+
+.form-5 {
+  text-align: center;
+}
+
+@import url(https://fonts.googleapis.com/earlyaccess/roundedmplus1c.css);
+.sample_selection.address ul li input {
+  font-family: 'Rounded Mplus 1c';
+  font-size: 20px;
+  font-weight: 600;
+  color: black;
+  border-radius: 10px;
+  width: 300px;
+  height: 50px;
+  margin: 50px;
+  padding: 0 10px;
+  outline: none;
+}
+
+.form-login-after {
+  text-align: center;
+}
+
+.form-login-after input {
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.form-login-after input:hover {
+  box-shadow: 0 0 8px blue;
+}
+
+
 /*header*/
 
 li.info {
@@ -27,10 +279,9 @@ li.info {
 }
 
 header {
-  z-index: 5;
+  z-index: 10;
   position: absolute;
 }
-
 
 .form-inline {
   max-width: 250px;
@@ -224,7 +475,7 @@ header {
 .bg-light {
   width: 100%;
   position: fixed;
-  z-index: 10;
+  z-index: 20;
 }
 
 .container.mt-3 {
@@ -1066,7 +1317,7 @@ a:hover {
 
 .hide_text {
   position: absolute;
-  margin: 45px;
+  margin: 50px;
   cursor: pointer;
   display: none;
   z-index: 1;

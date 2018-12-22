@@ -77,6 +77,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     image = models.ImageField(_('image'), max_length=150)
+    fab_selection_id = models.CharField(_('fab_selection_id'), max_length=45)
 
     objects = UserManager()
 

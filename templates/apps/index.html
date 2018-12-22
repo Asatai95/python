@@ -9,6 +9,25 @@
       {% for object_list_view in tmp_list %}
         {% for view_list in object_list_view %}
       <div class="item box-big{{view_list.id}}">
+        {% for fab_selections in fab_selection_list %}
+          {% for fab_label in fab_selections %}
+            {%if fab_label.id == view_list.id %}
+            <div class='balloon1-top'>
+              <p>オススメ！</p>
+            </div>
+            <div class='ribbon'>
+             <span class="ribbon12">★</span>
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+        {% for date in fab_article %}
+          {% if date.id == view_list.id %}
+          <div class="ribbon_area">
+            <span class="ribbon14">NEW</span>
+          </div>
+          {% endif %}
+        {% endfor %}
         <div class='img_item'>
           <div class="hide_text">
             <p class='text'>{{view_list.comments}}</p>

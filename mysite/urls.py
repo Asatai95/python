@@ -17,6 +17,7 @@ urlpatterns = [
     path('login/', views.Login.as_view(), name='login'),
     # path('customer/login/', views.LoginCustomer.as_view(), name='customer_login'),
     path('logout/', login_required(views.Logout.as_view()), name='logout'),
+    path('login_after/', views.LoginAfter.as_view(), name='login_after'),
     path('roomii/', login_required(views.MainView.as_view()), name='top'),
     path('roomii/', login_required(views.MainView.post), name='get_ajax'),
     url(r'^roomii/[0-9]', login_required(views.Redirect), {'location':'fab'}),
