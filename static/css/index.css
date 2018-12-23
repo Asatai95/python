@@ -3,6 +3,11 @@
 body {
   position: absolute;
   width: 100%;
+  background: url("../img/top4.jpg");
+  background-repeat: no-repeat;
+  background-attachment:fixed;
+  background-size: cover;
+  z-index: 1;
 }
 
 li {
@@ -21,7 +26,7 @@ li {
 	font-size: 20px;
   font-weight: 800;
   border-radius: 10px;
-	background: rgba(30, 144, 255, .8);
+	background: rgba(30, 144, 255, .9);
 }
 
 .balloon1-top:before{
@@ -41,13 +46,13 @@ li {
 }
 
 .ribbon {
-  display: block;
+  cursor: pointer;
   position: absolute;
   margin-left: 30px;
 }
 
 .ribbon12 {
-  cursor: pointer;
+  display: block;
   position: absolute;
   margin: 0;
   padding: 10px 0;
@@ -1269,7 +1274,18 @@ a:hover {
   display: inline-block;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  margin: 100px!important;
+  width: 650px;
+  height: 650px;
+  /*margin: 100px!important;*/
+  background: url('../img/home.png');
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.row_login form {
+  margin-top: 320px;
+  width: 450px;
+  margin-left: 110px;
 }
 
 .remake_main_text {
@@ -1466,9 +1482,45 @@ a:hover {
 
 /*詳細情報*/
 
-.image_field {
-  margin-bottom: 30px;
+.topic {
+  background-color: rgba(255, 255, 255);
+  border: 2px solid;
+  border-radius: 10px;
 }
+
+.image_field {
+  margin: 30px;
+}
+
+.back_botton {
+  text-align: right;
+  margin: 30px;
+}
+
+.css-cancel{
+  display: inline-block;
+  position: relative;
+  margin: 0 30px 0 10px;
+  padding: 0;
+  width: 4px;
+  height: 40px;
+  background: #000;
+  transform: rotate(45deg);
+}
+
+.css-cancel:before{
+  display: block;
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -17px;
+  width: 40px;
+  height: 4px;
+  margin-top: -2px;
+  background: #000;
+
+}
+
 
 /*物件登録*/
 .article {
@@ -1592,4 +1644,17 @@ a:hover {
 
 .topic .table {
   margin-top: 80px;
+}
+
+
+.card {
+  width: 400px;
+  margin-top: 320px;
+  margin-bottom: 0;
+  background-color: none;
+  border: none;
+}
+
+.card-body {
+  padding: 0;
 }

@@ -81,65 +81,66 @@
 
   <!-- メインコンテント -->
   <div class="container mt-3">
-    <header>
+    <div class='main_view'>
+      <header>
 
-        <form method="get" action="" name='filter_name'>
-          {% csrf_token %}
-          <ul id='fade-in' class='dropmenu'>
-          <li class='first'>
-            <ul>
-              </li><a href="#">間取り</a> {%for tmp in room_list%}
-              <li><a href="#"><input type="checkbox" id="filter_kind_{{ tmp.id }}" name="room" value="{{ tmp.room_id }}">{{ tmp.room_id }}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-          <li class='middle'>
-            <ul>
-              <a href="#">階数</a> {%for list in floor_list%}
-              <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="floor" value="{{ list.floor_id }}">{{ list.floor_id }}</a></li>
-              {% endfor %}
-            </ul>
-          </li>
-          <li class='last'>
-            <ul>
-              <a href="#">空室状況</a>
-              {%for list in room_list%}
-                {% if list.room_live_id == '空室あり' %}
-                   <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="0">{{ list.room_live_id }}</a></li>
-                {% elif list.room_live_id == Nene %}
+          <form method="get" action="" name='filter_name'>
+            {% csrf_token %}
+            <ul id='fade-in' class='dropmenu'>
+            <li class='first'>
+              <ul>
+                </li><a href="#">間取り</a> {%for tmp in room_list%}
+                <li><a href="#"><input type="checkbox" id="filter_kind_{{ tmp.id }}" name="room" value="{{ tmp.room_id }}">{{ tmp.room_id }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            <li class='middle'>
+              <ul>
+                <a href="#">階数</a> {%for list in floor_list%}
+                <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="floor" value="{{ list.floor_id }}">{{ list.floor_id }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            <li class='last'>
+              <ul>
+                <a href="#">空室状況</a>
+                {%for list in room_list%}
+                  {% if list.room_live_id == '空室あり' %}
+                     <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="0">{{ list.room_live_id }}</a></li>
+                  {% elif list.room_live_id == Nene %}
 
-                {% else %}
-                   <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="1">{{ list.room_live_id }}</a></li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          </li>
-          <li class="price">
-            <ul>
-              <a href="#">家賃</a>
-              <li><a href="#"><input type="checkbox" id="filter_kind_4" name="price" value="1">〜３万円</a></li>
+                  {% else %}
+                     <li><a href="#"><input type="checkbox" id="filter_kind_{{ list.id }}" name="live" value="1">{{ list.room_live_id }}</a></li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </li>
+            <li class="price">
+              <ul>
+                <a href="#">家賃</a>
+                <li><a href="#"><input type="checkbox" id="filter_kind_4" name="price" value="1">〜３万円</a></li>
 
-              <li><a href="#"><input type="checkbox" id="filter_kind_2" name="price" value="2">3万円〜5万円</a></li>
+                <li><a href="#"><input type="checkbox" id="filter_kind_2" name="price" value="2">3万円〜5万円</a></li>
 
-              <li><a href="#"><input type="checkbox" id="filter_kind_1" name="price" value="3" >5万円〜7万円</a></li>
+                <li><a href="#"><input type="checkbox" id="filter_kind_1" name="price" value="3" >5万円〜7万円</a></li>
 
-              <li><a href="#"><input type="checkbox" id="filter_kind_3" name="price" value="4">7万円〜</a></li>
+                <li><a href="#"><input type="checkbox" id="filter_kind_3" name="price" value="4">7万円〜</a></li>
 
-            </ul>
-          </li>
-          <div class='name_box'>
-            <input id="sbox" id="search" name="name" type="text" placeholder="名称" />
-          </div>
-          <div class='address_box'>
-            <input id="sbox" id="search" name="article_address" type="text" placeholder="住所" />
-            <input id="sbtn" type="submit" value="検索" />
-          </div>
-        </ul>
-        </form>
+              </ul>
+            </li>
+            <div class='name_box'>
+              <input id="sbox" id="search" name="name" type="text" placeholder="名称" />
+            </div>
+            <div class='address_box'>
+              <input id="sbox" id="search" name="article_address" type="text" placeholder="住所" />
+              <input id="sbtn" type="submit" value="検索" />
+            </div>
+          </ul>
+          </form>
 
-    </header>
-    {% block content %}{% endblock %}
-
+      </header>
+      {% block content %}{% endblock %}
+    </div>
   </div>
   <!-- Optional JavaScript -->
   <!-- jQuery first, then Popper.js, then Bootstrap JS -->

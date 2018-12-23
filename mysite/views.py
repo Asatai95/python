@@ -320,7 +320,7 @@ class LoginAfter(generic.ListView):
         if request.user.fab_selection_id:
             return redirect('apps:top')
 
-        return render(request, 'apps/login_after.html')
+        return render(request, self.template_name)
 
     def post(self, request, *args, **kwargs):
 
@@ -425,7 +425,6 @@ class MainView(generic.ListView):
                        address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
                 )
             fab_selection_list.append(user_fab)
-            print(fab_selection_list)
         context["fab_selection_list"] = fab_selection_list
 
         """
@@ -460,6 +459,9 @@ class MainView(generic.ListView):
         else:
             for list_value in live_list:
                 live = list_value
+                articlelive_list = ArticleLive.objects.filter(vacancy_info=live)
+                for article_list in articlelive_list:
+                    live = article_list
 
         price_list = self.request.GET.getlist('price')
         if price_list == []:
@@ -503,80 +505,80 @@ class MainView(generic.ListView):
             if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
                 if live == '選択なし':
                     if price == '選択なし':
-                        object_list = Article.objects.distinct().filter(
+                        object_list = Article.objects.filter(
                                 Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
                         )
                         tmp_list.append(object_list)
                     elif price == '1':
-                        object_list = Article.objects.distinct().filter(
+                        object_list = Article.objects.filter(
                                 Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
                                 Q(rent__lte="3")
                         )
                         tmp_list.append(object_list)
                     elif price == '2':
 
-                        object_list = Article.objects.distinct().filter(
+                        object_list = Article.objects.filter(
                                 Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
                                 Q(rent__lte= "5") , Q(rent__gte="3")
                         )
                         tmp_list.append(object_list)
                     elif price == '3':
-                        object_list = Article.objects.distinct().filter(
+                        object_list = Article.objects.filter(
                                 Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
                                 Q(rent__lte= "7") , Q(rent__gte="5")
                         )
                         tmp_list.append(object_list)
                     elif price == '4':
-                        object_list = Article.objects.distinct().filter(
+                        object_list = Article.objects.filter(
                                 Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
                                 Q(rent__gte="7")
                         )
                         tmp_list.append(object_list)
                 else:
-                    articlelive_list = ArticleLive.objects.filter(vacancy_info=live)
-                    for article_list in articlelive_list:
-                        if price == '選択なし':
-                            object_list = Article.objects.all().filter(
-                                    Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                            ).distinct()
-                            print(object_list)
-                            tmp_list.append(object_list)
+                    if price == '選択なし':
+                        object_list = Article.objects.filter(
+                                Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        )
+                        print(object_list)
+                        tmp_list.append(object_list)
 
-                        elif price == '1':
-                            object_list = Article.objects.distinct().filter(
-                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                    Q(rent__lte="3")
-                            )
-                            tmp_list.append(object_list)
-                        elif price == '2':
-                            object_list = Article.objects.distinct().filter(
-                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                    Q(rent__lte= "5"), Q(rent__gte="3")
-                            )
-                            tmp_list.append(object_list)
-                        elif price == '3':
-                            object_list = Article.objects.distinct().filter(
-                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                    Q(rent__lte= "5"), Q(rent__gte="7")
-                            )
-                            tmp_list.append(object_list)
-                        elif price == '4':
-                            object_list = Article.objects.distinct().filter(
-                                    Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                    Q(rent__gte="7")
-                            )
-                            tmp_list.append(object_list)
-            if not tmp_list[0] :
-                if self.request.user.is_staff is False:
+                    elif price == '1':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        )
+                        print(object_list)
+                        tmp_list.append(object_list)
+                    elif price == '2':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="3")
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="7")
+                        )
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        )
+                        tmp_list.append(object_list)
 
-                    object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
-                    tmp_list.append(object_list)
-                else:
-                    object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
-                    tmp_list.append(object_list)
+        if not tmp_list[0] :
+            if self.request.user.is_staff is False:
 
-            context["tmp_list"] = tmp_list
-            return context
+                object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                tmp_list.append(object_list)
+            else:
+                object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                tmp_list.append(object_list)
+
+        context["tmp_list"] = tmp_list
+        return context
 
     def post(self, request, *args, **kwargs):
 
@@ -831,7 +833,7 @@ class Accesstoken(View):
                         for user in check_user:
                             if social.is_active:
                                 login(self.request, user)
-                                return redirect("apps:top")
+                                return redirect("apps:login_after")
                             else:
                                 return redirect("apps:login")
                     else:
@@ -845,7 +847,7 @@ class Accesstoken(View):
                     for user in check_user:
                         if user.is_active:
                             login(self.request, user)
-                            return redirect("apps:top")
+                            return redirect("apps:login_after")
                         else:
                             return redirect("apps:login")
             else:
@@ -887,7 +889,7 @@ class CallbackFacebook(View):
                         for user in check_user:
                             if user.is_active:
                                 login(self.request, user)
-                                return redirect("apps:top")
+                                return redirect("apps:login_after")
                             else:
                                 return redirect("apps:login")
                     else:
@@ -899,7 +901,7 @@ class CallbackFacebook(View):
                     for user in check_user:
                         if user.is_active:
                             login(self.request, user)
-                            return redirect("apps:top")
+                            return redirect("apps:login_after")
                         else:
                             return redirect("apps:login")
             else:

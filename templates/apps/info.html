@@ -6,6 +6,9 @@
 <div class='content_main'>
   {% for view_list in object_list %}
   <div class='topic'>
+    <div class='back_botton'>
+      <a href="{% url 'apps:top' %}"><span class='css-cancel'></span></a>
+    </div>
     <div class='image_field'>
       <div class='image_contents'>
       {% for images in room_view %}
@@ -27,7 +30,6 @@
               {% else %}
                  <td>空室なし({{view_list.live_flag.vacancy_live}})</td>
               {% endif %}
-
           </tr>
           <tr>
               <th>名称</th>
