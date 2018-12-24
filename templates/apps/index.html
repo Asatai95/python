@@ -52,54 +52,54 @@
             {% endif %}
           {% endif %}
         {% endfor %}
-      {% if not fab_view %}
-      <form id="fab_id" action="{% url 'apps:get_ajax' %}" method="POST">
-        {% csrf_token %}
-        <div class="heart">
-          <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
-          <input id="heart" class='fab_bt' type="submit" value="" />
-        </div>
-      </form>
-      {% endif %}
-      {% for view in fab_view %}
-        {% if view.article_id == view_list.id %}
-          {% if view.user_id == user.id %}
-            {% if view.flag == 1 %}
-            <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST" >
-              {% csrf_token %}
-              <div class="heart">
-                <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
-                <input id="commit" class='fab_bt' type="submit" value="" />
-              </div>
-            </form>
-            {% elif view.flag == 0 %}
-            <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
-              {% csrf_token %}
-              <div class="heart">
-                <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
-                <input id="heart" class='fab_bt' type="submit" value="" />
-              </div>
-            </form>
-            {% else %}
-            <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
-              {% csrf_token %}
-              <div class="heart">
-                <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
-                <input id="heart" class='fab_bt' type="submit" value="" />
-              </div>
-            </form>
+
+        {% if not fab_not_view %}
+        <form id="fab_id" action="{% url 'apps:get_ajax' %}" method="POST">
+          {% csrf_token %}
+          <div class="heart">
+            <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+            <input id="heart" class='fab_bt' type="submit" value="" />
+          </div>
+        </form>
+        {% endif %}
+        {% for view in fab_view %}
+          {% if view.article_id == view_list.id %}
+            {% if view.user_id == user.id %}
+              {% if view.flag == 1 %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST" >
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="commit" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% elif view.flag == 0 %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="heart" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% else %}
+              <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                {% csrf_token %}
+                <div class="heart">
+                  <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                  <input id="heart" class='fab_bt' type="submit" value="" />
+                </div>
+              </form>
+              {% endif %}
             {% endif %}
           {% endif %}
-        {% endif %}
-      {% endfor %}
-      <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
-        {% csrf_token %}
-        <div class="dark">
-          <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
-          <input id="heart" class='fab_bt' type="submit" value="" />
-        </div>
-      </form>
-
+        {% endfor %}
+        <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+          {% csrf_token %}
+          <div class="dark">
+            <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+            <input id="heart" class='fab_bt' type="submit" value="" />
+          </div>
+        </form>
       {%else%}
       <div class='update'>
         <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>

@@ -299,17 +299,28 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
     def get_success_url(self):
 
         User = Get_user.objects.all().filter(pk=self.kwargs['pk'])
-        img_file = self.request.FILES['img_file'].name
-        img_filename = Image.open(self.request.FILES['img_file'])
-        img_filename.save(os.path.join('./static/img/', img_file))
 
-        img_file = os.path.join('/static/img/', img_file)
-        for user in User:
-            user.image = user
-        user.image = img_file
-        user.save()
+        try:
+            img_file = self.request.FILES['img_file'].name
+            img_filename = Image.open(self.request.FILES['img_file'])
+            img_filename.save(os.path.join('./static/img/', img_file))
+            img_file = os.path.join('/static/img/', img_file)
+            for user in User:
+                user.image = user
+            user.image = img_file
+            user.save()
 
-        return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+            return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+        except:
+            img_file = self.request.POST.get("user_img")
+            for user in User:
+                user.image = user
+            user.image = img_file
+            user.save()
+
+            return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+
+
 
 """
 不適切な入力、トップページにリダイレクト
@@ -396,6 +407,7 @@ class MainView(generic.ListView):
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
         fab_view = Fab.objects.all()
+        fab_not_view = Fab.objects.all().filter(user_id=self.request.user.id)
 
         """
         現在の日付取得、最新の記事情報を開示する
@@ -409,6 +421,7 @@ class MainView(generic.ListView):
 
         live = ArticleLive.objects.all()
 
+        context["fab_not_view"] = fab_not_view
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
