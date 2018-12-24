@@ -22,12 +22,13 @@ from django.contrib.auth.views import (
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 from django.db import models
 from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -38,12 +39,19 @@ from django.views.decorators.http import require_POST
 
 from .forms import (
     LoginForm, UserCreateForm, MyPasswordChangeForm, MyPasswordResetForm, MySetPasswordForm,
-    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm
+    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm, CreateCompany
 )
 
 import requests
 
 import re
+
+from time import sleep
+import urllib.request
+
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 
 """
@@ -86,8 +94,12 @@ def error_500(request):
 """
 class MyView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
-    template_name = 'apps/index.html'
 
+"""
+業者、ユーザー識別
+"""
+def user_check(user):
+    return user.is_staff
 
 """
 ログイン機能（ユーザー）
@@ -471,35 +483,70 @@ class MainView(generic.ListView):
                 price = list_value
 
         if self.request.user.is_staff is True:
-            if article is not None or address is not None or floor is not None or room is not None:
-                object_list = object_list.order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag').filter(
-                        Q(article_name__contains=article) | Q(address__contains=address)
-                ).filter(customer=self.request.user.id)
-                if not object_list:
-                    object_list = object_list.order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', 'live_flag').filter(
-                        Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                    ).filter(customer=self.request.user.id)
+            tmp_list = []
+            if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
+                if live == '選択なし':
+                    if price == '選択なし':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '1':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '2':
 
-                if not object_list:
-                    articlelive_list = ArticleLive.objects.all()
-                    for check_live in live:
-                        if check_live == '0':
-                            tmp_live = []
-                            articlelive_list = articlelive_list.filter(vacancy_info=check_live)
-                            for article_list in articlelive_list:
-                                print(article_list)
-                                object_list = self.model.objects.all().filter(
-                                        customer=self.request.user.id, live_flag=article_list.id
-                                )
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5") , Q(rent__gte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "7") , Q(rent__gte="5")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                else:
+                    if price == '選択なし':
+                        object_list = Article.objects.filter(
+                                Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
 
-
-                        else:
-                            articlelive_list = articlelive_list.order_by("id").filter(vacancy_info=check_live)
-
-                            for article_list in articlelive_list:
-                                object_list = self.model.objects.all().filter(
-                                         customer=self.request.user.id, live_flag=article_list.id
-                                )
+                    elif price == '1':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '2':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
         else:
             tmp_list = []
             if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
@@ -632,6 +679,69 @@ class InfoView(generic.ListView):
         object_list = self.model.objects.filter(id=get)
 
         return object_list
+"""
+業者テーブル登録
+"""
+class Company(generic.CreateView):
+    model = CompanyCreate
+    form_class = CreateCompany
+    template_name = "company/company.html"
+    success_url = reverse_lazy("apps:create")
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_staff:
+            return redirect("apps:top")
+
+        if CompanyCreate.objects.filter(user_id=request.user.id, is_company=1):
+            return redirect("apps:create")
+
+        return render(request, self.template_name)
+
+    def form_valid(self, form):
+
+        company_table = form.save(commit=False)
+        user = self.request.POST.get('user_id')
+
+        tel = self.request.POST.get("tel_number")
+        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
+        tel_number = re.match(pattern, tel)
+
+        license_number = self.request.POST.get("license")
+        license = license_number.replace("第", "").replace("号", "")
+        check = re.match(r'^[0-9]+$', license)
+        if check is None or tel_number is None :
+            context = {
+                 'error_tel': '正しい番号を入力してください',
+                 'error_license': '数字は半角英数字で入力してください'
+            }
+            return render(self.request, self.template_name, context)
+
+        url = self.request.POST.get("web")
+        if 'http://' not in url :
+            if 'https://' not in url:
+                context = {
+                     'error_url': '正しいURLを入力してください'
+                }
+                return render(self.request, self.template_name, context)
+            else:
+                pass
+        else:
+            pass
+
+        try:
+            company_table.is_company = 1
+            company_table.save()
+
+            return super(Company, self).form_valid(form)
+
+        except IntegrityError:
+            context = {
+                'error_license': "すでに存在する免許番号です。",
+                'info': '免許番号を前回登録しましたか？'
+            }
+            return render(request, self.template_name, context)
+
 
 """
 物件登録
@@ -642,7 +752,15 @@ class ArticleEdit(generic.CreateView):
     template_name = 'company/create_form.html'
     success_url = reverse_lazy('apps:top')
 
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('apps:top')
+
+        form = self.form_class(initial=self.initial)
+        return render(request, self.template_name, {'form': form})
+
     def form_valid(self, form):
+
         tmp_list = []
         live_id = ArticleLive.objects.order_by('id').reverse()[0]
         user = self.request.user.id
@@ -697,7 +815,6 @@ class ArticleUpdate(generic.UpdateView):
     template_name = 'company/update_form.html'
     success_url = reverse_lazy('apps:top')
 
-
     def get_context_data(self, **kwargs):
         context = super(ArticleUpdate, self).get_context_data(**kwargs)
 
@@ -705,10 +822,21 @@ class ArticleUpdate(generic.UpdateView):
         list_view = Article.objects.order_by('id').filter(id=get)
         live_list = ArticleLive.objects.order_by('id').filter(article_id=get)
 
-        context["live_list"] = live_list
-        context["list_view"] = list_view
+        return super(ArticleUpdate, self).get_context_data(
+                live_list=live_list, list_view=list_view, **kwargs
+            )
 
-        return context
+    def render_to_response(self, context, **response_kwargs):
+       if not self.request.user.is_staff:
+           return redirect("apps:top")
+       get = self.request.path.replace('/roomii/update/', '')
+       article_check = Article.objects.order_by('id').filter(id=get, customer=self.request.user.id)
+       if article_check:
+           return super(ArticleUpdate, self).render_to_response(
+               context, **response_kwargs
+           )
+       else:
+           return redirect('apps:top')
 
     def post(self, request, **kwargs):
 

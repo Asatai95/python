@@ -37,6 +37,7 @@ urlpatterns = [
     path('roomii/info/<int:article_id>', login_required(views.InfoView.as_view()), name='info'),
     path('roomii/create/', login_required(views.ArticleEdit.as_view()), name='create'),
     path('roomii/update/<int:pk>', login_required(views.ArticleUpdate.as_view()), name='update'),
+    path("roomii/company/", login_required(views.Company.as_view()), name='company'),
     path('google/login/', views.RedirectGoogle.as_view(), name='google_login'),
     path('auth/complete/google-oauth2/', views.Accesstoken.as_view(), name='google_callback'),
     path('facebook/login/', views.RedirectFacebook.as_view(), name='facebook_login'),

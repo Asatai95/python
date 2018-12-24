@@ -6,10 +6,9 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate
 from django.db import models
 from django.shortcuts import redirect
-
 
 User = get_user_model()
 # Article = Article.objects.all()
@@ -104,6 +103,27 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ("username", "email", "image")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+class CreateCompany(forms.ModelForm):
+    """業者登録"""
+
+    def clean_email(self):
+
+        email = self.cleaned_data['email']
+        print(email)
+        try:
+            return email
+        except:
+            raise forms.ValidationError("正しいEmailアドレスを入力してください。")
+
+    class Meta:
+        model = CompanyCreate
+        fields = ("user_id", "company_name", "address", "license", "email", "web", "tel_number", "company_image",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -233,4 +253,5 @@ class ArticleUpdateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
+
             field.widget.attrs['class'] = 'form-control'

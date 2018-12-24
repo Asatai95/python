@@ -11,6 +11,9 @@ from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.manager import EmptyManager
+from django.core.validators import RegexValidator
+
+import re
 
 SILENCED_SYSTEM_CHECKS = ["auth.W004"]
 
@@ -218,7 +221,7 @@ class ArticleFloor(models.Model):
         db_table = 'sample_floor'
 
 class ArticleCreate(models.Model):
-
+    """物件登録モデル"""
     id = models.AutoField(primary_key=True)
     customer = models.IntegerField(_('customer'))
     article_name = models.CharField(u'名称', max_length=150)
@@ -243,3 +246,28 @@ class ArticleCreate(models.Model):
         verbose_name = _('article_name')
         verbose_name_plural = _('article_name')
         db_table = 'article'
+
+class CompanyCreate(models.Model):
+    """物件登録モデル"""
+    id = models.AutoField(primary_key=True)
+    is_company = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
+    user_id = models.IntegerField(_('user_id'))
+    company_name = models.CharField(u'会社名', max_length=150)
+    address = models.CharField(u'住所', max_length=150)
+    license = models.CharField(u'免許番号', max_length=45)
+    email = models.EmailField(u'Email', max_length=45)
+    web = models.CharField(u'Webサイト', max_length=45)
+    tel_number = models.CharField(u'電話番号', max_length=150)
+    company_image = models.FileField(u'イメージ画像')
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
+
+    class Meta:
+        verbose_name = _('company_name')
+        verbose_name_plural = _('company_name')
+        db_table = 'company'

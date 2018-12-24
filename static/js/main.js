@@ -314,6 +314,14 @@ $(function(){
 });
 
 $(function(){
+  $('span.error').each(function(){
+    if ( $(this).text() != "" ) {
+      $(this).css("display", "block");
+    }
+  });
+});
+
+$(function(){
   $('label').each(function(){
     var divText = $(this).html();
     $(this).html(divText.replace("ユーザー名:", "ユーザー名")

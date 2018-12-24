@@ -1532,6 +1532,7 @@ a:hover {
   border: 2px solid black;
   border-radius: 10px;
   left: 0;
+  background-color: rgba(255,255,255);
 }
 
 .vacant {
@@ -1657,4 +1658,14 @@ a:hover {
 
 .card-body {
   padding: 0;
+}
+
+#id_license {
+  margin: 10px 0;
+}
+
+span.error {
+  color: red;
+  margin: 10px 0;
+  display: none;
 }

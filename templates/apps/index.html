@@ -8,6 +8,7 @@
     {% for object_list_view in tmp_list %}
       {% for view_list in object_list_view %}
     <div class="item box-big{{view_list.id}}">
+    {% if user.is_staff is False%}
       {% for fab_selections in fab_selection_list %}
         {% for fab_label in fab_selections %}
           {%if fab_label.id == view_list.id %}
@@ -27,6 +28,7 @@
         </div>
         {% endif %}
       {% endfor %}
+    {% endif %}
       <div class='img_item'>
         <div class="hide_text">
           <p class='text'>{{view_list.comments}}</p>
