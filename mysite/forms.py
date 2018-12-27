@@ -243,7 +243,6 @@ UploadModelFormSet = forms.modelformset_factory(
 class ArticleUpdateForm(forms.ModelForm):
     """物件更新"""
 
-
     class Meta:
         model = Article
         fields = ("article_image","article_name", "comments", "address", "rent",
