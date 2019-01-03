@@ -1,3 +1,24 @@
+$(function(){
+  $(document).ready(function(){
+    $('body').each(function(){
+      $(this).find(".item").fadeIn(800);
+      $(this).find('.item').css("transition-duration", "1.0s");
+      $(this).find(".item").css("margin-top", "20px");
+    });
+  });
+});
+
+$(function() {
+  $('.item').css('opacity', '0');
+  $('.item').on('inview', function(event, isInView, visiblePartX, visiblePartY) {
+  	if (isInView) {
+      $(this).stop().animate({opacity:1}, 300);
+  	} else {
+  		$(this).stop().animate({opacity: 0}, 300);
+  	}
+  });
+});
+
 $(document).ready(function() {
   var pagetop = $('.navbar-brand');
   pagetop.click(function () {
@@ -69,6 +90,19 @@ $(function() {
     $(this).attr('id', 'commit');
   });
 });
+
+$(function() {
+  $('.item').each(function(e) {
+    if (!$(e.target).closest(this).length ) {
+      if ($(this).find('.heart').length){
+        $(this).find('.dark').fadeOut();
+      } else {
+        $(this).find('.dark').fadeIn();
+      }
+    }
+  });
+});
+
 
 $(function() {
   $(document).on('click', function(e) {

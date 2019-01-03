@@ -6,7 +6,7 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company
 from django.db import models
 from django.shortcuts import redirect
 
@@ -123,7 +123,7 @@ class CreateCompany(forms.ModelForm):
 
     class Meta:
         model = CompanyCreate
-        fields = ("user_id", "company_name", "address", "license", "email", "web", "tel_number", "company_image",)
+        fields = ("user_id", "company_name", "address" ,"update_count" , "license", "email", "web", "tel_number", "company_image",)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -247,7 +247,20 @@ class ArticleUpdateForm(forms.ModelForm):
         model = Article
         fields = ("article_image","article_name", "comments", "address", "rent",
                   "park", "floor_plan", "floor_number", "initial_cost", "common_service_expense",
-                  "term_of_contract", "column", "room_images_id", "live_flag", "customer")
+                  "term_of_contract", "column", "room_images_id", "live_flag", "customer",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+
+            field.widget.attrs['class'] = 'form-control'
+
+class CompanyUpdateForm(forms.ModelForm):
+    """会社情報更新"""
+
+    class Meta:
+        model = Company
+        fields = ("company_name", "address", "license", "email", "web", "tel_number", "company_image", )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

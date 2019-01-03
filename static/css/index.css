@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+::-webkit-scrollbar{
+  display: none;
+}
+
 body {
   position: absolute;
   width: 100%;
@@ -12,6 +16,27 @@ body {
 
 li {
   list-style: none;
+}
+
+.bottom_load {
+  height: 60px;
+  /*background-color: rgba(255, 255, 255, .7);*/
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.load {
+  display: none;
+  background: url("../img/icon_loader_a_ww_01_s1.gif");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  right: 0;
+  left: 0;
+  position: absolute;
+  margin: auto;
+  height: 60px;
+  width: 60px;
 }
 
 .balloon1-top {
@@ -288,6 +313,10 @@ header {
   position: absolute;
 }
 
+form[name='filter_name'] {
+  position: fixed;
+}
+
 .form-inline {
   max-width: 250px;
   position: absolute;
@@ -295,9 +324,11 @@ header {
 .dropmenu{
   *zoom: 1;
   list-style-type: none;
-  width: 1110px;
+  width: 1120px;
+  height: 50px;
   margin: 5px auto 30px;
   padding: 0;
+  background-color: rgba(255, 255, 255, .6);
 }
 
 .dropmenu:before, .dropmenu:after{
@@ -319,18 +350,23 @@ header {
 
 .dropmenu li.first{
   margin-right: 15px;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 .dropmenu li.middle {
   margin-right: 15px;
+  margin-top: 5px;
 }
 
 .dropmenu li.last{
   margin-right: 15px;
+  margin-top: 5px;
 }
 
 .dropmenu li.price {
   margin-right: 15px;
+  margin-top: 5px;
 }
 
 .dropmenu li a{
@@ -389,7 +425,7 @@ header {
 .name_box {
   float: left;
   height: 40px;
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
 .name_box input {
@@ -398,8 +434,9 @@ header {
 }
 
 .address_box {
-  width: 300px;
+  width: 275px;
   float: right;
+  margin-top: 2px;
 }
 
 .address_box input {
@@ -1036,6 +1073,10 @@ li.new_account {
   text-align: right;
 }
 
+.company_change {
+  position: absolute;
+}
+
 .main_mypage {
   padding-top: 30px;
   height: 100vh;
@@ -1266,6 +1307,7 @@ a:hover {
 
 .commit_text_mail {
   font-size: 25px;
+  margin: auto;
   margin-top: 200px;
   background-color: rgba(255, 255, 255);
   border-radius: 10px;
@@ -1338,6 +1380,7 @@ a:hover {
   margin: auto;
   margin-top: 100px;
   width: 800px;
+  background-color: rgba(255, 255, 255);
 }
 
 .content_main {
@@ -1368,6 +1411,7 @@ a:hover {
 }
 
 .item {
+  display: none;
   float: left;
   margin: 20px;
   width: 300px;
@@ -1377,61 +1421,71 @@ a:hover {
   border-radius: 8px;
   border: 3px solid #ccc;
   display: table;
+  margin-top: 150px;
 }
 
 .box-big1 {
+  display: none;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big2 {
+  display: none;
   background: #fc2;
   border-color: #fa0;
+  margin-top: 180px
 }
 
 .box-big3 {
-
+  display: none;
   background: #fc2;
   border-color: #fa0;
-
+  margin-top: 200px;
 }
 
 .box-big4 {
-
+  display: none;
   background: #0ba;
   border-color: #098;
 }
 
 .box-big5 {
-
+  display: none;
   background: #fc2;
   border-color: #fa0;
+  margin-top: 180px;
 }
 
 .box-big6 {
+  display: none;
   background: #fc2;
   border-color: #fa0;
+  margin-top: 200px;
 }
 
 .box-big7 {
-
+  display: none;
   background: #fc2;
   border-color: #fa0;
 }
 
 .box-big8 {
-
+  display: none;
   background: #fc2;
   border-color: #fa0;
+  margin-top: 180px;
 }
 
 .box-big9 {
+  display: none;
   background: #fc2;
   border-color: #fa0;
+  margin-top: 200px;
 }
 
 .box-big10 {
-
+  display: none;
   background: #fc2;
   border-color: #fa0;
 
@@ -1554,6 +1608,7 @@ a:hover {
   border-radius: 10px;
   left: 0;
   background-color: rgba(255,255,255);
+  margin-bottom: 100px;
 }
 
 .vacant {
@@ -1700,4 +1755,8 @@ span.error {
 .main.mypage {
   background-color: rgba(255, 255, 255);
   margin-top: 150px;
+}
+
+label.license_year {
+  display: block;
 }

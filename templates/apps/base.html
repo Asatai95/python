@@ -52,8 +52,14 @@
           <li>
             <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
           </li>
+          {% if user.is_company %}
           <li>
-            <a class="nav-item nav-link" href="{% url 'apps:create' %}">物件登録</a>
+            <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
+          </li>
+          {% else%}
+          {% endif %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
@@ -82,7 +88,7 @@
   <!-- メインコンテント -->
   <div class="container mt-3">
     <div class='main_view'>
-      
+
       <header>
 
           <form method="get" action="" name='filter_name'>
@@ -151,6 +157,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
   {% block extrajs %}{% endblock %}
+  <script src="{% static 'js/jquery.inview-master/jquery.inview.js' %}"></script>
+  <script src="{% static 'js/jquery-scrollfade-master/jquery.scrollfade.js' %}"></script>
   <link rel="stylesheet" type="text/css" href="{% static 'js/slick.css' %}"/>
   <!-- <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.woff' %}"/>
   <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.ttf' %}"/>

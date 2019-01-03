@@ -25,12 +25,20 @@
       <span></span>
       <!-- {% endif %} -->
     </div>
+    {% if user.is_staff %}
+      <div class='company_change'>
+        {% for company_id in company %}
+        <button type="button" name="button" class='back change'><a href="{% url 'apps:company_change' %}">会社情報編集</a></button>
+        {% endfor %}
+      </div>
+    {% endif %}
+
     <div class='password_change'>
       <button type="button" name="button" class='back change'><a href="{% url 'register:password_change'%}">パスワード変更</a></button>
     </div>
   </div>
   <div class='main_content'>
-
+  {% if not user.is_staff %}
     {% for tmp in list %}
        {% for fab_list in fab %}
           {% if tmp.id == fab_list.article %}
@@ -51,7 +59,7 @@
               <div class="inline">
                 <div class="stream-content">
                   <div class='profile_img'>
-                    <img src="{% static 'img/wanko.png'%}" alt="">
+                    <img src="{{user.image}}" alt="">
                   </div>
                 </div>
               </div>
@@ -72,6 +80,52 @@
           {% endif %}
        {% endfor %}
      {% endfor %}
+  {% else %}
+  {% for live in tmp_article_live %}
+    {% if live.vacancy_info == "0" %}
+      {% for main in tmp_article %}
+        {% if main.id == live.article_id %}
+        <div class="stream">
+          <div class="content">
+            <div class='preview'>
+              <img src="/media/{{main.article_image}}" alt="">
+            </div>
+            <div class="stream-header">
+              <p>
+                <span class="like-time">お気に入り登録:{{main.updated_at}}</span>
+                <span class="room-name">{{main.article_name}}</span>
+                <div class="stream-content">
+                  <span name="comment">{{main.comments}}</span>
+                </div>
+              </p>
+            </div>
+            <div class="inline">
+              <div class="stream-content">
+                <div class='profile_img'>
+                  <img src="{{user.image}}" alt="">
+                </div>
+              </div>
+            </div>
+            <!-- <div class='outline'>
+              <div class='stream-delete'>
+                <div class='delete'>
+                  <a href="/mypage/edit/" class="cp_btn"></a>
+                </div>
+              </div>
+              <div class='stream-delete'>
+                <div class='delete'>
+                  <a href="/mypage/delete/" class="cp_btn"></a>
+                </div>
+              </div>
+            </div> -->
+           </div>
+         </div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+  </div>
 </div>
 
 {% endblock %}

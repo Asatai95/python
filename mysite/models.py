@@ -70,6 +70,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_(
             'Designates whether the user can log into this admin site.'),
     )
+    is_company = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
     is_active = models.BooleanField(
         _('active'),
         default=True,
@@ -247,8 +253,8 @@ class ArticleCreate(models.Model):
         verbose_name_plural = _('article_name')
         db_table = 'article'
 
-class CompanyCreate(models.Model):
-    """物件登録モデル"""
+class Company(models.Model):
+    """業者モデル"""
     id = models.AutoField(primary_key=True)
     is_company = models.BooleanField(
         _('staff status'),
@@ -259,6 +265,7 @@ class CompanyCreate(models.Model):
     user_id = models.IntegerField(_('user_id'))
     company_name = models.CharField(u'会社名', max_length=150)
     address = models.CharField(u'住所', max_length=150)
+    update_count = models.CharField(u'住所', max_length=45)
     license = models.CharField(u'免許番号', max_length=45)
     email = models.EmailField(u'Email', max_length=45)
     web = models.CharField(u'Webサイト', max_length=45)
@@ -268,6 +275,35 @@ class CompanyCreate(models.Model):
     updated_at = models.DateTimeField(_('updated at'))
 
     class Meta:
-        verbose_name = _('company_name')
-        verbose_name_plural = _('company_name')
+        verbose_name = _('company')
+        verbose_name_plural = verbose_name
+        db_table = 'company'
+
+    def __str__(self):
+        return self.company_name
+
+class CompanyCreate(models.Model):
+    """業者登録モデル"""
+    id = models.AutoField(primary_key=True)
+    is_company = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_(
+            'Designates whether the user can log into this admin site.'),
+    )
+    user_id = models.IntegerField(_('user_id'))
+    company_name = models.CharField(u'会社名', max_length=150)
+    address = models.CharField(u'住所', max_length=150)
+    update_count = models.CharField(u'住所', max_length=45)
+    license = models.CharField(u'免許番号', max_length=45)
+    email = models.EmailField(u'Email', max_length=45)
+    web = models.CharField(u'Webサイト', max_length=45)
+    tel_number = models.CharField(u'電話番号', max_length=150)
+    company_image = models.FileField(u'イメージ画像')
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
+
+    class Meta:
+        verbose_name = _('company create')
+        verbose_name_plural = _('company creates')
         db_table = 'company'

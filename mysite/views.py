@@ -28,7 +28,7 @@ from django.contrib import messages
 
 from django.db import models
 from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -39,7 +39,7 @@ from django.views.decorators.http import require_POST
 
 from .forms import (
     LoginForm, UserCreateForm, MyPasswordChangeForm, MyPasswordResetForm, MySetPasswordForm,
-    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm, CreateCompany
+    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm, CreateCompany, CompanyUpdateForm
 )
 
 import requests
@@ -260,33 +260,47 @@ class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
     template_name = 'register/user_detail.html'
 
-    def get_context_data(self, **kwargs):
-
-        context = super(IndexView, self).get_context_data(**kwargs)
-        floor_list = ArticleFloor.objects.all().order_by('floor_id')
-        room_list = ArticleRoom.objects.all().order_by('room_id')
-        context['floor_list'] = floor_list
-        context['room_list'] = room_list
-
-        return context
+    # def get_context_data(self, **kwargs):
+    #
+    #     context = super(IndexView, self).get_context_data(**kwargs)
+    #     floor_list = ArticleFloor.objects.all().order_by('floor_id')
+    #     room_list = ArticleRoom.objects.all().order_by('room_id')
+    #
+    #     context['floor_list'] = floor_list
+    #     context['room_list'] = room_list
+    #
+    #     return context
 
     def get(self, request, **kwargs):
 
-        tmp_fab = []
-        tmp_article = []
-        fab = Fab.objects.filter(user=request.user ,flag=1).values('article', 'updated_at')
-        for tmp in fab:
-            fab_dic = {'article': tmp['article'], 'updated': tmp['updated_at']}
-            tmp_fab.append(fab_dic)
+        if not request.user.is_staff:
 
-        article = ArticleMain.values('id', 'article_name', 'article_image', 'comments')
-        for tmp in article:
-            article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
-            tmp_article.append(article_dic)
+            tmp_fab = []
+            tmp_article = []
+            fab = Fab.objects.filter(user=request.user ,flag=1).values('article', 'updated_at')
+            for tmp in fab:
+                fab_dic = {'article': tmp['article'], 'updated': tmp['updated_at']}
+                tmp_fab.append(fab_dic)
 
-        return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
+            article = ArticleMain.values('id', 'article_name', 'article_image', 'comments')
+            for tmp in article:
+                article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
+                tmp_article.append(article_dic)
 
+            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
 
+        else:
+            tmp_article_live = []
+            tmp_article = []
+            article = Article.objects.filter(customer=request.user.id).order_by("live_flag_id")
+            company = CompanyCreate.objects.filter(user_id=request.user.id)
+            for main in article:
+                tmp_article.append(main)
+                articleLive = ArticleLive.objects.filter(id=main.live_flag_id).order_by("vacancy_info")
+                for live in articleLive:
+                    tmp_article_live.append(live)
+
+            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company})
 
 """
 マイページ更新
@@ -693,9 +707,9 @@ class InfoView(generic.ListView):
 
         return object_list
 """
-業者テーブル登録
+業者登録
 """
-class Company(generic.CreateView):
+class CompanyView(generic.CreateView):
     model = CompanyCreate
     form_class = CreateCompany
     template_name = "company/company.html"
@@ -715,6 +729,9 @@ class Company(generic.CreateView):
 
         company_table = form.save(commit=False)
         user = self.request.POST.get('user_id')
+        user_table = Get_user.objects.filter(id=user)
+        for user_is_company in user_table:
+            user_is_company.is_company = 1
 
         tel = self.request.POST.get("tel_number")
         pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
@@ -744,9 +761,11 @@ class Company(generic.CreateView):
 
         try:
             company_table.is_company = 1
+            company_table.update_count = self.request.POST.get("license_year")
             company_table.save()
+            user_is_company.save()
 
-            return super(Company, self).form_valid(form)
+            return super(CompanyView, self).form_valid(form)
 
         except IntegrityError:
             context = {
@@ -755,7 +774,91 @@ class Company(generic.CreateView):
             }
             return render(request, self.template_name, context)
 
+"""
+業者編集
+"""
+class CompanyChange(generic.UpdateView):
+    model = Company
+    form_class = CompanyUpdateForm
+    template_name = 'company/company_update.html'
+    success_url = reverse_lazy('apps:user_detail')
 
+    def get(self, request, *args, **kwargs):
+        user = request.user.id
+        company = Company.objects.filter(user_id=user)
+        if not request.user.is_staff:
+            return redirect('apps:top')
+        return render(request, self.template_name, {'company': company})
+
+    def post(self, request, *args, **kwargs):
+
+        company = Company.objects.filter(user_id=request.user.id)
+        company_name = request.POST.get("company_name")
+        address = request.POST.get("address")
+
+        email = request.POST.get('email')
+        email_pattern = r"[^@]+@[^@]+\.[^@]+"
+        email_match = re.match(email_pattern, email)
+
+        license_year = request.POST.get("license_year")
+        if license_year == '':
+            for license in company:
+                license_year = license.update_count
+
+        tel = request.POST.get("tel_number")
+        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
+        tel_number = re.match(pattern, tel)
+
+        license_number = request.POST.get("license")
+        license = license_number.replace("第", "").replace("号", "")
+        check = re.match(r'^[0-9]+$', license)
+
+        if check is None or tel_number is None or email_match is None:
+            context = {
+                 'error_tel': '正しい番号を入力してください',
+                 'error_license': '数字は半角英数字で入力してください',
+                 "error_email": "正しいEmailを入力してください",
+                 'company': company
+            }
+            return render(request, self.template_name, context)
+
+        url = request.POST.get("web")
+        if 'http://' not in url :
+            if 'https://' not in url:
+                context = {
+                     'error_url': '正しいURLを入力してください',
+                     'company': company
+                }
+                return render(request, self.template_name, context)
+            else:
+                pass
+        else:
+            pass
+
+        company_table = Company.objects.filter(user_id=request.user.id)
+        try:
+            upload_file = request.FILES.get('company_image')
+            img_filename = Image.open(upload_file)
+            img_filename.save(os.path.join('./media/', upload_file.name))
+        except:
+            upload_file = request.POST.get("company_image_hidden")
+
+        for company_info in company_table:
+            company_info.company_name= company_name
+            company_info.address = address
+            company_info.update_count = license_year
+            company_info.license = license_number
+            company_info.email = email
+            company_info.web = url
+            company_info.tel_number = tel
+            try:
+                company_info.company_image = upload_file.name
+            except:
+                company_info.company_image = upload_file
+
+        company_info.save()
+
+        return redirect('apps:top')
 """
 物件登録
 """
@@ -800,6 +903,7 @@ class ArticleEdit(generic.CreateView):
         vacant_info = ArticleLive.objects.create(article_id=count, vacancy_info=vacant, vacancy_live=info,
                                                  start_date=start_date, update_date=update_date, cancel_date=cancel_date)
 
+        main_file.park = self.request.POST["rent"]
         main_file.park = self.request.POST["park"]
         main_file.floor_plan = self.request.POST["floor_plan"]
         main_file.floor_number = self.request.POST["floor_number"]
