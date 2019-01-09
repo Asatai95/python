@@ -3,7 +3,7 @@
 {% load static %}
 
 <div class="article">
-  <div class="form contents">
+  <div class="form_company_update">
     <main id="profile_edit">
       <div class="logo">
         <p class="logo text">roomii <br> 【業者情報更新】</p>
@@ -17,68 +17,127 @@
         <div class="preview">
           <img class="sample_img" src="/media/{{list_view.company_image}}" alt="">
         </div>
-        <div class="form-group">
-          <label for="id_company_image"><label for="id_company_image">イメージ画像</label></label>
-          <input type="hidden" name="company_image_hidden" value="{{list_view.company_image}}">
-          <input type="file" name="company_image" class="form-control" id="id_company_image">
-        </div>
 
-        <div class="form-group">
-          <label for="id_company_name"><label for="id_company_name">会社名</label></label>
-          <input type="text" name="company_name" maxlength="150" class="form-control" id="id_company_name" required="" value="{{list_view.company_name}}">
-        </div>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th><label for="id_article_image">メイン画像</label></th>
+              <td><input type="file" name="company_image" class="form-control" required="" id="id_article_image"><br></td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_address"><label for="id_address">住所</label></label>
-          <input type="text" name="address" maxlength="150" class="form-control" id="id_address" required="" value="{{list_view.address}}">
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>会社名</th>
+              <td>
+                <input type="text" name="company_name" maxlength="150" class="form-control" id="id_company_name" required="" value="{{list_view.company_name}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>〒郵便番号</th>
+              <td>
+                <input type="text" name="address" maxlength="150" class="form-control" id="id_address" required="" value="{{list_view.address_number}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_license"><label for="id_license">免許番号</label></label>
-          <label for="license_year" class='license_year'>免許更新回数</label>
-          <select name="license_year" class="form-control" id="id_license">
-            <option value="" selected>免許の更新回数</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-          <span class='error'>{{error}}</span>
-          <label for="license">免許</label>
-          <input type="text" name="license" maxlength="45" class="form-control" id="id_license" required="" value="{{list_view.license}}">
-          <span class='error' value='{{error_license}}'>{{error_license}}</span>
-          <span class='error' value='{{info}}'><a href="{% url 'apps:create' %}">{{info}}</a></span>
-        </div>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>住所</th>
+              <td>
+                <input type="text" name="address" maxlength="150" class="form-control" id="id_address" required="" value="{{list_view.address}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_email"><label for="id_email">Email</label></label>
-          <input type="text" name="email" maxlength="45" class="form-control" id="id_email" required="" value="{{list_view.email}}">
-          <span class='error'>{{error_email}}</span>
-        </div>
-        <span class="test"></span>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>免許更新回数</th>
+              <td>
+                <select name="license_year" class="form-control" id="id_license">
+                  <option value="" selected>免許の更新回数</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+                <span class='error'>{{error}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_web"><label for="id_web">Webサイト</label></label>
-          <input type="text" name="web" maxlength="45" class="form-control" id="id_web" required="" value="{{list_view.web}}">
-          <span class='error' value='{{error_url}}'>{{error_url}}</span>
-        </div>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>免許</th>
+              <td><input type="text" name="license" maxlength="45" class="form-control" id="id_license" required="" value="{{list_view.license}}">
+                <span class='error' value='{{error_license}}'>{{error_license}}</span>
+                <span class='error' value='{{info}}'><a href="{% url 'apps:create' %}">{{info}}</a></span>
+              </td>
+            </tr>
+         </tbody>
+       </table>
 
-        <div class="form-group">
-          <label for="id_tel_number"><label for="id_tel_number">電話番号</label></label>
-          <input type="text" name="tel_number" maxlength="150" class="form-control" id="id_tel_number" required="" value="{{list_view.tel_number}}">
-          <span class='error' value='{{error_tel}}'>{{error_tel}}</span>
-        </div>
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>Email</th>
+              <td>
+                <input type="text" name="email" maxlength="45" class="form-control" id="id_email" required="" value="{{list_view.email}}">
+                <span class='error'>{{error_email}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>Webサイト</th>
+              <td>
+                <input type="text" name="web" maxlength="45" class="form-control" id="id_web" required="" value="{{list_view.web}}">
+
+                <span class='error' value='{{error_url}}'>{{error_url}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="form-company update">
+          <tbody>
+            <tr>
+              <th>電話番号</th>
+              <td>
+                <input type="text" name="tel_number" maxlength="150" class="form-control" id="id_tel_number" required="" value="{{list_view.tel_number}}">
+
+                <span class='error' value='{{error_tel}}'>{{error_tel}}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
         <button type="submit" class="btn btn-success btn-lg btn-block">情報変更</button>
-      <div classs="comment">
-        <ul class="note">
-          <li class="title">【ご登録に関して、注意事項】</li>
-          <li>全ての項目入力してください</li>
-        </ul>
-      </div>
+
+        <div classs="comment">
+          <ul class="note">
+            <li class="title">【ご登録に関して、注意事項】</li>
+            <li>全ての項目入力してください</li>
+          </ul>
+        </div>
       {% endfor %}
     </form>
   </main>

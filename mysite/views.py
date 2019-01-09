@@ -429,8 +429,11 @@ class MainView(generic.ListView):
         import datetime
 
         dt = datetime.datetime.utcnow()
+        print(type(dt))
+        print(dt)
         month_first = dt.date() - datetime.timedelta(days=dt.day - 1)
         today = datetime.date.today()
+        print(today)
         fab_article = Article.objects.all().filter(created_at__range=(month_first, today))
 
         live = ArticleLive.objects.all()
@@ -709,6 +712,7 @@ class InfoView(generic.ListView):
 """
 業者登録
 """
+
 class CompanyView(generic.CreateView):
     model = CompanyCreate
     form_class = CreateCompany
@@ -723,56 +727,35 @@ class CompanyView(generic.CreateView):
         if CompanyCreate.objects.filter(user_id=request.user.id, is_company=1):
             return redirect("apps:create")
 
-        return render(request, self.template_name)
+        form = self.form_class()
+        return render(request, self.template_name, {'form':form})
 
     def form_valid(self, form):
 
-        company_table = form.save(commit=False)
-        user = self.request.POST.get('user_id')
-        user_table = Get_user.objects.filter(id=user)
+        company = form.save(commit=False)
+        address_number = self.request.POST.get("address_number")
+        address = self.request.POST.get("address")
+        address_city = self.request.POST.get("address_city")
+        address_others = self.request.POST.get("address_others")
+        user_table = Get_user.objects.filter(id=int(self.request.user.id))
         for user_is_company in user_table:
             user_is_company.is_company = 1
-
-        tel = self.request.POST.get("tel_number")
-        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
-        tel_number = re.match(pattern, tel)
-
-        license_number = self.request.POST.get("license")
-        license = license_number.replace("第", "").replace("号", "")
-        check = re.match(r'^[0-9]+$', license)
-        if check is None or tel_number is None :
-            context = {
-                 'error_tel': '正しい番号を入力してください',
-                 'error_license': '数字は半角英数字で入力してください'
-            }
-            return render(self.request, self.template_name, context)
-
-        url = self.request.POST.get("web")
-        if 'http://' not in url :
-            if 'https://' not in url:
-                context = {
-                     'error_url': '正しいURLを入力してください'
-                }
-                return render(self.request, self.template_name, context)
-            else:
-                pass
-        else:
-            pass
-
-        try:
-            company_table.is_company = 1
-            company_table.update_count = self.request.POST.get("license_year")
-            company_table.save()
-            user_is_company.save()
-
+        img_file = self.request.FILES['company_image'].name
+        img_filename = Image.open(self.request.FILES['company_image'])
+        img_filename.save(os.path.join('./static/img/', img_file))
+        if company:
+            company.is_company = 1
+            company.user_id = int(self.request.user.id)
+            company.update_count = self.request.POST.get("update_count")
+            company.address_number = address_number
+            company.address = address + ' ' + address_city + ' ' + address_others
+            company.license = self.request.POST.get("license")
+        company.save()
+        user_is_company.save()
+        if form:
             return super(CompanyView, self).form_valid(form)
-
-        except IntegrityError:
-            context = {
-                'error_license': "すでに存在する免許番号です。",
-                'info': '免許番号を前回登録しましたか？'
-            }
-            return render(request, self.template_name, context)
+        else:
+            return redirect("apps:company")
 
 """
 業者編集
@@ -794,6 +777,7 @@ class CompanyChange(generic.UpdateView):
 
         company = Company.objects.filter(user_id=request.user.id)
         company_name = request.POST.get("company_name")
+        address_number = request.POST.get("address_number")
         address = request.POST.get("address")
 
         email = request.POST.get('email')
@@ -845,6 +829,7 @@ class CompanyChange(generic.UpdateView):
 
         for company_info in company_table:
             company_info.company_name= company_name
+            company_info.address_number = address_number
             company_info.address = address
             company_info.update_count = license_year
             company_info.license = license_number
@@ -872,7 +857,7 @@ class ArticleEdit(generic.CreateView):
         if not request.user.is_staff:
             return redirect('apps:top')
 
-        form = self.form_class(initial=self.initial)
+        form = self.form_class()
         return render(request, self.template_name, {'form': form})
 
     def form_valid(self, form):
@@ -902,8 +887,12 @@ class ArticleEdit(generic.CreateView):
         count = file_id.id + 1
         vacant_info = ArticleLive.objects.create(article_id=count, vacancy_info=vacant, vacancy_live=info,
                                                  start_date=start_date, update_date=update_date, cancel_date=cancel_date)
-
-        main_file.park = self.request.POST["rent"]
+        address_town = self.request.POST["address"]
+        address_city = self.request.POST["address_city"]
+        address_others = self.request.POST["address_others"]
+        main_file.address_number = self.request.POST["address_number"]
+        main_file.address = address_town + ' ' + address_city + ' ' + address_others
+        main_file.rent = self.request.POST["rent"]
         main_file.park = self.request.POST["park"]
         main_file.floor_plan = self.request.POST["floor_plan"]
         main_file.floor_number = self.request.POST["floor_number"]
@@ -1003,6 +992,7 @@ class ArticleUpdate(generic.UpdateView):
             main.article_image = upload_file.name
             main.article_name = self.request.POST["article_name"]
             main.comments = self.request.POST["comments"]
+            main.address_number = self.request.POST["address_number"]
             main.address = self.request.POST["address"]
             main.rent = self.request.POST["rent"]
             main.park = self.request.POST["park"]

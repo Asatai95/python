@@ -1,7 +1,7 @@
 {% extends "apps/base.html" %}
 {% block content %}
 <div class="article">
-  <div class="form contents">
+  <div class="form_company">
     <main id="profile_edit">
       <div class="logo">
         <p class="logo text">roomii <br> 【業者登録】</p>
@@ -14,73 +14,29 @@
         <div class="preview">
           <img class="sample_img" src="/media/living.jpg" alt="">
         </div>
-
-        <div class="form-group">
-          <label for="id_company_image"><label for="id_company_image">イメージ画像</label></label>
-          <input type="file" name="company_image" class="form-control" id="id_company_image" required="">
-        </div>
-
-        <div class="form-group">
-          <input type="hidden" name="user_id" class="form-control" id="id_user_id" value='{{user.id}}'>
-        </div>
-
-        <div class="form-group">
-          <label for="id_company_name"><label for="id_company_name">会社名</label></label>
-          <input type="text" name="company_name" maxlength="150" class="form-control" id="id_company_name" required="">
-        </div>
-
-        <div class="form-group">
-          <label for="id_address"><label for="id_address">住所</label></label>
-          <input type="text" name="address" maxlength="150" class="form-control" id="id_address" required="">
-
-        </div>
-
-        <div class="form-group">
-          <label for="id_license"><label for="id_license">免許番号</label></label>
-          <select name="license_year" required="" class="form-control" id="id_license">
-            <option value="" selected>免許の更新回数</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-          </select>
-          <input type="text" name="license" maxlength="45" class="form-control" id="id_license" required="" placeholder="第123456号">
-          <span class='error' value='{{error_license}}'>{{error_license}}</span>
-          <span class='error' value='{{info}}'><a href="{% url 'apps:create' %}">{{info}}</a></span>
-        </div>
-
-        <div class="form-group">
-          <label for="id_email"><label for="id_email">Email</label></label>
-          <input type="text" name="email" maxlength="45" class="form-control" id="id_email" required="">
-          {% for field in form %}
-              {{ field.errors }}
-          {% endfor %}
-        </div>
-        <span class='test'></span>
-
-        <div class="form-group">
-          <label for="id_web"><label for="id_web">Webサイト</label></label>
-          <input type="text" name="web" maxlength="45" class="form-control" id="id_web" required="">
-          <span class='error' value='{{error_url}}'>{{error_url}}</span>
-        </div>
-
-        <div class="form-group">
-          <label for="id_tel_number"><label for="id_tel_number">電話番号</label></label>
-          <input type="text" name="tel_number" maxlength="150" class="form-control" id="id_tel_number" required="">
-          <span class='error' value='{{error_tel}}'>{{error_tel}}</span>
-        </div>
-
+        {{ form.non_field_errors }}
+        {% for field in form %}
+        <table class="form-company">
+          <tbody>
+            <tr>
+              <th>{{ field.label_tag }}</th>
+              <td>{{ field }}</br>{{ field.errors }}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% endfor %}
         <button type="submit" class="btn btn-success btn-lg btn-block">登録</button>
-      <div classs="comment">
-        <ul class="note">
-          <li class="title">【ご登録に関して、注意事項】</li>
-          <li>全ての項目入力してください</li>
-        </ul>
-      </div>
-    </form>
-  </main>
+        <div classs="comment">
+          <ul class="note">
+            <li class="title">【ご登録に関して、注意事項】</li>
+            <li>全ての項目入力してください</li>
+            <li>画像ファイルは" .jpeg, .png, .jpg "のみ登録可能です</li>
+            <li>郵便番号はハイフン(-)を除いてください</li>
+          </ul>
+        </div>
+      </form>
+    </main>
   </div>
 </div>
-{% endblock %}
+
+{% endblock%}

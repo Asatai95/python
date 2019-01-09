@@ -95,9 +95,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'roomii_sample',
-        'USER': 'root',
-        'PASSWORD': 'Asatai951156',
+        'NAME': 'roomii_main',
+        'USER': 'roomii',
+        'PASSWORD': 'roomii1156',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -165,10 +165,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
-    "root",
-    "Asatai951156",
+    "roomii",
+    "roomii1156",
     "127.0.0.1:3306",
-    "roomii_sample",
+    "roomii_main",
 )
 
 ENGINE = create_engine(

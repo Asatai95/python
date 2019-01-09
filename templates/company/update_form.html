@@ -12,128 +12,238 @@
         <div class="error">
           <span class="error_meaasage" id="username_error"></span>
         </div>
-
-
-        <div class="form-group">
-          <label for="id_article_image"><label for="id_article_image">メイン画像</label></label>
-          <img class='media_img' src="/media/{{view.article_image}}" alt="">
-          <input type="file" name="article_image" required="" class="form-control" id="id_article_image">
-
+        <div class="preview">
+          <img class="sample_img" src="/media/{{view.article_image}}" alt="">
         </div>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_article_image">メイン画像</label>
+              </th>
+              <td><input type="file" name="article_image" required="" class="form-control" id="id_article_image"></td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_article_name"><label for="id_article_name">名称</label></label>
-          <input type="text" name="article_name" required="" class="form-control" id="id_article_name" maxlength="150" value='{{view.article_name}}'>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_article_name">名称</label>
+              </th>
+              <td>
+                <input type="text" name="article_name" required="" class="form-control" id="id_article_name" maxlength="150" value='{{view.article_name}}'>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_comments">キャッチコピー</label>
+              </th>
+              <td>
+                <input type="text" name="comments" required="" class="form-control" id="id_comments" maxlength="150" value='{{view.comments}}'>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_comments"><label for="id_comments">キャッチコピー</label></label>
-          <input type="text" name="comments" required="" class="form-control" id="id_comments" maxlength="150" value='{{view.comments}}'>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_address">〒郵便番号</label>
+              </th>
+              <td>
+                <input type="text" name="address_number" required="" class="form-control" id="id_address_number" maxlength="150" value='{{view.address_number}}'>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_address">住所</label>
+              </th>
+              <td>
+                <input type="text" name="address" required="" class="form-control" id="id_address" maxlength="150" value='{{view.address}}'>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div class="form-group">
-          <label for="id_address"><label for="id_address">住所</label></label>
-          <input type="text" name="address" required="" class="form-control" id="id_address" maxlength="150" value='{{view.address}}'>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_rent">家賃</label>
+              </th>
+              <td>
+                <input type="text" name="rent" required="" class="form-control" id="id_rent" maxlength="150" value="{{view.rent}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_park">駐車場</label>
+              </th>
+              <td>
+                <select name="park" required="" class="form-control" id="id_park">
+                  <option value="" selected="">選択肢から選んでください</option>
 
-        <div class="form-group">
-          <label for="id_rent"><label for="id_rent">家賃</label></label>
-          <input type="text" name="rent" required="" class="form-control" id="id_rent" maxlength="150" value="{{view.rent}}">
+                  <option value="駐車場あり">あり</option>
 
-        </div>
+                  <option value="駐車場なし">なし</option>
 
-        <div class="form-group">
-          <label for="id_park"><label for="id_park">駐車場</label></label>
-          <select name="park" required="" class="form-control" id="id_park">
-            <option value="" selected="">選択肢から選んでください</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="駐車場あり">あり</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_floor_plan">間取り</label>
+              </th>
+              <td>
+                <select name="floor_plan" required="" class="form-control" id="id_floor_plan">
+                  <option value="" selected="">選択肢から選んでください</option>
 
-            <option value="駐車場なし">なし</option>
+                  <option value="1L">1L</option>
 
-          </select>
+                  <option value="1DK">1DK</option>
 
-        </div>
+                  <option value="1LDK">1LDK</option>
 
-        <div class="form-group">
-          <label for="id_floor_plan"><label for="id_floor_plan">間取り</label></label>
-          <select name="floor_plan" required="" class="form-control" id="id_floor_plan">
-            <option value="" selected="">選択肢から選んでください</option>
+                  <option value="1D">1D</option>
 
-            <option value="1L">1L</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="1DK">1DK</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_floor_number">階数</label>
+              </th>
+              <td>
+                <select name="floor_number" required="" class="form-control" id="id_floor_number">
+                  <option value="" selected="">選択肢から選んでください</option>
 
-            <option value="1LDK">1LDK</option>
+                  <option value="1F">1F</option>
 
-            <option value="1D">1D</option>
+                  <option value="2F">2F</option>
 
-          </select>
+                  <option value="3F">3F</option>
 
-        </div>
+                  <option value="4F">4F</option>
 
-        <div class="form-group">
-          <label for="id_floor_number"><label for="id_floor_number">階数</label></label>
-          <select name="floor_number" required="" class="form-control" id="id_floor_number">
-            <option value="" selected="">選択肢から選んでください</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="1F">1F</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_initial_cost">初期費用</label>
+              </th>
+              <td>
+                <input type="text" name="initial_cost" required="" class="form-control" id="id_initial_cost" maxlength="150" value="{{view.initial_cost}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="2F">2F</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_common_service_expense">共益費</label>
+              </th>
+              <td>
+                <input type="text" name="common_service_expense" required="" class="form-control" id="id_common_service_expense" maxlength="150" value="{{view.common_service_expense}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="3F">3F</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_term_of_contract">契約期間</label>
+              </th>
+              <td>
+                <input type="text" name="term_of_contract" required="" class="form-control" id="id_term_of_contract" maxlength="150" value="{{view.term_of_contract}}">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-            <option value="4F">4F</option>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_column">備考</label>
+              </th>
+              <td>
+                <textarea name="column" class="form-control" required="" cols="40" id="id_column" rows="10" maxlength="150">{{view.column}}</textarea>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-          </select>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_files">その他の画像</label>
+              </th>
+              <td>
+                <input type="file" name="files" required="" class="form-control" id="id_files" multiple="">
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
+        <table class="form-article">
+          <tbody>
+            <tr>
+              <th>
+                <label for="id_live_flag">空室情報</label>
+              </th>
+              <td>
+                <select name="live_flag" required="" class="form-control" id="id_live_flag">
+                  <option value="" selected="">選択肢から選んでください</option>
 
-        <div class="form-group">
-          <label for="id_initial_cost"><label for="id_initial_cost">初期費用</label></label>
-          <input type="text" name="initial_cost" required="" class="form-control" id="id_initial_cost" maxlength="150" value="{{view.initial_cost}}">
+                  <option value="0">空室です</option>
 
-        </div>
+                  <option value="1">空室ではないです</option>
 
-        <div class="form-group">
-          <label for="id_common_service_expense"><label for="id_common_service_expense">共益費</label></label>
-          <input type="text" name="common_service_expense" required="" class="form-control" id="id_common_service_expense" maxlength="150" value="{{view.common_service_expense}}">
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
 
-        </div>
-
-        <div class="form-group">
-          <label for="id_term_of_contract"><label for="id_term_of_contract">契約期間</label></label>
-          <input type="text" name="term_of_contract" required="" class="form-control" id="id_term_of_contract" maxlength="150" value="{{view.term_of_contract}}">
-
-        </div>
-
-        <div class="form-group">
-          <label for="id_column"><label for="id_column">備考</label></label>
-          <textarea name="column" class="form-control" required="" cols="40" id="id_column" rows="10" maxlength="150">{{view.column}}</textarea>
-
-        </div>
-
-        <div class="form-group">
-          <label for="id_files"><label for="id_files">その他の画像</label></label>
-          <input type="file" name="files" required="" class="form-control" id="id_files" multiple="">
-
-        </div>
-
-        <div class="form-group">
-          <label for="id_live_flag"><label for="id_live_flag">空室情報</label></label>
-          <select name="live_flag" required="" class="form-control" id="id_live_flag">
-            <option value="" selected="">選択肢から選んでください</option>
-
-            <option value="0">空室です</option>
-
-            <option value="1">空室ではないです</option>
-
-          </select>
-
-        </div>
         {% for live in live_list %}
         {% if live.start_date %}
         <div class="vacant">

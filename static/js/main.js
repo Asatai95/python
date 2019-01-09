@@ -1,4 +1,11 @@
 $(function(){
+  if ( $("input[name=company_image]").length ) {
+    $("input[name=company_image]").attr("accept", " image/png,image/jpeg,image/jpg ");
+  }
+});
+
+
+$(function(){
   $(document).ready(function(){
     $('body').each(function(){
       $(this).find(".item").fadeIn(800);
@@ -358,28 +365,8 @@ $(function(){
 $(function(){
   $('label').each(function(){
     var divText = $(this).html();
-    $(this).html(divText.replace("ユーザー名:", "ユーザー名")
-                           .replace("メールアドレス:", "メールアドレス")
-                           .replace("パスワード:", "パスワード")
-                           .replace("パスワードの確認:", "パスワードの確認")
-                           .replace("Email:", "Email")
-                           .replace("新しいパスワード:", "新しいパスワード")
-                           .replace("新しいパスワード(確認用):", "新しいパスワード(確認用)")
-                           .replace("メイン画像:", "メイン画像")
-                           .replace("名称:", "名称")
-                           .replace("キャッチコピー:", "キャッチコピー")
-                           .replace("住所:", "住所")
-                           .replace("駐車場:", "駐車場")
-                           .replace("家賃:", "家賃")
-                           .replace("間取り:", "間取り")
-                           .replace("階数:", "階数")
-                           .replace("初期費用:", "初期費用")
-                           .replace("共益費:", "共益費")
-                           .replace("契約期間:", "契約期間")
-                           .replace("備考:", "備考")
-                           .replace("その他の画像:", "その他の画像")
-                           .replace("空室情報:", "空室情報")
-
-    );
+    if (divText.match(':')){
+      $(this).html($(this).text().slice(0,-1));
+    }
   });
 });

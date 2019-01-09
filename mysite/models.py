@@ -6,7 +6,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.core.validators import validate_email, EmailValidator
+from django.core.validators import validate_email, EmailValidator, FileExtensionValidator
 from django.contrib.auth.validators import ASCIIUsernameValidator
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
@@ -168,6 +168,7 @@ class Article(models.Model):
     comments = models.CharField(_('comments'), max_length=150)
     room_images_id = models.CharField(_('room images id'), max_length=150)
     article_image = models.ImageField(_('article image'), upload_to='media')
+    address_number = models.CharField(u'郵便番号', max_length=45)
     address = models.CharField(_('address'), max_length=150)
     rent = models.CharField(_('rent'), max_length=150)
     park = models.CharField(_('park'), max_length=150)
@@ -234,6 +235,7 @@ class ArticleCreate(models.Model):
     comments = models.CharField(u'キャッチコピー', max_length=150)
     room_images_id = models.CharField(u'メイン画像', max_length=150)
     article_image = models.FileField(u'メイン画像')
+    address_number = models.CharField(u'郵便番号', max_length=45)
     address = models.CharField(u'住所', max_length=150)
     rent = models.CharField(u'家賃', max_length=150)
     park = models.CharField(u'駐車場', max_length=150)
@@ -264,8 +266,9 @@ class Company(models.Model):
     )
     user_id = models.IntegerField(_('user_id'))
     company_name = models.CharField(u'会社名', max_length=150)
+    address_number = models.CharField(u'郵便番号', max_length=45)
     address = models.CharField(u'住所', max_length=150)
-    update_count = models.CharField(u'住所', max_length=45)
+    update_count = models.CharField(u'免許更新回数', max_length=45)
     license = models.CharField(u'免許番号', max_length=45)
     email = models.EmailField(u'Email', max_length=45)
     web = models.CharField(u'Webサイト', max_length=45)
@@ -293,13 +296,14 @@ class CompanyCreate(models.Model):
     )
     user_id = models.IntegerField(_('user_id'))
     company_name = models.CharField(u'会社名', max_length=150)
+    address_number = models.CharField(u'郵便番号', max_length=45)
     address = models.CharField(u'住所', max_length=150)
-    update_count = models.CharField(u'住所', max_length=45)
+    update_count = models.CharField(u'免許更新回数', max_length=45)
     license = models.CharField(u'免許番号', max_length=45)
     email = models.EmailField(u'Email', max_length=45)
-    web = models.CharField(u'Webサイト', max_length=45)
+    web = models.URLField(u'Webサイト', max_length=45)
     tel_number = models.CharField(u'電話番号', max_length=150)
-    company_image = models.FileField(u'イメージ画像')
+    company_image = models.FileField(u'イメージ画像', validators=[FileExtensionValidator(['pdf', 'png', 'jpeg', ])])
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'))
 

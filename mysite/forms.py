@@ -9,6 +9,9 @@ from django.contrib.auth import get_user_model
 from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company
 from django.db import models
 from django.shortcuts import redirect
+from django.utils.translation import gettext_lazy as _
+
+import re
 
 User = get_user_model()
 # Article = Article.objects.all()
@@ -112,18 +115,131 @@ class UserUpdateForm(forms.ModelForm):
 class CreateCompany(forms.ModelForm):
     """業者登録"""
 
+    CHOICE_License_year = (
+              ('', '免許の更新回数'),
+              ('1', '1'),
+              ('2', '2'),
+              ('3', '3'),
+              ('4', '4'),
+              ('4', '5'),
+              ('4', '6'),
+            )
+
+    address_number = forms.RegexField(
+        label = "郵便番号",
+        regex=r'^[0-9]+$',
+        max_length=7,
+        widget=forms.TextInput(attrs={'onKeyUp' : "AjaxZip3.zip2addr(this,'','address','address_city')",
+                                      'placeholder': '1002003 ハイフン(-)なし'}),
+    )
+
+    address = forms.CharField(
+           label="都道府県",
+           max_length=45,
+           widget=forms.TextInput(attrs={'placeholder':'沖縄県'}),
+     )
+
+    address_city = forms.CharField(
+            label="市町村区",
+            max_length=45,
+            widget=forms.TextInput(attrs={'placeholder':'那覇市首里'}),
+    )
+
+    address_others = forms.CharField(
+            label="番地以降",
+            max_length=45,
+            widget=forms.TextInput(attrs={'placeholder':'1-23 赤丸ビルディング'}),
+    )
+
+    update_count = forms.ChoiceField(
+           label="免許更新回数",
+           widget=forms.Select,
+           choices=CHOICE_License_year
+     )
+
+    license = forms.CharField(
+           widget=forms.TextInput(attrs={'placeholder':'第12345号'}),
+           label='免許番号',
+           max_length=45
+    )
+
     def clean_email(self):
 
-        email = self.cleaned_data['email']
+        email = self.cleaned_data["email"]
         print(email)
         try:
+            if not email:
+                raise forms.ValidationError(_("正しいEmailを入力してください"))
             return email
         except:
-            raise forms.ValidationError("正しいEmailアドレスを入力してください。")
+            raise forms.ValidationError(_("すでに登録されているEmailアドレスです"))
+
+
+    def clean_tel_number(self):
+
+        tel_number = self.cleaned_data["tel_number"]
+        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
+        if tel_number:
+            if not re.match( pattern, tel_number):
+                raise forms.ValidationError(_("正しい電話番号を入力してください"))
+        return tel_number
+
+    def clean_web(self):
+
+        url = self.cleaned_data["web"]
+        pattern = r'^[a-zA-Z0-9!-/:@.]+$'
+
+        if url:
+            if not re.match( pattern, url):
+                raise forms.ValidationError(_("正しいURLを入力してください"))
+
+            if not 'http' in url:
+                if not 'https' in url:
+                    raise forms.ValidationError(_("正しいURLを入力してください"))
+        return url
+
+    def clean_image(self):
+
+        image = self.cleaned_data["company_image"]
+        if image:
+            image_path = image.name
+            print(image_path)
+            if not image_path in [".jpg", ".png", ".jpeg"]:
+                raise forms.ValidationError(_("指定された画像ファイルのみ登録可能です"))
+        return image
+
+    def clean_license(self):
+
+        license = self.cleaned_data["license"]
+        company = CompanyCreate.objects.all()
+        if company.filter(license=license):
+            raise forms.ValidationError(_("すでに登録されている免許情報です"))
+        print(license)
+        try:
+            return license
+        except :
+            raise forms.ValidationError(_("すでに登録されている免許情報です"))
+
+    def clean_license_year(self):
+
+        update_count = self.cleaned_data["update_count"]
+        print(update_count)
+        return update_count
+
+    def clean_address(self):
+
+        address = self.cleaned_data["address_number"]
+        pattern = r'^[a-zA-Z0-9]+$'
+        if address:
+            if '-' in address:
+                raise forms.ValidationError(_("ハイフン(-)を省いてください"))
+            if not re.match( pattern, address):
+                raise forms.ValidationError(_("正しい郵便番号を入力してください"))
+        return address
 
     class Meta:
         model = CompanyCreate
-        fields = ("user_id", "company_name", "address" ,"update_count" , "license", "email", "web", "tel_number", "company_image",)
+        fields = ("company_image", "company_name" , "email", "web", "tel_number", )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -160,6 +276,32 @@ class Createform(forms.ModelForm):
               ('0', '空室です'),
               ('1', '空室ではないです'),
             )
+
+    address_number = forms.RegexField(
+        label = "郵便番号",
+        regex=r'^[0-9]+$',
+        max_length=7,
+        widget=forms.TextInput(attrs={'onKeyUp' : "AjaxZip3.zip2addr(this,'','address','address_city')",
+                                      'placeholder': '1002003'}),
+    )
+
+    address = forms.CharField(
+           label="都道府県",
+           max_length=45,
+           widget=forms.TextInput(attrs={'placeholder':'沖縄県'}),
+     )
+
+    address_city = forms.CharField(
+            label="市町村区",
+            max_length=45,
+            widget=forms.TextInput(attrs={'placeholder':'那覇市首里'}),
+    )
+
+    address_others = forms.CharField(
+            label="番地以降</br>(アパート名,</br> 部屋番号, </br> etc)",
+            max_length=45,
+            widget=forms.TextInput(attrs={'placeholder':'1-23 赤丸ビルディング203'}),
+    )
 
     rent = forms.CharField(
            label='家賃',
@@ -210,9 +352,20 @@ class Createform(forms.ModelForm):
            choices=CHOICE_Vacant
      )
 
+    def clean_address(self):
+
+        address = self.cleaned_data["address_number"]
+        pattern = r'^[a-zA-Z0-9]+$'
+        if address:
+            if '-' in address:
+                raise forms.ValidationError(_("ハイフン(-)を省いてください"))
+            if not re.match( pattern, address):
+                raise forms.ValidationError(_("正しい郵便番号を入力してください"))
+        return address
+
     class Meta:
         model = ArticleCreate
-        fields = ( "article_image", "article_name", "comments", "address", )
+        fields = ( "article_image", "article_name", "comments", )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

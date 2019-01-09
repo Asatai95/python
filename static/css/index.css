@@ -1561,6 +1561,7 @@ a:hover {
   background-color: rgba(255, 255, 255);
   border: 2px solid;
   border-radius: 10px;
+  margin-bottom: 100px;
 }
 
 .image_field {
@@ -1598,6 +1599,13 @@ a:hover {
 
 
 /*物件登録*/
+
+.article_form {
+  margin: 10px auto;
+  width: 400px;
+  padding: 0;
+}
+
 .article {
   position: absolute;
   width: 700px;
@@ -1609,6 +1617,28 @@ a:hover {
   left: 0;
   background-color: rgba(255,255,255);
   margin-bottom: 100px;
+}
+
+.form-article {
+  margin: 10px auto;
+}
+
+.form-article th {
+  width: 130px;
+  text-align: left;
+}
+
+.form-article label {
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.form-article td input {
+  width: 260px;
+}
+
+.form-article td select {
+  width: 260px;
 }
 
 .vacant {
@@ -1643,6 +1673,48 @@ a:hover {
 }
 
 /*業者用ページ*/
+
+.form_company_update {
+  margin: 10px auto;
+  width: 450px;
+  padding: 0;
+}
+
+.form-company.update {
+  margin: 30px auto;
+}
+
+.form-company.update select {
+  width: 290px;
+}
+
+.form_company {
+  margin: 10px auto;
+  width: 500px;
+  padding: 0;
+}
+
+#id_update_count {
+  width: 290px;
+}
+
+.form-company th {
+  width: 120px;
+  text-align: left;
+}
+
+.form-company label {
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.form-company td input {
+  width: 290px;
+}
+
+#company_form > table:nth-child(14) > tbody > tr > td > ul {
+  margin: 0!important;
+}
 
 .create {
   position: absolute;
