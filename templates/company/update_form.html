@@ -21,7 +21,8 @@
               <th>
                 <label for="id_article_image">メイン画像</label>
               </th>
-              <td><input type="file" name="article_image" required="" class="form-control" id="id_article_image"></td>
+              <td><input type="hidden" name="article_image_hidden" value="{{view.article_image}}"></td>
+              <td><input type="file" name="article_image" class="form-control" id="id_article_image"></td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +73,7 @@
                 <label for="id_address">住所</label>
               </th>
               <td>
-                <input type="text" name="address" required="" class="form-control" id="id_address" maxlength="150" value='{{view.address}}'>
+                <input type="text" name="address" class="form-control" id="id_address" maxlength="150" value='{{view.address}}'>
               </td>
             </tr>
           </tbody>
@@ -85,7 +86,7 @@
                 <label for="id_rent">家賃</label>
               </th>
               <td>
-                <input type="text" name="rent" required="" class="form-control" id="id_rent" maxlength="150" value="{{view.rent}}">
+                <input type="text" name="rent" class="form-control" id="id_rent" maxlength="150" value="{{view.rent}}">
               </td>
             </tr>
           </tbody>
@@ -98,7 +99,7 @@
                 <label for="id_park">駐車場</label>
               </th>
               <td>
-                <select name="park" required="" class="form-control" id="id_park">
+                <select name="park" class="form-control" id="id_park">
                   <option value="" selected="">選択肢から選んでください</option>
 
                   <option value="駐車場あり">あり</option>
@@ -118,7 +119,7 @@
                 <label for="id_floor_plan">間取り</label>
               </th>
               <td>
-                <select name="floor_plan" required="" class="form-control" id="id_floor_plan">
+                <select name="floor_plan" class="form-control" id="id_floor_plan">
                   <option value="" selected="">選択肢から選んでください</option>
 
                   <option value="1L">1L</option>
@@ -142,7 +143,7 @@
                 <label for="id_floor_number">階数</label>
               </th>
               <td>
-                <select name="floor_number" required="" class="form-control" id="id_floor_number">
+                <select name="floor_number" class="form-control" id="id_floor_number">
                   <option value="" selected="">選択肢から選んでください</option>
 
                   <option value="1F">1F</option>
@@ -218,7 +219,8 @@
                 <label for="id_files">その他の画像</label>
               </th>
               <td>
-                <input type="file" name="files" required="" class="form-control" id="id_files" multiple="">
+                <input type="hidden" name="files_hidden" multiple="" value="{{view.room_images_id}}">
+                <input type="file" name="files" class="form-control" id="id_files" multiple="">
               </td>
             </tr>
           </tbody>
@@ -231,7 +233,7 @@
                 <label for="id_live_flag">空室情報</label>
               </th>
               <td>
-                <select name="live_flag" required="" class="form-control" id="id_live_flag">
+                <select name="live_flag" class="form-control" id="id_live_flag">
                   <option value="" selected="">選択肢から選んでください</option>
 
                   <option value="0">空室です</option>
@@ -250,20 +252,20 @@
           <div class="calendar">
             <div class="start_date">
               <label for="start_date">契約開始日</label>
-              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.start_date}}" required=False>
+              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.start_date}}">
             </div>
             <div class="update_date">
               <label for="update_date">更新予定日</label>
-              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.update_date}}" required=False>
+              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.update_date}}">
             </div>
             <div class="cancel_date">
               <label for="cancel_date">解約予定日</label>
-              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.cancel_date}}" required=False>
+              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="{{live.cancel_date}}">
             </div>
           </div>
           <div class="vacant_live">
             <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
-            <input type="text" name="info" value="" required=False>
+            <input type="text" name="info" value="">
           </div>
         </div>
         {%else%}
@@ -271,20 +273,20 @@
           <div class="calendar">
             <div class="start_date">
               <label for="start_date">契約開始日</label>
-              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False>
+              <input name="start_date" type="date" min="2019-01-01" max="2020-12-31" value="">
             </div>
             <div class="update_date">
               <label for="update_date">更新予定日</label>
-              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False >
+              <input name="update_date" type="date" min="2019-01-01" max="2020-12-31" value="" >
             </div>
             <div class="cancel_date">
               <label for="cancel_date">解約予定日</label>
-              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="" required=False />
+              <input name="cancel_date" type="date" min="2019-01-01" max="2020-12-31" value="" />
             </div>
           </div>
           <div class="vacant_live">
             <label for="info">空室理由 (例:現在入居中, リフォーム中)</label>
-            <input type="text" name="info" value="{{live.vacancy_live}}" required=False>
+            <input type="text" name="info" value="{{live.vacancy_live}}" >
           </div>
         </div>
         {% endif %}

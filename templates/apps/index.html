@@ -4,9 +4,10 @@
 
 {{message}}
 <div class='content_main'>
+  <div class='test'></div>
+  <div class='text'></div>
   <div class="main_container">
-    {% for object_list_view in tmp_list %}
-      {% for view_list in object_list_view %}
+    {% for view_list in page_obj %}
     <div class="item box-big{{view_list.id}}">
     {% if user.is_staff is False%}
       {% for fab_selections in fab_selection_list %}
@@ -38,21 +39,24 @@
           </a>
         <div class='test'></div>
       </div>
-      {% if user.is_staff is False%}
-        {%for article_live in live %}
-          {% if article_live.article_id == view_list.id %}
-            {% if article_live.vacancy_info == '0' %}
-            <div class='empty_flag'>
-              <span>空室あり</span>
-            </div>
-            {% else %}
-            <div class='empty_flag'>
-              <span>空室なし<br/>{{article_live.vacancy_live}}</span>
-            </div>
-            {% endif %}
-          {% endif %}
-        {% endfor %}
 
+      <!-- ログイン後の表示画面 -->
+      {% if user.is_staff is False%}
+        <!-- ログイン前の表示 -->
+          {% for article_live in live_table %}
+            {% if article_live.article_id == view_list.id %}
+              {% if article_live.vacancy_info == '0' %}
+              <div class='empty_flag'>
+                <span>空室あり</span>
+              </div>
+              {% else %}
+              <div class='empty_flag'>
+                <span>空室なし<br/>{{article_live.vacancy_live}}</span>
+              </div>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+      {% if user.is_authenticated %}
         {% if not fab_not_view %}
         <form id="fab_id" action="{% url 'apps:get_ajax' %}" method="POST">
           {% csrf_token %}
@@ -100,6 +104,11 @@
             <input id="heart" class='fab_bt' type="submit" value="" />
           </div>
         </form>
+        {% else %}
+        <div class="heart">
+          <input id='heart_hidden' class='fab_bt heart' type="submit" value="" />
+        </div>
+        {% endif %}
       {%else%}
       <div class='update'>
         <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
@@ -107,14 +116,45 @@
       {% endif %}
     </div>
     {% endfor %}
-  {% endfor %}
   </div>
 </div>
+
+<div class='login_menu'>
+  <div class="back_login_botton">
+    <a href="#"><span class="css-cancel"></span></a>
+  </div> 
+  <div class='login_content'>
+    <form action="{% url 'register:login' %}" method="POST">
+      <div class="col-md-6 offset-md-3">
+          <div class="login_card">
+              <div class="card-body">
+                <div>
+                  <label for="title">Welcome</label>
+                </div>
+                  <input type="text" name="username" placeholder="Email" class="form-control" id="id_username" required="">
+                  <hr>
+                  <input type="password" name="password" placeholder="パスワード" class="form-control" id="id_password" required="">
+                  <hr>
+                  <button type="submit" class="btn btn-success btn-lg btn-block" >ログイン</button>
+                  {% csrf_token %}
+              </div>
+          </div>
+      </div>
+      <div classs='comment'>
+        <ul class='note'>
+          <li class='forget'><a href="{% url 'register:password_reset' %}">パスワードをお忘れの方</a></li>
+          <li class='new_account'>ユーザー登録がまだの方は<a href="{% url 'register:user_create'%}">こちら</a></li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+{% include 'commons/commons_page.html' %}
 
 {% endblock %}
 
 {% block extrajs %}
-
+{% if user.is_authenticated %}
 <script type="text/javascript">
 
 function getCookie(name) {
@@ -166,4 +206,16 @@ $('form[method="POST"]').on('submit', function(e) {
 });
 
 </script>
+{% else %}
+<script type="text/javascript">
+$('.fab_bt.heart').on('click', function(e) {
+  $('.login_menu').fadeIn();
+  $('.login_menu').css("position", "fixed");
+  $('.content_main').css("filter", "brightness(70%)");
+  $('.content_main').css("position", "fixed");
+});
+</script>
+{% endif %}
 {% endblock %}
+
+

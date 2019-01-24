@@ -22,7 +22,8 @@
           <tbody>
             <tr>
               <th><label for="id_article_image">メイン画像</label></th>
-              <td><input type="file" name="company_image" class="form-control" required="" id="id_article_image"><br></td>
+              <td><input type="hidden" name="company_image_hidden" value="{{list_view.company_image}}"><br></td>
+              <td><input type="file" name="company_image" class="form-control" id="id_article_image"><br></td>
             </tr>
           </tbody>
         </table>
@@ -43,7 +44,7 @@
             <tr>
               <th>〒郵便番号</th>
               <td>
-                <input type="text" name="address" maxlength="150" class="form-control" id="id_address" required="" value="{{list_view.address_number}}">
+                <input type="text" name="address_number" maxlength="150" class="form-control" id="id_address" required="" value="{{list_view.address_number}}">
               </td>
             </tr>
           </tbody>
@@ -67,12 +68,15 @@
               <td>
                 <select name="license_year" class="form-control" id="id_license">
                   <option value="" selected>免許の更新回数</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
+                  <option value="01">1</option>
+                  <option value="02">2</option>
+                  <option value="03">3</option>
+                  <option value="04">4</option>
+                  <option value="05">5</option>
+                  <option value="06">6</option>
+                  <option value="07">7</option>
+                  <option value="08">8</option>
+                  <option value="09">9</option>
                 </select>
                 <span class='error'>{{error}}</span>
               </td>

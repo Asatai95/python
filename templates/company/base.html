@@ -25,26 +25,61 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-         {% if user.is_authenticated %}
-         <li>
-           <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
-         </li>
-         <li>
-           <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
-         </li>
-         <li>
-           <a class="nav-item nav-link" href="#">メッセージBox</a>
-         </li>
-         <li>
-           <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
-         </li>
-         {% else %}
-         <li class="nav-item">
-           <a class="nav-item nav-link" href="{% url 'register:login'%}">
-           ゲストログインはこちら
-         </a>
-         </li>
-         {% endif %}
+          {% if user.is_staff is False %}
+            {% if user.is_authenticated %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-item nav-link" href="{% url 'register:login' %}">
+                 ゲストログインはこちら
+              </a>
+              <a class="nav-item nav-link" href="{% url 'register:customer_login' %}">
+                 業者の方はこちら
+              </a>
+            </li>
+            {% endif %}
+          {% else %}
+            {% if user.is_authenticated %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+            </li>
+            {% if user.is_company %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
+            </li>
+            {% else%}
+            {% endif %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">メッセージBox</a>
+            </li>
+            <li>
+              <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-item nav-link" href="{% url 'register:login' %}">
+                 ゲストログインはこちら
+              </a>
+              <a class="nav-item nav-link" href="{% url 'register:customer_login' %}">
+                 業者の方はこちら
+              </a>
+            </li>
+            {% endif %}
+          {% endif %}
        </ul>
       </div>
     </nav>

@@ -28,7 +28,7 @@ from django.contrib import messages
 
 from django.db import models
 from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company, License, test_image
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -46,13 +46,11 @@ import requests
 
 import re
 
-from time import sleep
-import urllib.request
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from pure_pagination.mixins import PaginationMixin
 
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-
+from channels.generic.websocket import WebsocketConsumer
+import json
 
 """
 Settingファイル
@@ -66,6 +64,28 @@ from mysite.library import *
 Get_user = get_user_model()
 ArticleMain = Article.objects.all()
 ArticleImage = RoomImage.objects.all()
+
+"""
+cloudinary
+"""
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+"""
+ページネーション
+"""
+def paginate_queryset(request, queryset, count):
+
+    paginator = Paginator(queryset, count)
+    page = request.GET.get('page')
+    try:
+        page_obj = paginator.page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
+    return page_obj
 
 
 """
@@ -158,12 +178,9 @@ class UserCreate(generic.CreateView):
         user.email_user(subject, message)
         return redirect('/user_create/done/')
 
-
-
 class UserCreateDone(generic.TemplateView):
     """ユーザー仮登録したよ"""
     template_name = 'register/user_create_done.html'
-
 
 class UserCreateComplete(generic.TemplateView):
     """メール内URLアクセス後のユーザー本登録"""
@@ -205,7 +222,6 @@ class PasswordChange(PasswordChangeView):
     form_class = MyPasswordChangeForm
     success_url = reverse_lazy('register:password_change_done')
     template_name = 'register/password_change.html'
-
 
 class PasswordChangeDone(PasswordChangeDoneView):
     """パスワード変更しました"""
@@ -260,24 +276,13 @@ class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
     template_name = 'register/user_detail.html'
 
-    # def get_context_data(self, **kwargs):
-    #
-    #     context = super(IndexView, self).get_context_data(**kwargs)
-    #     floor_list = ArticleFloor.objects.all().order_by('floor_id')
-    #     room_list = ArticleRoom.objects.all().order_by('room_id')
-    #
-    #     context['floor_list'] = floor_list
-    #     context['room_list'] = room_list
-    #
-    #     return context
-
     def get(self, request, **kwargs):
 
         if not request.user.is_staff:
 
             tmp_fab = []
             tmp_article = []
-            fab = Fab.objects.filter(user=request.user ,flag=1).values('article', 'updated_at')
+            fab = Fab.objects.filter(user=request.user ,message_flag=1, flag=1).values('article', 'updated_at')
             for tmp in fab:
                 fab_dic = {'article': tmp['article'], 'updated': tmp['updated_at']}
                 tmp_fab.append(fab_dic)
@@ -333,8 +338,6 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
             user.save()
 
             return resolve_url('register:user_detail', pk=self.kwargs['pk'])
-
-
 
 """
 不適切な入力、トップページにリダイレクト
@@ -401,13 +404,22 @@ class LoginAfter(generic.ListView):
 
         return redirect("apps:login_after")
 
+class TopSearch(generic.ListView):
+    
+    model = Article
+    template_name = "apps/top.html"
+
+    def get(self, request, *args, **kwargs):
+
+        return render(request, self.template_name)
+
 """
 TOPページ, 検索機能
 """
-
-class MainView(generic.ListView):
+class MainView(PaginationMixin, generic.ListView):
     model = Article
     template_name = 'apps/index.html'
+    paginate_by = 3
     success_url = 'apps:top'
 
     def get_context_data(self, **kwargs):
@@ -418,10 +430,11 @@ class MainView(generic.ListView):
 
         context = super(MainView, self).get_context_data(**kwargs)
         user = User.objects.all().filter(id=self.request.user.id).order_by("fab_selection_id")
-        floor_list = ArticleFloor.objects.all().order_by('floor_id')
-        room_list = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
+        floor_table = ArticleFloor.objects.all().order_by('floor_id')
+        room_table = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
         fab_view = Fab.objects.all()
         fab_not_view = Fab.objects.all().filter(user_id=self.request.user.id)
+        live_table = ArticleLive.objects.all()
 
         """
         現在の日付取得、最新の記事情報を開示する
@@ -429,21 +442,9 @@ class MainView(generic.ListView):
         import datetime
 
         dt = datetime.datetime.utcnow()
-        print(type(dt))
-        print(dt)
         month_first = dt.date() - datetime.timedelta(days=dt.day - 1)
         today = datetime.date.today()
-        print(today)
         fab_article = Article.objects.all().filter(created_at__range=(month_first, today))
-
-        live = ArticleLive.objects.all()
-
-        context["fab_not_view"] = fab_not_view
-        context['floor_list'] = floor_list
-        context['room_list'] = room_list
-        context['fab_view'] = fab_view
-        context['live'] = live
-        context['fab_article'] = fab_article
 
         """
         おすすめ表記
@@ -467,7 +468,6 @@ class MainView(generic.ListView):
                        address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
                 )
             fab_selection_list.append(user_fab)
-        context["fab_selection_list"] = fab_selection_list
 
         """
         検索部分
@@ -653,33 +653,51 @@ class MainView(generic.ListView):
             else:
                 object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
                 tmp_list.append(object_list)
+        
+        page_obj = paginate_queryset(self.request, object_list, 10)
+      
+        return super(MainView, self).get_context_data(
+                tmp_list=tmp_list, page_obj=page_obj, fab_selection_list=fab_selection_list, fab_not_view=fab_not_view, live_table=live_table, floor_table=floor_table, 
+                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, **kwargs
+            )
+            
+    def render_to_response(self, context, **response_kwargs):
+        # if not self.request.GET.get:
+        #    return redirect("apps:top_search")
 
-        context["tmp_list"] = tmp_list
-        return context
+        return super(MainView, self).render_to_response(
+               context, **response_kwargs
+           )
 
     def post(self, request, *args, **kwargs):
 
         if request.POST.get("fab"):
-            print(request.POST.get("fab"))
-            fab_db = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab"))
-            is_fab = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab")).values("flag")
-            if not is_fab:
-                Fab(user_id=request.user.id, article_id=request.POST.get("fab"), flag=1).save()
-            # unlike
-            for fab in is_fab:
-                if fab['flag']> 0:
-                    fab_db.update(flag=0)
-                    context = [{
-                       'message': 'test'
-                    }]
-                    return HttpResponse(context)
-                # like
-                else:
-                    fab_db.update(flag=1)
-                    context = [{
-                       'message': 'test'
-                    }]
-                    return HttpResponse(context)
+            if request.user.id:
+                print(request.POST.get("fab"))
+                fab_db = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab"))
+                is_fab = Fab.objects.filter(user_id=request.user.id, article_id=request.POST.get("fab")).values("flag")
+                if not is_fab:
+                    Fab(user_id=request.user.id, article_id=request.POST.get("fab"), flag=1).save()
+                    # unlike
+                    for fab in is_fab:
+                        if fab['flag']> 0:
+                            fab_db.update(flag=0)
+                            context = [{
+                                'message': 'test'
+                            }]
+                            
+                            return HttpResponse(context)
+                        # like
+                        else:
+                            fab_db.update(flag=1)
+                            context = [{
+                                'message': 'test'
+                            }]
+                            
+                            return HttpResponse(context)
+            else:
+                return False
+        
 """
 詳細情報
 """
@@ -743,6 +761,7 @@ class CompanyView(generic.CreateView):
         img_file = self.request.FILES['company_image'].name
         img_filename = Image.open(self.request.FILES['company_image'])
         img_filename.save(os.path.join('./static/img/', img_file))
+
         if company:
             company.is_company = 1
             company.user_id = int(self.request.user.id)
@@ -778,6 +797,7 @@ class CompanyChange(generic.UpdateView):
         company = Company.objects.filter(user_id=request.user.id)
         company_name = request.POST.get("company_name")
         address_number = request.POST.get("address_number")
+        print(address_number)
         address = request.POST.get("address")
 
         email = request.POST.get('email')
@@ -844,6 +864,7 @@ class CompanyChange(generic.UpdateView):
         company_info.save()
 
         return redirect('apps:top')
+
 """
 物件登録
 """
@@ -863,6 +884,7 @@ class ArticleEdit(generic.CreateView):
     def form_valid(self, form):
 
         tmp_list = []
+        company_id = Company.objects.filter(user_id=self.request.user.id)
         live_id = ArticleLive.objects.order_by('id').reverse()[0]
         user = self.request.user.id
         main_file = form.save(commit=False)
@@ -890,6 +912,8 @@ class ArticleEdit(generic.CreateView):
         address_town = self.request.POST["address"]
         address_city = self.request.POST["address_city"]
         address_others = self.request.POST["address_others"]
+        for company in company_id:
+            main_file.company_id = company.id
         main_file.address_number = self.request.POST["address_number"]
         main_file.address = address_town + ' ' + address_city + ' ' + address_others
         main_file.rent = self.request.POST["rent"]
@@ -947,7 +971,7 @@ class ArticleUpdate(generic.UpdateView):
     def post(self, request, **kwargs):
 
         get_id = self.request.path.replace('/roomii/update/', '')
-
+        article = self.model.objects.filter(id=get_id)
         tmp_list = []
 
         vacant = self.request.POST["live_flag"]
@@ -986,18 +1010,39 @@ class ArticleUpdate(generic.UpdateView):
             vacant_info.cancel_date = cancel_date
 
         main_table = Article.objects.filter(id=get_id)
-        upload_file = self.request.FILES.get('article_image')
-        print(upload_file.name)
+
+        try:
+            upload_file = self.request.FILES.get('article_image')
+            img_filename = Image.open(upload_file)
+            img_filename.save(os.path.join('./media/', upload_file.name))
+        except:
+            upload_file = self.request.POST.get("article_image_hidden")
+
         for main in main_table:
-            main.article_image = upload_file.name
+            try:
+                main.article_image = upload_file.name
+            except:
+                main.article_image = upload_file
             main.article_name = self.request.POST["article_name"]
             main.comments = self.request.POST["comments"]
             main.address_number = self.request.POST["address_number"]
             main.address = self.request.POST["address"]
             main.rent = self.request.POST["rent"]
-            main.park = self.request.POST["park"]
-            main.floor_plan = self.request.POST["floor_plan"]
-            main.floor_number = self.request.POST["floor_number"]
+            try:
+                main.park = self.request.POST["park"]
+            except:
+                for article_park in article:
+                    main.park = article_park.park
+            try:
+                main.floor_plan = self.request.POST["floor_plan"]
+            except:
+                for article_floor_plan in article:
+                    main.floor_plan = article_floor_plan.floor_plan
+            try:
+                main.floor_number = self.request.POST["floor_number"]
+            except:
+                for article_floor_number in article:
+                    main.floor_number = article_floor_number.floor_number
             main.initial_cost = self.request.POST["initial_cost"]
             main.common_service_expense = self.request.POST["common_service_expense"]
             main.term_of_contract = self.request.POST["term_of_contract"]
@@ -1006,28 +1051,33 @@ class ArticleUpdate(generic.UpdateView):
             main.customer = self.request.user.id
 
         upload_files = self.request.FILES.getlist('files')
-        print(upload_files)
         other_files = []
-        for files in upload_files:
-            img_filename = Image.open(files)
-            img_filename.save(os.path.join('./media/', files.name))
-            other_files.append(files.name)
+        try:
+            for files in upload_files:
+                img_filename = Image.open(files)
+                img_filename.save(os.path.join('./media/', files.name))
+                other_files.append(files.name)
 
-        tmp_room_images_id = []
-        for file_image in other_files:
-            RoomImage(article_id=self.request.path.replace('/roomii/update/', ''), image=file_image).save()
-            tmp_room_images_id.append(RoomImage.id)
-        main.room_images_id = str(tmp_room_id)
+            tmp_room_images_id = []
+            for file_image in other_files:
+                RoomImage(article_id=self.request.path.replace('/roomii/update/', ''), image=file_image).save()
+                tmp_room_images_id.append(RoomImage.id)
+            main.room_images_id = str(tmp_room_id)
 
-        img_file = self.request.FILES['article_image'].name
-        img_filename = Image.open(self.request.FILES['article_image'])
-        img_filename.save(os.path.join('./media/', img_file))
+            img_file = self.request.FILES['article_image'].name
+            img_filename = Image.open(self.request.FILES['article_image'])
+            img_filename.save(os.path.join('./media/', img_file))
+        except:
+            main.room_images_id = self.request.POST.get("files_hidden")
 
         main.save()
         vacant_info.save()
 
         return redirect('apps:top')
 
+"""
+ソーシャルログイン修正
+"""
 """
 Googleログイン
 """
@@ -1097,7 +1147,7 @@ class RedirectFacebook(View):
 
     def get(self, request, **kwargs):
 
-        url = 'https://www.facebook.com/v3.2/dialog/oauth'
+        url = 'http://www.facebook.com/v3.2/dialog/oauth'
         params = {
             'response_type': 'code',
             'redirect_uri': FACEBOOK_CALLBACK_URL,
@@ -1111,6 +1161,7 @@ class RedirectFacebook(View):
 class CallbackFacebook(View):
 
     def get(self, request, **kwargs):
+
         if request.GET.get('code'):
             access_token = get_facebook_access_token(request.GET.get('code'))
             data = check_facebook_access_token(access_token)
@@ -1141,3 +1192,23 @@ class CallbackFacebook(View):
                             return redirect("apps:login")
             else:
                 return redirect('apps:login')
+
+
+class image(View):
+
+    model = test_image
+    template_name = 'apps/test_image.html'
+
+    def upload(file, **options):
+        table = self.model.objects.all()
+        for table_list in table:
+            cloudinary.uploader.upload(table_list.image)
+
+    def get(self, request, *args, **kwargs):
+
+        table = self.model.objects.all()
+        for table_list in table:
+            context = {
+                 'test': table_list
+            }
+        return render(request, self.template_name, context)

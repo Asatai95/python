@@ -38,10 +38,10 @@ flow = flow_from_clientsecrets(
 
 """
 facebook
-"""
-FACEBOOK_ID = '292183621408680'
-FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
-FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
+# """
+# FACEBOOK_ID = '292183621408680'
+# FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
+# FACEBOOK_CALLBACK_URL = 'http://localhost:8000/callback/facebook'
 
 """
 Settingファイル
@@ -167,6 +167,7 @@ def get_facebook_access_token(code):
             'code': code,
     }
     r = requests.get(url, params=params)
+    print(r)
     return r.json()['access_token']
 
 def check_facebook_access_token(access_token):

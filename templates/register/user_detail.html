@@ -58,9 +58,11 @@
               </div>
               <div class="inline">
                 <div class="stream-content">
-                  <div class='profile_img'>
-                    <img src="{{user.image}}" alt="">
-                  </div>
+                  <a href="{% url 'chatroom:index' user.pk fab_list.article %}">
+                      <div class='profile_img'>
+                          <img src="{{user.image}}" alt="">
+                      </div>
+                  </a>
                 </div>
               </div>
               <!-- <div class='outline'>
@@ -102,7 +104,11 @@
             <div class="inline">
               <div class="stream-content">
                 <div class='profile_img'>
-                  <img src="{{user.image}}" alt="">
+                
+                  <a href="{% url 'chatroom:index' user.pk main.id %}">
+                    <img src="{{user.image}}" alt="">
+                  </a>
+
                 </div>
               </div>
             </div>

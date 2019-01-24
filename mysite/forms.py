@@ -6,7 +6,7 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company, License
 from django.db import models
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -117,12 +117,12 @@ class CreateCompany(forms.ModelForm):
 
     CHOICE_License_year = (
               ('', '免許の更新回数'),
-              ('1', '1'),
-              ('2', '2'),
-              ('3', '3'),
-              ('4', '4'),
-              ('4', '5'),
-              ('4', '6'),
+              ('01', '1'),
+              ('02', '2'),
+              ('03', '3'),
+              ('04', '4'),
+              ('04', '5'),
+              ('04', '6'),
             )
 
     address_number = forms.RegexField(
@@ -210,11 +210,16 @@ class CreateCompany(forms.ModelForm):
 
     def clean_license(self):
 
-        license = self.cleaned_data["license"]
+        update_date = self.cleaned_data["update_count"]
+        license_field = self.cleaned_data["license"]
+        license = "("+update_date+")" + license_field
+        license_table = License.objects.filter(license=license)
+        if not license_table:
+            raise forms.ValidationError(_("免許情報が異なります"))
+
         company = CompanyCreate.objects.all()
         if company.filter(license=license):
             raise forms.ValidationError(_("すでに登録されている免許情報です"))
-        print(license)
         try:
             return license
         except :
@@ -276,6 +281,8 @@ class Createform(forms.ModelForm):
               ('0', '空室です'),
               ('1', '空室ではないです'),
             )
+    
+    company_id =  forms.IntegerField(label='企業ID')
 
     address_number = forms.RegexField(
         label = "郵便番号",
@@ -393,6 +400,19 @@ UploadModelFormSet = forms.modelformset_factory(
     extra=10
 )
 
+class CompanyUpdateForm(forms.ModelForm):
+    """会社情報更新"""
+
+    class Meta:
+        model = Company
+        fields = ("company_name", "address_number", "address", "license", "email", "web", "tel_number", "company_image", )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+
+            field.widget.attrs['class'] = 'form-control'
+
 class ArticleUpdateForm(forms.ModelForm):
     """物件更新"""
 
@@ -408,15 +428,27 @@ class ArticleUpdateForm(forms.ModelForm):
 
             field.widget.attrs['class'] = 'form-control'
 
-class CompanyUpdateForm(forms.ModelForm):
-    """会社情報更新"""
-
-    class Meta:
-        model = Company
-        fields = ("company_name", "address", "license", "email", "web", "tel_number", "company_image", )
+class ChatRoom(forms.ModelForm):
+    """チャットルーム"""
+    company_id = forms.IntegerField(label='企業ID')
+    user_id = forms.IntegerField(label='ユーザーID')
+    article_id = forms.IntegerField(label='物件ID')
+    chat = forms.CharField(
+           label = 'コメント',
+           max_length=200,
+    )
+    to_person = forms.CharField(
+           label = '送信相手',
+           max_length=45,
+    )
+    from_person = forms.CharField(
+           label = '送信主',
+           max_length=45,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
 
             field.widget.attrs['class'] = 'form-control'
+

@@ -1,0 +1,162 @@
+<!doctype html>
+{% load static %}
+<html lang="ja">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+
+
+  <title>roomii</title>
+</head>
+
+<body>
+
+  <!-- ナビバー -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    {% if user.is_authenticated %}
+      <a class="navbar-brand" href="#">roomii</a>
+    {% else %}
+      <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
+    {% endif %}
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        {% if user.is_staff is False %}
+          {% if user.is_authenticated %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-item nav-link" href="{% url 'register:login' %}">
+               ゲストログインはこちら
+            </a>
+      
+          </li>
+          {% endif %}
+        {% else %}
+          {% if user.is_authenticated %}
+          <li>
+            <a class="nav-item nav-link btn_sidebar" data-action="toggle" data-side="left" href="javascript:void(0)">ダッシュボード</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+          </li>
+          {% if user.is_company %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
+          </li>
+          {% else%}
+          {% endif %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'chatroom:index' user.pk  %}">メッセージBox</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-item nav-link" href="{% url 'register:login' %}">
+               ゲストログインはこちら
+            </a>
+            
+          </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+  {% if user.is_authenticated %}
+  <aside class="sidebar left">
+      <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
+          <img src="{% static 'img/Untitled1.png' %}" alt="">
+        </a>
+    <h1 id="brand-logo">roomii</h1>
+    <nav id="global-nav">
+        <ul>
+          {% if user.is_authenticated %}
+            <li><a href="{% url 'register:top'%}">TOP</a></li>
+            {% if user.is_company %}
+            <li><a href="{% url 'apps:company_change' %}">業者情報編集</a></li>
+            {%else%}
+            {% endif %}
+            <li><a href="{% url 'apps:company' %}">物件登録</a></li>
+            <li><a href="{% url 'register:user_detail' user.pk %}">マイページ</a></li>
+            <li><a href="#">メッセージBOX</a></li>
+            <li><a href="{% url 'register:logout' %}">ログアウト</a></li>
+          {% else %}
+            <li><a href="{% url 'register:login' %}">ゲストログインはこちら</a></li>
+          {% endif %}
+        </ul>
+    </nav> 
+  </aside>
+  {% endif %}
+
+  <div id="main_top_view">
+        <div class="top_contents">
+            <div class="title">
+                <p>さっそく検索してみよう！</p>
+            </div>
+            <div>
+                <form action="roomii/" method="GET" class="top_search">
+                    <select name="address_name" class="menu_area">
+                        <option value="Select Area">Select Area</option>
+                        <option value="那覇市">那覇市</option>
+                        <option value="南風原">南風原</option>
+                        <option value="南城市">南城市</option>
+                    </select>
+                        <div class="top_search_bar">
+                            <button type="submit" class="hidden_button">
+                                <img src="{%static 'img/musi.png' %}" alt="">
+                            </button>
+                            <input type="text" name="name" class="search_box" placeholder="何らかのキーワードを入力してみよう！！">
+                        </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+  <!-- <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.1.0/jquery.sidebar.min.js"></script>
+  <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+  {% block extrajs %}{% endblock %}
+  <script src="{% static 'js/jquery.inview-master/jquery.inview.js' %}"></script>
+  <script src="{% static 'js/jquery-scrollfade-master/jquery.scrollfade.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick.css' %}"/>
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.woff' %}"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.ttf' %}"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/ajax-loader.gif' %}"/> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick-theme.css' %}"/>
+  <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+</body>
+
+</html>

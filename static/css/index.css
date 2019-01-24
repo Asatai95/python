@@ -18,6 +18,90 @@ li {
   list-style: none;
 }
 
+.mx-auto {
+  display: none;
+  width: 230px!important;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  z-index: 30;
+  padding: 60px;
+  padding-bottom: 0;
+}
+
+.pagination {
+  border: 1px solid black;
+}
+
+.pagination li a {
+  font-size: 20px;
+}
+
+/* .main_view {
+  height: 100vh;
+} */
+
+#main_top_view {
+  height: 90vh;
+}
+
+.top_contents {
+  margin: auto;
+  position: absolute;
+  width: 700px;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  height: 200px;
+  background: none;
+}
+
+.top_contents div.title p {
+  font-size: 30px;
+  color: white;
+  font-weight: 800;
+  text-shadow: 0 0 10px black;
+}
+
+.menu_area {
+  width: 200px;
+  height: 28px;
+  margin: 15px;
+}
+
+.top_search {
+  display: inline-flex;
+  margin: 30px;
+}
+
+.top_search_bar {
+  margin: 10px;
+}
+
+.top_search_bar img {
+  width: 30px;
+  height: 30px;
+  margin: 5px;
+}
+
+.top_search_bar input {
+  width: 400px;
+  height: 40px;
+  border: 1px solid black;
+  border-radius: 15px;
+  padding-left: 50px;
+}
+
+.hidden_button {
+  position: absolute;
+  background: none;
+  padding: 0;
+  border: none;
+}
+
 .bottom_load {
   height: 60px;
   /*background-color: rgba(255, 255, 255, .7);*/
@@ -143,6 +227,106 @@ li {
 
 .ribbon14:after{
   right: 18px;
+}
+
+.login_menu {
+  display: none;
+  position: fixed;
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 20px 0;
+  z-index: 30;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto;
+  width: 430px;
+  height: 370px;
+  background: rgba(255, 255, 255);
+}
+
+.login_card {
+  width: 400px;
+  border: none;
+}
+
+.login_card label {
+  margin-top: 15px;
+  font-size: 30px;
+  font-weight: 800;
+  font-family: "Compass Serif", Times, "Times New Roman", serif;
+}
+
+.back_login_botton {
+  text-align: right;
+  width: 50px;
+  position: absolute;
+  margin-left: 20px;
+  z-index: 30;
+  cursor: pointer;
+}
+
+.btn_sidebar img {
+  margin-bottom: 20px;
+  margin-left: 150px;
+  width: 80px;
+  position: relative;
+}
+
+.navbar-nav.mr-auto li a {
+  color: rgba(0,0,0,.5);
+}
+
+.sidebar {
+  z-index: 20;
+  font-size: 15px;
+  padding: 150px 0;
+  width: 260px;
+  height: 100%;
+  position: fixed;
+  background: #fff;
+  text-align: center;
+}
+
+#brand-logo {
+  font-size: 35px;
+  margin: 20px auto;
+}
+
+#global-nav ul {
+  padding: 0;
+}
+
+#global-nav ul li {
+  margin: 10px auto;
+}
+
+#global-nav ul li a {
+  font-size: 20px;
+  color: black;
+  font-weight: 600;
+  text-decoration-color: rgba(255, 64, 0);
+}
+
+#global-nav .sub-menu > a:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 18px;
+  margin: auto;
+  vertical-align: middle;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid #033560;
+  border-right: 1px solid #033560;
+  transition: all .2s ease-out;
+  transform: rotate(135deg);
+}
+
+#global-nav .sub-menu.is-active > a:after {
+  transform: rotate(-45deg);
 }
 
 .login_after_title {
@@ -324,7 +508,7 @@ form[name='filter_name'] {
 .dropmenu{
   *zoom: 1;
   list-style-type: none;
-  width: 1120px;
+  width: 1130px;
   height: 50px;
   margin: 5px auto 30px;
   padding: 0;
@@ -434,7 +618,6 @@ form[name='filter_name'] {
 }
 
 .address_box {
-  width: 275px;
   float: right;
   margin-top: 2px;
 }
@@ -500,6 +683,14 @@ form[name='filter_name'] {
   border-radius:2px 0 0 2px;/*検索ボックスの角を丸める*/
   background:#eee;/*検索ボックスの背景カラー*/
 }
+
+#search {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 2px 0 0 2px;
+  background: #eee;
+}
+
 /*検索ボタン*/
 #sbtn{
   width: 70px;
@@ -515,9 +706,14 @@ form[name='filter_name'] {
 }
 
 .bg-light {
+  top: 0;
+  margin: auto;
+  right: 0;
   width: 100%;
+  z-index: 50;
+  background-color: rgba(255, 255, 255)!important;
   position: fixed;
-  z-index: 20;
+  z-index: 30;
 }
 
 .container.mt-3 {
@@ -1065,8 +1261,9 @@ li.new_account {
 /*ユーザーページ*/
 
 .back.change {
-  font-size: 15px!important;
+  font-size: 20px!important;
   border-radius: 20px;
+  width: 180px!important;
 }
 
 .password_change {
@@ -1079,12 +1276,17 @@ li.new_account {
 
 .main_mypage {
   padding-top: 30px;
+  margin-bottom: 100px;
   height: 100vh;
+  overflow: auto;
+  margin-bottom: 100px;
+  display: flex;
 }
 
 .profilecard {
-  width: 50vw;
-  margin: 3vw auto;
+  width: 40vw;
+  height:25vw;
+  margin: 3vw 2vw;
   padding: 1vw;
   background-color: rgba(255,255,255);
   border: solid 10px #f7b52c;
@@ -1115,8 +1317,8 @@ li.new_account {
 }
 
 .profile-header img {
-  width: 25%;
-  height: 25%;
+  width: 50%;
+  height: 50%;
 }
 
 .profile-header p {
@@ -1146,6 +1348,7 @@ li.new_account {
 
 .profile-footer {
   text-align: center;
+  margin: 30px auto;
 }
 
 p span {
@@ -1153,11 +1356,11 @@ p span {
 }
 
 p span.user-name {
-  font-size: 25px!important;
+  font-size: 30px!important;
 }
 
 p span.user-email {
-  font-size: 20px!important;
+  font-size: 25px!important;
 }
 
 p span.room-name {
@@ -1198,8 +1401,15 @@ a:hover {
 }
 
 .content {
-  margin-top: 2vw;
+  margin-top: 3vw;
   background-color: #EEEEEE;
+  display: flex;
+  justify-content: center;
+  border-radius: 10px;
+}
+ 
+.main_content .stream .content div {
+  margin: 0 10px;
 }
 
 .stream-header {
@@ -1225,7 +1435,11 @@ a:hover {
   width: 100px;
   height: 100px;
   border-radius: 50px;
-  margin-left: 50px;
+  margin: 10px auto; 
+}
+
+.inline .stream-content .profile_img img:hover {
+  transform: scale(1.1);
 }
 
 .inline {
@@ -1339,7 +1553,7 @@ a:hover {
   flex-wrap: wrap;
   width: 650px;
   height: 650px;
-  /*margin: 100px!important;*/
+  margin-bottom: 150px;
   background: url('../img/home.png');
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -1386,8 +1600,9 @@ a:hover {
 .content_main {
   z-index: 5;
   position: absolute;
-  max-width: 1100px;
+  max-width: 900px;
   margin-top: 100px;
+  margin-bottom : 80px ;
 }
 
 .item img {
@@ -1523,6 +1738,14 @@ a:hover {
   cursor: pointer;
 }
 
+#heart_hidden {
+  width: 100px;
+  height: 100px;
+  background: url(http://nelog.jp/wp-content/uploads/2016/03/heart_animation.png) no-repeat;
+  background-position: 0 0;
+  cursor: pointer;
+}
+
 #heart:hover {
   background-position: -2800px 0;
   -webkit-transition: background 1s steps(28);
@@ -1620,7 +1843,7 @@ a:hover {
 }
 
 .form-article {
-  margin: 10px auto;
+  margin: 40px auto;
 }
 
 .form-article th {
@@ -1630,7 +1853,6 @@ a:hover {
 
 .form-article label {
   display: inline-block;
-  margin-bottom: 30px;
 }
 
 .form-article td input {
@@ -1795,6 +2017,37 @@ a:hover {
   margin-top: 80px;
 }
 
+.map {
+  margin: 20px auto;
+}
+
+.map_button {
+  display: inline-flex;
+  width: 100px;
+  margin: 0 50px;
+}
+
+.map_button .square_btn {
+  border-radius: 30px;
+  font-size: 20px;
+  font-weight: 800;
+  width: 100px;
+  border-radius: 30px;
+  position: relative;
+  display: inline-block;
+  padding: 0.25em 0.5em;
+  text-decoration: none;
+  color: #FFF;
+  background: #fd9535;/*背景色*/
+  border-bottom: solid 2px #d27d00;/*少し濃い目の色に*/
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 2px 2px rgba(0, 0, 0, 0.19);
+  font-weight: bold;
+}
+
+.map_button .square_btn:active {
+  border-bottom: solid 2px #fd9535;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.30);
+}
 
 .card {
   width: 400px;
@@ -1831,4 +2084,222 @@ span.error {
 
 label.license_year {
   display: block;
+}
+
+/* チャットルーム */
+
+.main_chat_room {
+  margin-top: 70px;
+}
+
+.main_room {
+  width: 60%;
+  position: absolute;
+  right: 0;
+  display: inline;
+  overflow: auto;
+  margin: 20px 10px 0 0;
+}
+
+#room{
+  position: fixed;
+  width: 900px;
+  height: 50px;
+  font-size: 35px;
+  line-height: 1.5em;
+  background-color:#263147;
+  color:#ffffff;
+  text-align:center;
+  z-index: 10;
+}
+
+.chat_room_contents {
+  width: 900px;
+  height:80vh;
+  background-color:#7293c2;
+  overflow-x:hidden;
+  overflow-y:scroll;
+  padding: 50px 0;
+  position: fixed;
+  padding-top: 70px;
+  padding-bottom: 10px;
+}
+
+#msg{
+  display: inline-block;
+  width: 100%;
+  margin: 20px 10px 20px 10px;
+  z-index: 1;
+}
+
+.msg-right {
+  width: 50%!important;
+  position: absolute;
+  right: 0;
+}
+
+#msg img {
+  float: left;
+  width: 10%;
+}
+
+#msg > ul{
+  width: 100%;
+  margin: 10px auto;
+  text-align: left;
+  -webkit-margin-before:0;
+  -webkit-margin-after:0;
+  -webkit-padding-start:0;
+}
+
+#msg > ul > li {
+  float: left;
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  margin: 10px 0 0 30px;
+  padding: 10px;
+  max-width: 250px;
+  border-radius: 12px;
+  background: #edf1ee;
+  list-style-type:none;
+}
+
+#msg > ul > li.fk:after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 3px; 
+  left: -18px;
+  border: 8px solid transparent;
+  border-right: 18px solid #edf1ee;
+  -ms-transform: rotate(35deg);
+  -webkit-transform: rotate(35deg);
+  transform: rotate(35deg);
+}
+
+#msg > ul > li > textarea {
+  margin: 0;
+  padding: 0;
+  background: none;
+  resize: none;
+  border: none;
+  width: 100%;
+  font-size: 20px;
+  padding: 15px;
+}
+
+.clear_balloon{
+  clear:both;
+}
+   
+.chat_room{
+  height: 60px;
+  padding:5px 0;
+  background-color:#f3f4f8;
+  text-align:center;
+  position: fixed;
+  bottom: 50px;
+  width: 900px;
+  z-index: 10;
+}
+  
+.chat_room > input{
+  width: 600px;
+  height: 50px;
+  font-size: 20px;
+  padding: 0 10px;
+  background-color:#ffffff;
+}
+  
+#chat-message-submit {
+  width: 100px;
+  height: 48px;
+  background-color:#5785e3;
+  color:#ffffff;
+  cursor: pointer;
+}
+
+#msg ul li.chat_msg.right {
+  float: right;
+  width: 100%;
+  display: inline-block;
+  position: relative;
+  margin: 20px 50px 0 0;
+  padding: 10px;
+  max-width: 250px;
+  border-radius: 12px;
+  background: #edf1ee;
+  list-style-type: none;
+}
+
+#msg ul li.chat_msg.right:before {
+  content: "";
+  position: absolute;
+  top: 1px; 
+  right: -19px;
+  border: 8px solid transparent;
+  border-left: 18px solid #edf1ee;
+  -ms-transform: rotate(-35deg);
+  -webkit-transform: rotate(-35deg);
+  transform: rotate(-35deg);
+}
+
+#msg ul li.chat_msg.right.now {
+  visibility: hidden;
+  transform: translateY(60%);
+}
+
+#msg ul li.chat_msg.right {
+  visibility: visible;
+  transform: translateY(0%);
+  transition: transform 1s ease .5s;
+}
+
+.chat_msg.right textarea {
+  margin: 0;
+  padding: 0;
+  background: none;
+  resize: none;
+  border: none;
+  width: 100%;
+  font-size: 20px;
+  padding: 15px;
+}
+
+.users {
+  position: absolute;
+  border: 2px solid black;
+  width: 30%;
+  background: white;
+  top: 100px;
+  padding: 50px 5px;
+  margin-left: 15px;
+  border-radius: 50px;
+}
+
+.users_profile div {
+  text-align: center;
+}
+
+.users_profile div img {
+  width: 40%;
+}
+
+.users_profile div ul {
+  padding: 0;
+  margin: 0 auto;
+  width: 50
+}
+
+.users_profile div ul li {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 600;
+  margin: 20px auto;
+}
+
+.users_profile div ul li span {
+  font-size: 25px;
+  color: gray;
 }

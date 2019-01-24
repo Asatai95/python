@@ -163,6 +163,7 @@ class Article(models.Model):
     """カスタム物件モデル(View専用)"""
 
     id = models.AutoField(primary_key=True)
+    company_id = models.IntegerField(_('company_id'))
     customer = models.IntegerField(_('customer'))
     article_name = models.CharField(_('article name'), max_length=150)
     comments = models.CharField(_('comments'), max_length=150)
@@ -198,6 +199,7 @@ class Fab(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_key")
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="article_key")
     flag = models.IntegerField()
+    message_flag = models.IntegerField()
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'))
 
@@ -231,6 +233,7 @@ class ArticleCreate(models.Model):
     """物件登録モデル"""
     id = models.AutoField(primary_key=True)
     customer = models.IntegerField(_('customer'))
+    company_id = models.IntegerField(_('company_id'))
     article_name = models.CharField(u'名称', max_length=150)
     comments = models.CharField(u'キャッチコピー', max_length=150)
     room_images_id = models.CharField(u'メイン画像', max_length=150)
@@ -303,7 +306,7 @@ class CompanyCreate(models.Model):
     email = models.EmailField(u'Email', max_length=45)
     web = models.URLField(u'Webサイト', max_length=45)
     tel_number = models.CharField(u'電話番号', max_length=150)
-    company_image = models.FileField(u'イメージ画像', validators=[FileExtensionValidator(['pdf', 'png', 'jpeg', ])])
+    company_image = models.FileField(u'イメージ画像', validators=[FileExtensionValidator(['jpg', 'png', 'jpeg', ])])
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'))
 
@@ -311,3 +314,35 @@ class CompanyCreate(models.Model):
         verbose_name = _('company create')
         verbose_name_plural = _('company creates')
         db_table = 'company'
+
+class License(models.Model):
+    """免許番号"""
+    id = models.AutoField(primary_key=True)
+    license = models.CharField(u'免許番号', max_length=45)
+
+    class Meta:
+        db_table = 'license'
+
+class Chat_room(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    company_id = models.ImageField(u'企業ID')
+    user_id = models.IntegerField(u'ユーザーID')
+    article_id = models.IntegerField(u'物件ID')
+    chat = models.CharField(u'メッセージ', max_length=200)
+    to_person = models.CharField(u'送信相手', max_length=45)
+    from_person = models.CharField(u'送信主', max_length=45)
+    updated_at = models.DateTimeField(_('updated at'))
+    created_at = models.DateTimeField(_('created at'), default=timezone.now)
+
+    class Meta:
+        db_table = 'chat_room'
+
+class test_image(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    image = models.ImageField(_('image'), upload_to='media')
+
+    class Meta:
+        db_table = 'image_table'
+

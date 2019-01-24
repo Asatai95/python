@@ -1,9 +1,34 @@
 $(function(){
   if ( $("input[name=company_image]").length ) {
-    $("input[name=company_image]").attr("accept", " image/png,image/jpeg,image/jpg ");
+    $("input[name=company_image]").attr("accept", ".png, .jpg, .jpeg");
   }
 });
 
+$(document).ready(function () {
+  var sides = ["left", "top", "right", "bottom"];
+  for (var i = 0; i < sides.length; ++i) {
+      var cSide = sides[i];
+      $(".sidebar." + cSide).sidebar({side: cSide});
+  }
+
+  $(".btn_sidebar[data-action]").on("click", function () {
+      var $this = $(this);
+      var action = $this.attr("data-action");
+      var side = $this.attr("data-side");
+      $(".sidebar." + side).trigger("sidebar:" + action);
+      return false;
+  });
+});
+
+$(function() {
+  $(document).on('click', function(e) {
+    if ($(e.target).closest('.back_login_botton').length) {
+      $(".login_menu").fadeOut();
+      $(".content_main").css("filter", "brightness(100%)");
+      $('.content_main').css("position", "");
+    } 
+  });
+});
 
 $(function(){
   $(document).ready(function(){
@@ -125,6 +150,7 @@ $(function() {
         $('.container.facebook').fadeOut();
         $('.container.google').fadeOut();
       }
+      e.preventDefault();
     }
   });
 });
@@ -367,6 +393,46 @@ $(function(){
     var divText = $(this).html();
     if (divText.match(':')){
       $(this).html($(this).text().slice(0,-1));
+    }
+  });
+});
+
+$(window).on('scroll', function () {
+  var doch = $(document).innerHeight(); 
+  var winh = $(window).innerHeight(); 
+  var bottom = doch - winh; 
+  if (bottom <= $(window).scrollTop()) {
+    $('.row.mx-auto').fadeIn();
+  } else {
+    $('.row.mx-auto').fadeOut();
+  }
+});
+
+$(function(){
+  try{
+    $("html,div.chat_room_contents").animate({scrollTop:$('#chat-log').offset().top, },{ duration: 2000, easing: 'swing', });
+  }catch {
+
+  }
+  try { 
+    var t = $("#chat-log").offset().top;
+    var p = t - $(".chat_room_contents").height();
+    if ( t > p ){  
+      $("div.chat_room_contents").animate({
+      scrollTop: $("#chat-log").offset().top,}, { duration: 2000, easing: 'swing', });
+    }
+  } catch {}
+});
+
+$(function() {
+  if ( $('#chat-message-input').val().length == 0 ) {
+    $('#chat-message-submit').attr('disabled', 'disabled');
+  }
+  $('#chat-message-input').bind('keydown keyup keypress change', function() {
+    if ( $(this).val().length > 0 ) {
+      $('#chat-message-submit').removeAttr('disabled');
+    } else {
+      $('#chat-message-submit').attr('disabled', 'disabled');
     }
   });
 });

@@ -13,7 +13,6 @@ from django.contrib import *
 
 from django.db import models
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PROJECT_NAME = os.path.basename(BASE_DIR)
@@ -34,7 +33,21 @@ INSTALLED_APPS = [
     # 'mysite.apps.WebappConfig',
     'mysite',
     # 'social_django',
+    'jet',
+    'cloudinary',
+    'cloudinary_storage',
+    'mysite.chat',
+    'channels',
 ]
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -92,12 +105,15 @@ LOGOUT_URL = 'register:logout'
 sys.path.append(os.getcwd())
 WSGI_APPLICATION = 'config.wsgi.application'
 
+sys.path.append(os.getcwd())
+ASGI_APPLICATION = 'mysite.routing.application'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'roomii_main',
-        'USER': 'roomii',
-        'PASSWORD': 'roomii1156',
+        'NAME': 'roomii_sample',
+        'USER': 'root',
+        'PASSWORD': 'Asatai951156',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -140,8 +156,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'mysite.User'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '991249997158-ns651fs80kdi05dtbaq6e9if081ubq9k.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'eodCVb8XjTTR_sf-41XkJt8g'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '979839320684-ru46386tvgh35kdh7cog9mm27lpulvr9.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'mG3KZnJfs9JBMFym8fLdjYIC'
 
 
 FACEBOOK_CALLBACK_URL='http://localhost:8000/auth/complete/facebook/'
@@ -165,10 +181,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
-    "roomii",
-    "roomii1156",
+    "root",
+    "Asatai951156",
     "127.0.0.1:3306",
-    "roomii_main",
+    "roomii_sample",
 )
 
 ENGINE = create_engine(
@@ -188,3 +204,13 @@ session = scoped_session(
 
 Base = declarative_base()
 Base.query = session.query_property()
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dn72zl9c7',
+    'API_KEY': '558834748665224',
+    'API_SECRET': 'FfdZ0IanWSyLLoHBRnqrHhVlECw'
+}
+#
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
