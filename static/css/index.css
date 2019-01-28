@@ -31,9 +31,6 @@ li {
   padding-bottom: 0;
 }
 
-.pagination {
-  border: 1px solid black;
-}
 
 .pagination li a {
   font-size: 20px;
@@ -68,7 +65,7 @@ li {
 
 .menu_area {
   width: 200px;
-  height: 28px;
+  height: 50px;
   margin: 15px;
 }
 
@@ -82,17 +79,17 @@ li {
 }
 
 .top_search_bar img {
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   margin: 5px;
 }
 
 .top_search_bar input {
-  width: 400px;
-  height: 40px;
+  width: 450px;
+  height: 70px;
   border: 1px solid black;
   border-radius: 15px;
-  padding-left: 50px;
+  padding-left: 70px;
 }
 
 .hidden_button {
@@ -1284,7 +1281,7 @@ li.new_account {
 }
 
 .profilecard {
-  width: 40vw;
+  width: 48vw;
   height:25vw;
   margin: 3vw 2vw;
   padding: 1vw;
@@ -1317,20 +1314,22 @@ li.new_account {
 }
 
 .profile-header img {
-  width: 50%;
-  height: 50%;
+  width: 35%;
+  height: 35%;
 }
 
 .profile-header p {
-  margin-left: 20px;
-  padding-top: 18px;
+  margin-left: 30px;
+  padding-top: 50px;
 }
 
 .date_joined {
-  float: right;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .created_date {
+  position: absolute;
   height: 25px;
   margin: 0!important;
   padding: 0!important;
@@ -1342,8 +1341,9 @@ li.new_account {
 
 .profile-header p a img {
   width: 25px;
-  height: 15px;
+  height: 20px;
   margin-left: 5px;
+  margin-bottom: 10px;
 }
 
 .profile-footer {
@@ -2121,7 +2121,7 @@ label.license_year {
   overflow-y:scroll;
   padding: 50px 0;
   position: fixed;
-  padding-top: 70px;
+  padding-top: 50px;
   padding-bottom: 10px;
 }
 
@@ -2130,12 +2130,6 @@ label.license_year {
   width: 100%;
   margin: 20px 10px 20px 10px;
   z-index: 1;
-}
-
-.msg-right {
-  width: 50%!important;
-  position: absolute;
-  right: 0;
 }
 
 #msg img {
@@ -2159,7 +2153,7 @@ label.license_year {
   position: relative;
   margin: 10px 0 0 30px;
   padding: 10px;
-  max-width: 250px;
+  max-width: 300px;
   border-radius: 12px;
   background: #edf1ee;
   list-style-type:none;
@@ -2184,7 +2178,7 @@ label.license_year {
   background: none;
   resize: none;
   border: none;
-  width: 100%;
+  height:100%;
   font-size: 20px;
   padding: 15px;
 }
@@ -2231,6 +2225,8 @@ label.license_year {
   border-radius: 12px;
   background: #edf1ee;
   list-style-type: none;
+  max-width: 300px;
+  height: 100%;
 }
 
 #msg ul li.chat_msg.right:before {
@@ -2302,4 +2298,33 @@ label.license_year {
 .users_profile div ul li span {
   font-size: 25px;
   color: gray;
+}
+
+.msg-right-sub {
+  display: none;
+}
+
+.customer_list {
+  position: absolute;
+  background: rgba(255, 255, 255, .9);
+  margin: 10px auto;
+  max-width: 45%;
+  border-radius: 10px;
+  display: none;
+}
+
+.customer_list ul {
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+}
+
+.customer_list ul li {
+  text-align: center;
+}
+
+.customer_list ul li img {
+  width: 30%;
+  height: 90%;
 }

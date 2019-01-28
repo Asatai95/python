@@ -424,6 +424,14 @@ $(function(){
   } catch {}
 });
 
+$(function(){
+  if ( $(".msg-right").length ) {
+    $(".msg-right-sub").css("display", "none")
+  } else {
+    $(".msg-right-sub").css("display", "block");
+  }
+});
+
 $(function() {
   if ( $('#chat-message-input').val().length == 0 ) {
     $('#chat-message-submit').attr('disabled', 'disabled');
@@ -434,5 +442,28 @@ $(function() {
     } else {
       $('#chat-message-submit').attr('disabled', 'disabled');
     }
+  });
+});
+
+$(function(){
+  $(".customer_list ul li a").on("click", function(e){
+    e.preventDefault();
+    $(".customer_list").fadeIn();
+  });
+});
+
+$(function(){
+  $(document).on('click', function(e) {
+    if (!$(e.target).closest('.profile_img a img').length && !$(e.target).closest('.main_content').length) {
+      $('.customer_list').fadeOut();
+    } else if ($(e.target).closest('.profile_img a img').length) {
+
+      if ($('.customer_list').css('display') == 'none') {
+        $('.customer_list').fadeIn();
+      } else {
+        $('.customer_list').fadeOut();
+      }
+    }
+    
   });
 });

@@ -78,19 +78,28 @@ class ChatView(View):
     def get(self, request, *args, **kwargs):
         user_id = request.path.split('/').pop(3)
         aritcle_id = request.path.split('/').pop(4)
-        print(aritcle_id)
-        message = self.model.objects.filter(message_flag=1, user=user_id, article=aritcle_id) 
+        message = self.model.objects.filter(message_flag=1, article=aritcle_id, user=user_id) 
         if not message:
             return redirect('register:user_detail')
         else:
-            
-            article_info = Article.objects.order_by('id').filter(id=aritcle_id)
-            for info in article_info:
-                company_info_id = info.company_id
-                company_info = Company.objects.order_by('id').filter(id=company_info_id)
+            if not request.user.is_staff:
+                article_info = Article.objects.order_by('id').filter(id=aritcle_id)
+                for info in article_info:
+                    company_info_id = info.company_id
+                    company_info = Company.objects.order_by('id').filter(id=company_info_id)
+                    chat_room = Chat_room.objects.filter(user_id=user_id, company_id=company_info_id)
+   
+                    return render(request, self.template_name, {'view': company_info, 'chat': chat_room, 
+                         'user_id': mark_safe(json.dumps(user_id)),
+                         'aritcle_id': mark_safe(json.dumps(aritcle_id)) } )
+            else:
+                user_info = Get_user.objects.order_by('id').filter(id=user_id)
                 chat_room = Chat_room.objects.filter(user_id=user_id, company_id=company_info_id)
-
-            return render(request, self.template_name, {'view': company_info, 'chat': chat_room, 'user_id': user_id, 'aritcle_id':aritcle_id })
+   
+                return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 
+                     'user_id': mark_safe(json.dumps(user_id)),
+                     'aritcle_id': mark_safe(json.dumps(aritcle_id)) } )
+                                         
     
 
     # def post(self, request, *args, **kwargs):

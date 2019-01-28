@@ -324,20 +324,20 @@ class License(models.Model):
         db_table = 'license'
 
 class Chat_room(models.Model):
-
+    """メッセージルーム"""
     id = models.AutoField(primary_key=True)
-    company_id = models.ImageField(u'企業ID')
+    company_id = models.IntegerField(u'企業ID', null=True)
     user_id = models.IntegerField(u'ユーザーID')
     article_id = models.IntegerField(u'物件ID')
     chat = models.CharField(u'メッセージ', max_length=200)
-    to_person = models.CharField(u'送信相手', max_length=45)
-    from_person = models.CharField(u'送信主', max_length=45)
-    updated_at = models.DateTimeField(_('updated at'))
+    to_person = models.CharField(u'送信相手', max_length=45, null=True)
+    from_person = models.CharField(u'送信主', max_length=45, null=True)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
+    updated_at = models.DateTimeField(_('updated at'))
 
     class Meta:
         db_table = 'chat_room'
-
+        
 class test_image(models.Model):
 
     id = models.AutoField(primary_key=True)
@@ -346,3 +346,13 @@ class test_image(models.Model):
     class Meta:
         db_table = 'image_table'
 
+class Test(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    test = models.CharField(u'test', max_length=45)
+    user_id = models.IntegerField(u'ユーザーID')
+    article_id = models.IntegerField(u'物件ID')
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = 'test'

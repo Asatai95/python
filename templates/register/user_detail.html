@@ -83,10 +83,10 @@
        {% endfor %}
      {% endfor %}
   {% else %}
-  {% for live in tmp_article_live %}
-    {% if live.vacancy_info == "0" %}
-      {% for main in tmp_article %}
-        {% if main.id == live.article_id %}
+   {% for live in tmp_article_live %}
+     {% if live.vacancy_info == "0" %}
+       {% for main in tmp_article %}
+         {% if main.id == live.article_id %}
         <div class="stream">
           <div class="content">
             <div class='preview'>
@@ -94,7 +94,8 @@
             </div>
             <div class="stream-header">
               <p>
-                <span class="like-time">お気に入り登録:{{main.updated_at}}</span>
+                <span class="like-time">物件登録日:{{main.created_at}}</span>
+                <span class="like-time">物件更新日:{{main.updated_at}}</span>
                 <span class="room-name">{{main.article_name}}</span>
                 <div class="stream-content">
                   <span name="comment">{{main.comments}}</span>
@@ -105,7 +106,7 @@
               <div class="stream-content">
                 <div class='profile_img'>
                 
-                  <a href="{% url 'chatroom:index' user.pk main.id %}">
+                  <a href="#">
                     <img src="{{user.image}}" alt="">
                   </a>
 
@@ -125,11 +126,25 @@
               </div>
             </div> -->
            </div>
+           <div class='customer_list'>
+            <ul>
+              {% for user_info in tmp_user %}
+                {% for info in user_info %}
+                  <li>
+                    <a href="{% url 'chatroom:index' info.pk main.id %}">
+                      <span>{{info.username}}</span>
+                      <img src="{{info.image}}" alt="">
+                    </a>
+                  </li>
+                {% endfor %}
+              {%endfor %}
+            </ul>
+          </div>
          </div>
         {% endif %}
       {% endfor %}
     {% endif %}
-  {% endfor %}
+   {% endfor %}
   {% endif %}
   </div>
 </div>

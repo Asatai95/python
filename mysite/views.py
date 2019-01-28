@@ -49,9 +49,6 @@ import re
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from pure_pagination.mixins import PaginationMixin
 
-from channels.generic.websocket import WebsocketConsumer
-import json
-
 """
 Settingファイル
 """
@@ -297,6 +294,8 @@ class UserDetail(PermissionsMypage, generic.DetailView):
         else:
             tmp_article_live = []
             tmp_article = []
+            tmp_user = []
+            tmp_fab = []
             article = Article.objects.filter(customer=request.user.id).order_by("live_flag_id")
             company = CompanyCreate.objects.filter(user_id=request.user.id)
             for main in article:
@@ -304,8 +303,13 @@ class UserDetail(PermissionsMypage, generic.DetailView):
                 articleLive = ArticleLive.objects.filter(id=main.live_flag_id).order_by("vacancy_info")
                 for live in articleLive:
                     tmp_article_live.append(live)
-
-            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company})
+                    fab_user_list = Fab.objects.order_by("id").filter(article_id=main.id)
+                    tmp_fab.append(fab_user_list)
+                    for user_list in fab_user_list:
+                        user_info = Get_user.objects.filter(id=user_list.user_id)
+                        tmp_user.append(user_info)
+                        
+            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, })
 
 """
 マイページ更新
