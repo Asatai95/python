@@ -47,7 +47,17 @@ class LoginCustomerForm(AuthenticationForm):
 
 class UserCreateForm(UserCreationForm):
     """ユーザー登録用フォーム"""
+    username = forms.CharField(required=True, label='ユーザー名', max_length=45)
     email = forms.EmailField(required=True)
+    
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        check_username = User.objects.all().filter(username=username)
+        print(check_username)
+        if check_username:
+            raise forms.ValidationError('このユーザー名はすでに使用されています')
+
+        return username
 
     def clean_email(self):
         email = self.cleaned_data['email']

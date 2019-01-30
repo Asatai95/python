@@ -1470,7 +1470,7 @@ a:hover {
 }
 
 .form-group {
-  width: 300px;
+  width: 350px;
   margin: 10px auto;
 }
 
@@ -1526,7 +1526,7 @@ a:hover {
   background-color: rgba(255, 255, 255);
   border-radius: 10px;
   width: 800px;
-  height: 300px;
+  height: 350px;
   padding: 70px 0;
 }
 
@@ -2215,7 +2215,6 @@ label.license_year {
 }
 
 #msg ul li.chat_msg.right {
-  float: right;
   width: 100%;
   display: inline-block;
   position: relative;
@@ -2328,3 +2327,4 @@ label.license_year {
   width: 30%;
   height: 90%;
 }
+

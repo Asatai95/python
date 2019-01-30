@@ -275,8 +275,9 @@ class UserDetail(PermissionsMypage, generic.DetailView):
 
     def get(self, request, **kwargs):
 
+        user_id = request.path.split('/').pop(3)
+        print(user_id)
         if not request.user.is_staff:
-
             tmp_fab = []
             tmp_article = []
             fab = Fab.objects.filter(user=request.user ,message_flag=1, flag=1).values('article', 'updated_at')
@@ -289,7 +290,7 @@ class UserDetail(PermissionsMypage, generic.DetailView):
                 article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
                 tmp_article.append(article_dic)
 
-            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
+            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article,  })
 
         else:
             tmp_article_live = []
@@ -440,6 +441,12 @@ class MainView(PaginationMixin, generic.ListView):
         fab_not_view = Fab.objects.all().filter(user_id=self.request.user.id)
         live_table = ArticleLive.objects.all()
 
+        user_auth = self.request.user
+        if user_auth.is_staff:
+            auth_user = 'c'
+        else:
+            auth_user = 'u'
+            
         """
         現在の日付取得、最新の記事情報を開示する
         """
@@ -662,7 +669,7 @@ class MainView(PaginationMixin, generic.ListView):
       
         return super(MainView, self).get_context_data(
                 tmp_list=tmp_list, page_obj=page_obj, fab_selection_list=fab_selection_list, fab_not_view=fab_not_view, live_table=live_table, floor_table=floor_table, 
-                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, **kwargs
+                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, auth_user=auth_user, **kwargs
             )
             
     def render_to_response(self, context, **response_kwargs):

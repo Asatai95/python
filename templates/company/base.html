@@ -31,7 +31,7 @@
               <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
             </li>
             <li>
-              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk   %}">マイページ</a>
             </li>
             <li>
               <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
@@ -61,10 +61,10 @@
               <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
             </li>
             <li>
-              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
             </li>
             <li>
-              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">メッセージBox</a>
+              <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">メッセージBox</a>
             </li>
             <li>
               <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>

@@ -76,29 +76,39 @@ class ChatView(View):
     template_name = 'chat/room.html'
 
     def get(self, request, *args, **kwargs):
-        user_id = request.path.split('/').pop(3)
-        aritcle_id = request.path.split('/').pop(4)
-        message = self.model.objects.filter(message_flag=1, article=aritcle_id, user=user_id) 
+        user_id = request.path.split('/').pop(4)
+        article_id = request.path.split('/').pop(5)
+        message = self.model.objects.filter(message_flag=1, article=article_id, user=user_id) 
         if not message:
-            return redirect('register:user_detail')
+            return redirect("register:user_detail", pk=request.user.pk)
         else:
             if not request.user.is_staff:
-                article_info = Article.objects.order_by('id').filter(id=aritcle_id)
+                article_info = Article.objects.order_by('id').filter(id=article_id)
+               
                 for info in article_info:
                     company_info_id = info.company_id
-                    company_info = Company.objects.order_by('id').filter(id=company_info_id)
-                    chat_room = Chat_room.objects.filter(user_id=user_id, company_id=company_info_id)
-   
-                    return render(request, self.template_name, {'view': company_info, 'chat': chat_room, 
+                    chat_room = Chat_room.objects.filter(user_id=request.user.id, company_id=company_info_id, article_id=article_id)
+                  
+                    company_info = Company.objects.order_by('id').filter(id=company_info_id )
+                                   
+                    return render(request, self.template_name, {'view': company_info, 'chat': chat_room, 'article_id': article_id, 'user_info': user_id, 
                          'user_id': mark_safe(json.dumps(user_id)),
-                         'aritcle_id': mark_safe(json.dumps(aritcle_id)) } )
+                         'article_id': mark_safe(json.dumps(article_id)) } )
             else:
-                user_info = Get_user.objects.order_by('id').filter(id=user_id)
-                chat_room = Chat_room.objects.filter(user_id=user_id, company_id=company_info_id)
-   
-                return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 
-                     'user_id': mark_safe(json.dumps(user_id)),
-                     'aritcle_id': mark_safe(json.dumps(aritcle_id)) } )
+                company_user_name = request.path.split('/').pop(3)
+                article_info = Article.objects.order_by('id').filter(id=article_id)
+               
+                for info in article_info:
+                    company_info_id = info.company_id
+                    user_info = Get_user.objects.order_by('id').filter(id=user_id)
+                    chat_room = Chat_room.objects.filter(user_id=user_id, company_id=company_info_id, article_id=article_id)
+                    user_company = Get_user.objects.filter(username=company_user_name)
+                    for user in user_company:
+                        company_info = Company.objects.order_by('id').filter(id=company_info_id, user_id=user.id, email=user.email )
+                        print(company_info)
+                        return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 'company_info': company_info, 
+                            'user_id': mark_safe(json.dumps(user_id)),
+                            'article_id': mark_safe(json.dumps(article_id)) } )
                                          
     
 

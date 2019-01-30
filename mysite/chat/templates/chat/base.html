@@ -36,7 +36,7 @@
             <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
           </li>
           <li>
-            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
@@ -67,7 +67,7 @@
             <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
           </li>
           <li>
-            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="#">メッセージBox</a>
@@ -102,7 +102,7 @@
             {%else%}
             {% endif %}
             <li><a href="{% url 'apps:company' %}">物件登録</a></li>
-            <li><a href="{% url 'register:user_detail' user.pk %}">マイページ</a></li>
+            <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
             <li><a href="#">メッセージBOX</a></li>
             <li><a href="{% url 'register:logout' %}">ログアウト</a></li>
           {% else %}
@@ -132,22 +132,38 @@
 <script>
         
         var user_id = {{user_id}};
-        var article_id = {{aritcle_id}};
+        var article_id = {{article_id}};
+        var user_name = "{{user.username}}";
        
         var chatSocket = new WebSocket(
-            'ws://127.0.0.1:8000/ws/chat/' + user_id + '/' + article_id + '/' );
+            'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' );
     
         chatSocket.onmessage = function(e) {
             var data = JSON.parse(e.data);
             var message = data['message'];
             var div = document.getElementById('chat_test');
             var doc = document.getElementById("chat-log");
+            var chat_message_input = document.getElementById("chat-message-input")
             var ontime = document.getElementById("ontime");
             var remove = document.getElementsByClassName("chat_msg right now");
             var msg_id = document.getElementById("msg");
             var display_none_right = document.getElementsByClassName("msg-sub");
+            var display_msg_right = document.getElementsByClassName("msg-right");
             var msg_class = document.getElementsByClassName("msg-right-sub");
-            if (msg_id != null) {
+            if (msg_class[0]) {
+
+              document.querySelector('#chat-log').value += (message + '\n')
+              div.classList.remove("msg-sub")
+              msg_class[0].classList.remove("msg-right-sub")
+              msg_id.classList.add("msg-right")
+              doc.removeAttribute("id")
+              remove[0].classList.remove("now")
+              chat_message_input.parentNode.insertAdjacentHTML('beforebegin', 
+                                     "<div id='msg' class='msg-right'><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>"
+              )
+              div.classList.add("active")
+
+            }else {
 
               document.querySelector('#chat-log').value += (message + '\n')
               doc.removeAttribute("id")
@@ -156,17 +172,9 @@
                                      "<div id='msg' class='msg-right'><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>"
               )
               div.classList.add("active")
-            }else {
-              // document.querySelector('#chat-log').value += (message + '\n')
-              // msg_class[0].classList.remove("msg-right-sub")
-              // msg_id.classList.add("msg-right")
-              // doc.removeAttribute("id")
-              // remove[0].classList.remove("now")
-              // ontime.parentNode.insertAdjacentHTML('beforeend', "<div id='msg' class='msg-right's><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>")
-              // div.classList.add("active")
+
             }
-            // var insert = document.getElementByClassName('chat_msg right');
-            // insert.insertAdjacentHTML("beforebegin", doc);
+            
         };
     
         chatSocket.onclose = function(e) {

@@ -58,7 +58,7 @@
               </div>
               <div class="inline">
                 <div class="stream-content">
-                  <a href="{% url 'chatroom:index' user.pk fab_list.article %}">
+                  <a href="{% url 'chatroom:index' user.username user.pk fab_list.article %}" >
                       <div class='profile_img'>
                           <img src="{{user.image}}" alt="">
                       </div>
@@ -131,7 +131,7 @@
               {% for user_info in tmp_user %}
                 {% for info in user_info %}
                   <li>
-                    <a href="{% url 'chatroom:index' info.pk main.id %}">
+                    <a href="{% url 'chatroom:index' user.username info.pk main.id %}">
                       <span>{{info.username}}</span>
                       <img src="{{info.image}}" alt="">
                     </a>

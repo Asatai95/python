@@ -30,7 +30,7 @@
            <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
          </li>
          <li>
-           <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+           <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
          </li>
          <li>
            <a class="nav-item nav-link" href="#">メッセージBox</a>
@@ -69,5 +69,15 @@
 
 
     <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+
+    <!-- <script>
+      document.querySelector('#room-name-submit').onclick = function(e) {
+            var roomName = document.querySelector('#room-name-input').value;
+            var test = document.getElementById("test")
+            test.innerHTML = roomName
+            window.location.pathname = '/ws/chat/' + roomName + '/';
+        };
+    </script> -->
 </body>
 </html>

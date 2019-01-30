@@ -3,17 +3,19 @@
 {% block content %}
 
     <div class="main_chat_room">
+        <div class='test'></div>
         {% if not user.is_staff %}
             <div class='users'>
                 {% for info in view %}
                 <div class='users_profile'>
                     <div>
-                        <img src="../../../../media/{{info.company_image}}" alt="">
+                        <img src="../../../../../media/{{info.company_image}}" alt="">
                     </div>
                     <div>
                         <ul>
                             <li>
                                {{info.company_name}}
+                              
                             </li>
                             <li>
                                 <span>メールアドレス</span> </br>
@@ -30,36 +32,36 @@
             </div>
         {% else %}
             <div class='users'>
+                {% for user_info in view %}
                 <div class='users_profile'>
                     <div>
-                        <img src="{% static 'img/nin_img.png' %}" alt="">
+                        <img src="{{user_info.image}}" alt="">
                     </div>
                     <div>
                         <ul>
-                            <li>{{user.username}}</li>
+                            <li>{{user_info.username}}</li>
                             <li>
                                 <span>メールアドレス</span></br>
-                                {{user.email}}
+                                {{user_info.email}}
                             </li>
                         </ul>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         {% endif %}
         {% if not user.is_staff  %}
             <div class="main_room">
                     <!-- <div id="room">チャットルーム</div> -->
-                    <div class='chat_room_contents'>
-                            
+                    <div class='chat_room_contents'>   
                                 {% if chat %}
                                     {% for talk in chat %}
-                                      
                                         {% for article_info in view %}
-                                          {% if article_info.company_name == talk.from_person %}  
+                                          {% if user.username != talk.from_person %}  
                                           <div id="msg">
                                       
                                           {% for info in view %}
-                                              <img src="../../../../media/{{info.company_image}}" alt="">
+                                              <img src="../../../../../media/{{info.company_image}}" alt="">
                                           {% endfor %}
                                             <ul>                                           
                                               <li class="chat_msg fk"> 
@@ -69,22 +71,23 @@
                                           </div>  
                                           {% endif %}
                                         {% endfor %}
-                                    {% if user.username == talk.from_person %}
-                                      <div id="msg" class="msg-right">
+                                      {% if user.username == talk.from_person %}
+                                     
+                                        <div id="msg" class="msg-right">
                                     
-                                        <ul id="chat_test">
+                                          <ul id="chat_test">
                                                
-                                              <li id='ontime' class="chat_msg right"> 
-                                                  <textarea readonly class="chat-log-right">{{talk.chat}}</textarea>
-                                              </li>
+                                                <li id='ontime' class="chat_msg right"> 
+                                                    <textarea readonly class="chat-log-right">{{talk.chat}}</textarea>
+                                                </li>
                                             <!-- <li id='ontime' class="chat_msg right now"> 
                                                 <textarea readonly id="chat-log" class="chat-log-right"></textarea>
                                             </li> -->
-                                        </ul>
+                                          </ul>
                                    
-                                      </div>
-                                      {% endif %} 
-                                     
+                                        </div>
+                                        {% endif %}
+                                      
                                     {% endfor %}
                                     <div id="msg" class="msg-right">
                                         <ul id="chat_test">
@@ -114,18 +117,24 @@
                             
                                 {% if chat %}
                                     {% for talk in chat %}
-                                      {% for user_info in view %}
-                                        {% if user_info.username != talk.from_person %}  
+                                      {% for info in company_info %}
+                                        {% if info.company_name != talk.from_person %}  
+                                        
                                         <div id="msg">
-                                              <img src="{% static '{{user_info.image}}' %}" alt="">
+                                            {% for user_info in view %}
+                                              <img src="{{user_info.image}}" alt="">
+                                            {% endfor %}
                                           <ul>                                           
                                               <li class="chat_msg fk"> 
-                                                  <textarea  id="chat-other" >{{talk.chat}}</textarea>
+                                                  <textarea id="chat-other" >{{talk.chat}}</textarea>
                                               </li>
                                           </ul>
                                         </div>  
                                         {% endif %}
-                                        {% if user_info.username != talk.from_person %}
+                                      
+                                      {% endfor %}
+                                      {% for info in company_info %}
+                                        {% if info.company_name == talk.from_person %}
                                         <div id="msg" class="msg-right">
                                      
                                             <ul id="chat_test">

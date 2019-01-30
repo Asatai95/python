@@ -38,7 +38,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.article_info = self.scope['url_route']['kwargs']['article_id']
         self.user_info = self.scope['url_route']['kwargs']['pk']
-       
+        self.user_auth = self.scope['url_route']['kwargs']['username']
+
         self.room_group_name = 'chat_%s' % self.article_info
         
         await self.channel_layer.group_add (
@@ -52,18 +53,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
             for company_detail in self.company_info:
                 self.user = await self.get_user_info(self.user_info)
                 for user_detail in self.user:
-                    if not user_detail.is_staff:
+                    self.company_user_auth = await self.get_user_company_info(self.user_auth, company_detail.user_id)
+                    if not self.company_user_auth:
+                        
                         self.company_id_info = info.company_id
                         self.company_name_info = company_detail.company_name
-                        self.user = user_detail.username
+                        self.user = user_detail.username                       
                     else:
-                        # self.get_company_user = await self.get_company_user_info(info.company_id, self.user_info)
-                        # for get_user_info in self.get_company_user:
-                            
+                        
                         self.company_id_info = info.company_id
                         self.company_name_info = company_detail.company_name
                         self.user = user_detail.username
-
+                            
+                            
+                
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -75,6 +78,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        
 
         await self.channel_layer.group_send (
             self.room_group_name,
@@ -83,7 +87,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message
             }
         )
-   
+
+        
     async def chat_message(self, event):
         
         message = event['message']
@@ -95,14 +100,24 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def _save_message(self , message):
-        Chat_room.objects.create(
-            company_id = self.company_id_info,
-            user_id = self.user_info,
-            article_id = self.article_info,
-            chat= message,
-            to_person = self.company_name_info,
-            from_person = self.user,
-        )
+        if self.company_user_auth:
+            Chat_room.objects.create(
+               company_id = self.company_id_info,
+               user_id = self.user_info,
+               article_id = self.article_info,
+               chat= message,
+               to_person = self.user,
+               from_person = self.company_name_info,
+            )
+        else:
+            Chat_room.objects.create(
+               company_id = self.company_id_info,
+               user_id = self.user_info,
+               article_id = self.article_info,
+               chat= message,
+               to_person = self.company_name_info,
+               from_person = self.user,
+            )
 
     @database_sync_to_async
     def get_article_info(self, id_info):
@@ -116,12 +131,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return company
     
     @database_sync_to_async
-    def get_company_user_info(self, company_info, company_user_id_info):
-        company_user = Company.objects.filter(id=company_info, user_id=company_user_id_info)
-        return company_user
+    def get_user_company_info(self, user_name_info, company_user_id):
+        user_company = Get_user.objects.filter(id=company_user_id, username=user_name_info, is_staff=1, is_company=1)
+        if user_company:
+            return True
+        else:
+            return False
 
     @database_sync_to_async
-    def get_user_info(selfm, user_id_info):
+    def get_user_info(self, user_id_info):
         user = Get_user.objects.filter(id=user_id_info)
         return user
        

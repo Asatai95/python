@@ -213,4 +213,4 @@ CLOUDINARY_STORAGE = {
 #
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-
+SESSION_SAVE_EVERY_REQUEST = True

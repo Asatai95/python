@@ -5,7 +5,7 @@ from . import consumers
 
 app_name = 'chat'
 
-
+    
 channels_path = [
-    path('ws/chat/<int:pk>/<int:article_id>/', consumers.ChatConsumer),
+    path('ws/chat/<slug:username>/<int:pk>/<int:article_id>/', consumers.ChatConsumer),
 ]

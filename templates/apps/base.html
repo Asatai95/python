@@ -30,13 +30,13 @@
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
-        {% if user.is_staff is False %}
+        {% if not user.is_staff %}
           {% if user.is_authenticated %}
           <li>
             <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
           </li>
           <li>
-            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
@@ -67,10 +67,10 @@
             <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
           </li>
           <li>
-            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">マイページ</a>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
           <li>
-            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.pk %}">メッセージBox</a>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">メッセージBox</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
@@ -102,7 +102,7 @@
             {%else%}
             {% endif %}
             <li><a href="{% url 'apps:company' %}">物件登録</a></li>
-            <li><a href="{% url 'register:user_detail' user.pk %}">マイページ</a></li>
+            <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
             <li><a href="#">メッセージBOX</a></li>
             <li><a href="{% url 'register:logout' %}">ログアウト</a></li>
           {% else %}
