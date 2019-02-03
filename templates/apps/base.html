@@ -58,14 +58,20 @@
             <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
           </li>
           {% if user.is_company %}
-          <li>
+          <!-- <li>
             <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
-          </li>
+          </li> -->
           {% else%}
           {% endif %}
-          <li>
-            <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
-          </li>
+          {% if count_over %}
+            <!-- <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
+            </li> -->
+          {% else %}
+            <!-- <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company' %}">アップグレード</a>
+            </li> -->
+          {% endif %}
           <li>
             <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
@@ -89,24 +95,26 @@
   </nav>
   {% if user.is_staff %}
   <aside class="sidebar left">
-      <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
+      <!-- <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
           <img src="{% static 'img/Untitled1.png' %}" alt="">
-        </a>
+        </a> -->
     <h1 id="brand-logo">roomii</h1>
     <nav id="global-nav">
         <ul>
           {% if user.is_authenticated %}
-            <li><a href="{% url 'register:top'%}">TOP</a></li>
             {% if user.is_company %}
             <li><a href="{% url 'apps:company_change' %}">業者情報編集</a></li>
             {%else%}
             {% endif %}
-            <li><a href="{% url 'apps:company' %}">物件登録</a></li>
+            {% if count_over %}
+              <li><a href="{% url 'apps:company' %}">物件登録</a></li>
+            {% else %}
+              <li><a href="{% url 'apps:company' %}">アップグレード</a></li>
+            {% endif %}
             <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
             <li><a href="#">メッセージBOX</a></li>
-            <li><a href="{% url 'register:logout' %}">ログアウト</a></li>
           {% else %}
-            <li><a href="{% url 'register:login' %}">ゲストログインはこちら</a></li>
+            <li><a href="{% url 'register:login' %}">ゲストログイン</a></li>
           {% endif %}
         </ul>
     </nav> 
@@ -117,7 +125,7 @@
   <div class="container mt-3">
     <div class='main_view'>
 
-      {% if user.is_authenticated %}
+      {% if not user.is_staff %}
       
       <header>
 
@@ -180,7 +188,7 @@
       </header>
       {% endif %}
       {% if tmp_list %}
-      <header>
+      <header class='blank'>
         <form method="get" action="" name='filter_name'>
           <ul id='fade-in' class='dropmenu'>
           <li class='first'>

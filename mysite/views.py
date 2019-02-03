@@ -70,6 +70,11 @@ import cloudinary.uploader
 import cloudinary.api
 
 """
+画像ファイル制限
+"""
+MAX_MEMORY_SIZE = 10485760
+
+"""
 ページネーション
 """
 def paginate_queryset(request, queryset, count):
@@ -173,7 +178,7 @@ class UserCreate(generic.CreateView):
         message = message_template.render(context)
 
         user.email_user(subject, message)
-        return redirect('/user_create/done/')
+        return redirect("register:user_create_done")
 
 class UserCreateDone(generic.TemplateView):
     """ユーザー仮登録したよ"""
@@ -268,7 +273,6 @@ class PermissionsMypage(UserPassesTestMixin):
 """
 マイページ
 """
-
 class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
     template_name = 'register/user_detail.html'
@@ -320,6 +324,17 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
     form_class = UserUpdateForm
     template_name = 'register/user_form.html'
 
+    def form_valid(self, form):
+
+        """
+        画像サイズ制限
+        """
+        img_file_size = self.request.FILES['img_file']
+        if img_file_size.size > MAX_MEMORY_SIZE:
+            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+        else:
+            return super(UserUpdate, self).form_valid(form)
+
     def get_success_url(self):
 
         User = Get_user.objects.all().filter(pk=self.kwargs['pk'])
@@ -334,7 +349,7 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
             user.image = img_file
             user.save()
 
-            return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+            return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
         except:
             img_file = self.request.POST.get("user_img")
             for user in User:
@@ -342,7 +357,7 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
             user.image = img_file
             user.save()
 
-            return resolve_url('register:user_detail', pk=self.kwargs['pk'])
+            return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
 
 """
 不適切な入力、トップページにリダイレクト
@@ -432,13 +447,14 @@ class MainView(PaginationMixin, generic.ListView):
         """
         トップ画面表示(一部)
         """
+        auth_user_id = self.request.user.id
 
         context = super(MainView, self).get_context_data(**kwargs)
         user = User.objects.all().filter(id=self.request.user.id).order_by("fab_selection_id")
         floor_table = ArticleFloor.objects.all().order_by('floor_id')
         room_table = ArticleRoom.objects.all().order_by('room_id', 'room_live_id')
         fab_view = Fab.objects.all()
-        fab_not_view = Fab.objects.all().filter(user_id=self.request.user.id)
+        fab_not_view = Fab.objects.all().filter(user_id=auth_user_id)
         live_table = ArticleLive.objects.all()
 
         user_auth = self.request.user
@@ -446,7 +462,19 @@ class MainView(PaginationMixin, generic.ListView):
             auth_user = 'c'
         else:
             auth_user = 'u'
-            
+
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=auth_user_id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+        
         """
         現在の日付取得、最新の記事情報を開示する
         """
@@ -669,7 +697,7 @@ class MainView(PaginationMixin, generic.ListView):
       
         return super(MainView, self).get_context_data(
                 tmp_list=tmp_list, page_obj=page_obj, fab_selection_list=fab_selection_list, fab_not_view=fab_not_view, live_table=live_table, floor_table=floor_table, 
-                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, auth_user=auth_user, **kwargs
+                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, auth_user=auth_user, count_over=count_over, **kwargs
             )
             
     def render_to_response(self, context, **response_kwargs):
@@ -756,12 +784,32 @@ class CompanyView(generic.CreateView):
         if CompanyCreate.objects.filter(user_id=request.user.id, is_company=1):
             return redirect("apps:create")
 
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
         form = self.form_class()
-        return render(request, self.template_name, {'form':form})
+        return render(request, self.template_name, {'form':form, 'count_over': count_over})
 
     def form_valid(self, form):
 
         company = form.save(commit=False)
+
+        """
+        画像サイズ制限
+        """
+        img_file_size = self.request.FILES['company_image']
+        if img_file_size.size > MAX_MEMORY_SIZE:
+            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+
         address_number = self.request.POST.get("address_number")
         address = self.request.POST.get("address")
         address_city = self.request.POST.get("address_city")
@@ -798,10 +846,22 @@ class CompanyChange(generic.UpdateView):
 
     def get(self, request, *args, **kwargs):
         user = request.user.id
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
         company = Company.objects.filter(user_id=user)
         if not request.user.is_staff:
             return redirect('apps:top')
-        return render(request, self.template_name, {'company': company})
+        return render(request, self.template_name, {'company': company, 'count_over': count_over})
 
     def post(self, request, *args, **kwargs):
 
@@ -849,6 +909,12 @@ class CompanyChange(generic.UpdateView):
                 pass
         else:
             pass
+        """
+        画像サイズ制限
+        """
+        img_file_size = self.request.FILES['company_image']
+        if img_file_size.size > MAX_MEMORY_SIZE:
+            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
 
         company_table = Company.objects.filter(user_id=request.user.id)
         try:
@@ -889,11 +955,31 @@ class ArticleEdit(generic.CreateView):
         if not request.user.is_staff:
             return redirect('apps:top')
 
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
         form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {'form': form, 'count_over': count_over})
 
     def form_valid(self, form):
 
+        """
+        画像サイズ制限
+        """
+        upload_files = self.request.FILES.getlist("files")
+        for img_file_size in upload_files:
+            if img_file_size.size > MAX_MEMORY_SIZE:    
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+        
         tmp_list = []
         company_id = Company.objects.filter(user_id=self.request.user.id)
         live_id = ArticleLive.objects.order_by('id').reverse()[0]
@@ -963,8 +1049,20 @@ class ArticleUpdate(generic.UpdateView):
         list_view = Article.objects.order_by('id').filter(id=get)
         live_list = ArticleLive.objects.order_by('id').filter(article_id=get)
 
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
         return super(ArticleUpdate, self).get_context_data(
-                live_list=live_list, list_view=list_view, **kwargs
+                live_list=live_list, list_view=list_view, count_over=count_over, **kwargs
             )
 
     def render_to_response(self, context, **response_kwargs):
@@ -1060,8 +1158,15 @@ class ArticleUpdate(generic.UpdateView):
             main.column = self.request.POST["column"]
             main.live_flag_id = vacant_info.id
             main.customer = self.request.user.id
-
+        
+        """
+        画像サイズ制限
+        """
         upload_files = self.request.FILES.getlist('files')
+        for img_file_size in upload_files:
+            if img_file_size.size > MAX_MEMORY_SIZE:
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+                
         other_files = []
         try:
             for files in upload_files:
@@ -1075,6 +1180,13 @@ class ArticleUpdate(generic.UpdateView):
                 tmp_room_images_id.append(RoomImage.id)
             main.room_images_id = str(tmp_room_id)
 
+            """
+            画像ファイル制限
+            """
+            img_file_size = self.request.FILES['article_image']
+            if img_file_size.size > MAX_MEMORY_SIZE:
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+
             img_file = self.request.FILES['article_image'].name
             img_filename = Image.open(self.request.FILES['article_image'])
             img_filename.save(os.path.join('./media/', img_file))
@@ -1086,9 +1198,6 @@ class ArticleUpdate(generic.UpdateView):
 
         return redirect('apps:top')
 
-"""
-ソーシャルログイン修正
-"""
 """
 Googleログイン
 """
@@ -1197,7 +1306,7 @@ class CallbackFacebook(View):
                     check_user = Get_user.objects.filter(username=user.username, password=user.password)
                     for user in check_user:
                         if user.is_active:
-                            login(self.request, user)
+                            login(request, user)
                             return redirect("apps:login_after")
                         else:
                             return redirect("apps:login")

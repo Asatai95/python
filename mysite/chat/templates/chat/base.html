@@ -63,9 +63,15 @@
           </li>
           {% else%}
           {% endif %}
-          <li>
-            <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
-          </li>
+          {% if count_over %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
+            </li>
+          {% else %}
+            <li>
+              <a class="nav-item nav-link" href="{% url 'apps:company' %}">アップグレード</a>
+            </li>
+          {% endif %}
           <li>
             <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
@@ -101,7 +107,11 @@
             <li><a href="{% url 'apps:company_change' %}">業者情報編集</a></li>
             {%else%}
             {% endif %}
-            <li><a href="{% url 'apps:company' %}">物件登録</a></li>
+            {% if count_over %}
+              <li><a href="{% url 'apps:company' %}">物件登録</a></li>
+            {% else %}
+              <li><a href="{% url 'apps:company' %}">アップグレード</a></li>
+            {% endif %}
             <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
             <li><a href="#">メッセージBOX</a></li>
             <li><a href="{% url 'register:logout' %}">ログアウト</a></li>

@@ -60,6 +60,8 @@ SNSログイン
 
 def create_socials_user(data):
 
+    user_name = data["displayName"].replace(" ", "").replace("%20", "")
+
     secret = 'google'
     password = hmac.new(
                 secret.encode('UTF-8'),
@@ -68,7 +70,7 @@ def create_socials_user(data):
            ).hexdigest()
 
     user = User.objects.create(
-        username = data["displayName"],
+        username = user_name,
         email = data["emails"][0]['value'],
         password = password,
         is_staff = 0,
@@ -86,6 +88,8 @@ def create_socials_user(data):
 
 def create_facebook_user(data):
 
+    user_name = data["name"].replace(" ", "").replace("%20", "")
+
     secret = 'facebook'
     password = hmac.new(
                 secret.encode('UTF-8'),
@@ -94,7 +98,7 @@ def create_facebook_user(data):
            ).hexdigest()
 
     user = User.objects.create(
-        username = data['name'],
+        username = user_name,
         email = data['email'],
         password = password,
         is_staff = 0,
@@ -208,3 +212,4 @@ def google_login_flow(code):
     result = service.people().get(userId='me').execute()
 
     return result
+

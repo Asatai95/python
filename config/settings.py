@@ -57,19 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
-# AUTHENTICATION_BACKENDS = [
-#     'social_core.backends.open_id.OpenIdAuth',
-#     'social_core.backends.google.GoogleOpenId',
-#     'social_core.backends.google.GoogleOAuth2',
-#     'social_core.backends.google.GoogleOAuth',
-#     'django.contrib.auth.backends.ModelBackend',
-#     # 'facebook.custom_backends.SettingsBackend',
-#     # 'social_core.backends.facebook.FacebookOAuth2',
-#
-# ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -90,8 +79,7 @@ TEMPLATES = [
                     'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
                     'django.template.context_processors.static',
-                    # 'social_django.context_processors.backends',
-                    # 'social_django.context_processors.login_redirect',
+                    
                 ],
             },
         },
@@ -148,7 +136,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-# STATIC_ROOT = '/var/www/{}/static'.format(PROJECT_NAME)
 
 
 MEDIA_URL = '/media/'
@@ -159,16 +146,9 @@ AUTH_USER_MODEL = 'mysite.User'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '979839320684-ru46386tvgh35kdh7cog9mm27lpulvr9.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'mG3KZnJfs9JBMFym8fLdjYIC'
 
-
 FACEBOOK_CALLBACK_URL='http://localhost:8000/auth/complete/facebook/'
-# SOCIAL_AUTH_FACEBOOK_APP_NAMESPACE = 'auth'
 SOCIAL_AUTH_FACEBOOK_KEY = '292183621408680'
 SOCIAL_AUTH_FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
-# SOCIAL_AUTH_FACEBOOK_SCOPE =  ['email', 'public_profile']
-# SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
-#   'fields': 'id,name,email'
-# }
-
 
 EMAIL_HOST = 'smtp.muumuu-mail.com'
 DEFAULT_FROM_EMAIL = 'official@webapp2.com'
@@ -214,3 +194,6 @@ CLOUDINARY_STORAGE = {
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+# FILE_UPLOAD_MAX_MEMORY_SIZE = "10485760"
+

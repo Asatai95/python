@@ -32,7 +32,6 @@ class LoginForm(AuthenticationForm):
 
 class LoginCustomerForm(AuthenticationForm):
     """業者専用ログインフォーム"""
-
     class Meta:
         model = User
         # fields = ('username', 'password',)
@@ -47,15 +46,20 @@ class LoginCustomerForm(AuthenticationForm):
 
 class UserCreateForm(UserCreationForm):
     """ユーザー登録用フォーム"""
+
     username = forms.CharField(required=True, label='ユーザー名', max_length=45)
     email = forms.EmailField(required=True)
     
     def clean_username(self):
+        space = '%20'
+        space_compile = re.compile(space)
         username = self.cleaned_data['username']
         check_username = User.objects.all().filter(username=username)
         print(check_username)
         if check_username:
             raise forms.ValidationError('このユーザー名はすでに使用されています')
+        if space_compile.match(username):
+            raise forms.ValidationError('半角スペースを外してください')
 
         return username
 
@@ -211,9 +215,10 @@ class CreateCompany(forms.ModelForm):
     def clean_image(self):
 
         image = self.cleaned_data["company_image"]
+        print(image)
+        print(image._size)
         if image:
             image_path = image.name
-            print(image_path)
             if not image_path in [".jpg", ".png", ".jpeg"]:
                 raise forms.ValidationError(_("指定された画像ファイルのみ登録可能です"))
         return image
@@ -407,7 +412,7 @@ class Createform(forms.ModelForm):
 
 UploadModelFormSet = forms.modelformset_factory(
     ArticleCreate, form=Createform,
-    extra=10
+    extra=3
 )
 
 class CompanyUpdateForm(forms.ModelForm):

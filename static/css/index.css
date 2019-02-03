@@ -18,8 +18,17 @@ li {
   list-style: none;
 }
 
+tbody {
+  text-align: center;
+}
+
+header.blank {
+  display: none;
+}
+
 .mx-auto {
   display: none;
+  justify-content: center;
   width: 230px!important;
   position: fixed;
   bottom: 0;
@@ -276,10 +285,11 @@ li {
 }
 
 .sidebar {
+  left: 0!important;
   z-index: 20;
   font-size: 15px;
   padding: 150px 0;
-  width: 260px;
+  width: 350px;
   height: 100%;
   position: fixed;
   background: #fff;
@@ -287,7 +297,7 @@ li {
 }
 
 #brand-logo {
-  font-size: 35px;
+  font-size: 40px;
   margin: 20px auto;
 }
 
@@ -300,7 +310,7 @@ li {
 }
 
 #global-nav ul li a {
-  font-size: 20px;
+  font-size: 30px;
   color: black;
   font-weight: 600;
   text-decoration-color: rgba(255, 64, 0);
@@ -963,6 +973,14 @@ ul.note li {
 
 .error.edit {
   text-align: center!important;
+  margin: 10px;
+}
+
+.error.edit span {
+  text-align: center;
+  font-size: 20px;
+  color: red;
+  font-weight: 800;
 }
 
 .error.edit .error_text {
@@ -1281,8 +1299,8 @@ li.new_account {
 }
 
 .profilecard {
-  width: 48vw;
-  height:25vw;
+  width: 40vw;
+  height: 30vw;
   margin: 3vw 2vw;
   padding: 1vw;
   background-color: rgba(255,255,255);
@@ -1598,11 +1616,26 @@ a:hover {
 }
 
 .content_main {
+  right: 0;
+  z-index: 5;
+  position: absolute;
+  max-width: 1050px;
+  margin-top: 100px;
+  margin-bottom : 80px ;
+}
+
+.content_main_info {
   z-index: 5;
   position: absolute;
   max-width: 900px;
   margin-top: 100px;
   margin-bottom : 80px ;
+  right: 0;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  margin-top: 100px;
 }
 
 .item img {
@@ -2019,6 +2052,8 @@ a:hover {
 
 .map {
   margin: 20px auto;
+  display: flex;
+  justify-content: center;
 }
 
 .map_button {
@@ -2028,6 +2063,7 @@ a:hover {
 }
 
 .map_button .square_btn {
+  text-align:center;
   border-radius: 30px;
   font-size: 20px;
   font-weight: 800;
@@ -2249,6 +2285,7 @@ label.license_year {
   visibility: visible;
   transform: translateY(0%);
   transition: transform 1s ease .5s;
+  float: right;
 }
 
 .chat_msg.right textarea {

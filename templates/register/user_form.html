@@ -12,7 +12,7 @@
     </div>
     <form class="col s12" action="" method="POST" enctype="multipart/form-data" data-validate/>
       <div class='error edit'>
-        <span>{{ form.non_field_errors }}</span>
+        <span>{{ form.non_field_errors }}{{error}}</span>
       </div>
       <div class="input_file">
         <p class='input_file_tittle'>プロフィール画像</p>
@@ -44,11 +44,12 @@
       {% csrf_token %}
       <div class='button'>
         <input type="submit" id='submit' value="編集完了" disabled/>
-        <button class='back' type="button"><a href="{% url 'register:user_detail' user.pk user.username %}">戻る</a></button>
+        <button class='back' type="button"><a href="{% url 'register:user_detail' user.username user.pk %}">戻る</a></button>
       </div>
       <div class='point'>
         <p class='point_title'>【プロフィール画像について】</p>
         <p class='point_message'>※画像ファイルは、.jpeg, .png, .jpgのみ登録可能です</p>
+        <p class='point_message'>※画像ファイルは、10MB以内の容量のみ登録可能です</p>
       </div>
 
     </form>

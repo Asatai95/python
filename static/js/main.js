@@ -406,6 +406,7 @@ $(window).on('scroll', function () {
   } else {
     $('.row.mx-auto').fadeOut();
   }
+
 });
 
 $(function(){
