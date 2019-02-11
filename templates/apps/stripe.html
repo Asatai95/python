@@ -1,0 +1,295 @@
+<!doctype html>
+{% load static %}
+<html lang="ja">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+
+
+  <title>roomii</title>
+</head>
+
+<body>
+
+  <!-- ナビバー -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    {% if user.is_authenticated %}
+      <a class="navbar-brand" href="#">roomii</a>
+    {% else %}
+      <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
+    {% endif %}
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        {% if user.is_staff is False %}
+          {% if user.is_authenticated %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-item nav-link" href="{% url 'register:login' %}">
+               ゲストログインはこちら
+            </a>
+      
+          </li>
+          {% endif %}
+        {% else %}
+          {% if user.is_authenticated %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
+          </li>
+          {% if user.is_company %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
+          </li>
+          {% else%}
+          {% endif %}
+          <li>
+            <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk  %}">マイページ</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="#">メッセージBox</a>
+          </li>
+          <li>
+            <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class="nav-item nav-link" href="{% url 'register:login' %}">
+               ゲストログインはこちら
+            </a>
+            
+          </li>
+          {% endif %}
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  <section class="plans-comparison u-pt100 u-pb100 text-center" id="plans-section">
+    
+    <div class="container_stripe">
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <h2 class="plans-heading u-pb80">あなたに合ったプランを選択しよう</h2>
+      <article class="plans-comparison-box hidden-sm hidden-xs">
+        <div class="plans-comparison-box__top">
+          <div class="col-md-4"></div>
+        {% for info in plan %}
+          {% if info.id == 1 %}
+          <div class="col-md-4 u-bg-blue100">
+            <h4>{{info.name}}</h4>
+            <!-- <p>フリープランです</p> -->
+            <p>最初の登録時点では、</br>皆さまはこのプランです</p>
+            <div class="plans-comparison-box__images">
+              <img src="{% static 'img/ninnzyawannko.jpeg' %}" alt="free">
+            </div>
+          </div>
+          {% else %}
+          <div class="col-md-4 plans-comparison-trial">
+            <h4>{{info.name}}</h4>
+            <!-- <p>プロプランです</p> -->
+            <p>掲載情報を増やしたいという方は、</br>こちらのプランをご利用ください</p>
+            <div class="plans-comparison-box__images">
+              <img src="{% static 'img/ninnzyawannko.jpeg' %}" alt="Plus">
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+        </div>
+        
+        <div class="plans-comparison-box__row">
+          <div class="col-md-4">
+            <h4 class="text-left">
+            月額料金
+            <span>(税込)</span>
+            </h4>
+          </div>
+        {% for info in plan %}
+          {% if info.id == 1 %}
+          <div class="col-md-4 u-bg-blue100">
+            <div class="u-tb--large">{{info.amount}}</div>
+          </div>
+          {% else %}
+          <div class="col-md-4">
+            <div>
+            <span class="u-tb--x-large">
+              ¥{{info.amount}}
+            </span>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+        </div>
+        
+        <div class="plans-comparison-box__row plans-comparison-box__links">
+          <div class="col-md-4"></div>
+          {% for company_info in company %}
+           {% if company_info.user_id == user.id %}
+            {% if not company_info.plan_name %}
+            <div class="col-md-4 u-bg-blue100" id="basic-plan">
+              <p class="u-tb--medium u-fw-bold">現在ご利用中のプラン</p>
+            </div>
+            {% elif company_info.plan_name == 'beginner' %}
+            <div class="col-md-4 u-bg-blue100" id="basic-plan">
+              <p class="u-tb--medium u-fw-bold">現在ご利用中のプラン</p>
+            </div>
+            {% else %}
+            <div class="col-md-4 u-bg-blue100" id="basic-plan">
+              <form action="{% url 'apps:charge' 'beginner' %}" method="POST">
+                <a href="">    
+                  <button class="c-btn--turquoise">
+                    プラン選択
+                  </button>
+                </a>          
+                {% csrf_token %}
+              </form>
+            </div>
+            {% endif %}
+           {% endif %}
+          {% endfor %}
+   
+          <div class="col-md-4" id="plus-plan">
+          {% for company_info in company %}
+           {% if company_info.user_id == user.id %}
+            {% for info in plan %}
+              {% if info.namespace == "profetional" %}
+                {% if not company_info.stripe_id %}
+                  <form action="{% url 'apps:charge' info.namespace%}" method="POST">
+                    <input type="hidden" name='stripe_id' value='{{info.namespace}}'>
+                    <input type="hidden" name='amount' value="{{info.amount}}"> 
+                    <input type="hidden" name='description' value="{{info.name}}"> 
+                      <script
+                          src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                          data-key="{{ data_key }}"
+                          data-amount="{{ info.amount }}"
+                          data-name="{{data_name}}"
+                          data-description="{{ info.name }}"
+                          data-image="https://stripe.com/img/documentation/checkout/marketplace.png"
+                          data-locale="ja"
+                          data-currency="jpy"
+                          data-email="{{ user.email }}">
+                      </script>
+                      {% csrf_token %}
+                  </form>
+                {% else %}
+
+                  {% if company_info.plan_name == 'profetional' %}
+                  <p class="u-tb--medium u-fw-bold">現在ご利用中のプラン</p>
+                  {% else %}
+                  <form action="{% url 'apps:charge' 'profetional' %}" method="POST">
+                    <a href="">
+                    <button class="c-btn--turquoise">
+                      プラン選択
+                    </button>
+                    </a>
+                    {% csrf_token %}
+                  </form>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+           {% endif %}
+          {% endfor %}
+          </div>
+        </div>
+      </article>
+    
+    </div>
+    
+  </section>
+  <section class="plans-comparison u-pt100 u-pb100 text-center plans-section" id="plans-section">
+      <h2 class="plans-heading u-pb80 u-pt80">あなたに合ったプランを選択しよう</h2>
+      <div class='plan_info'>
+        <p>課金プラン説明</p>
+        <p>roomiiでは、２つのプランを用意しております.</p>
+        <p>----後ほど、記載予定----</p>
+      </div>
+      <div class="table-responsive">
+          <table class="table table-condensed table-bordered">
+                  <thead>
+                      <tr>
+                          <th></th>
+                          <th>フリープラン</th>
+                          <th>プロプラン</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr>
+                          <th>料金/月</th>
+                          <td>¥0</td>
+                          <td>¥4980(年間払い)</td>
+                      </tr>
+                      <tr>
+                          <th>登録戸数</th>
+                          <td>10</td>
+                          <td>100</td>
+                      </tr>
+                      <tr>
+                          <th>一括送信</th>
+                          <td>5</td>
+                          <td>100</td>
+                      </tr>
+                      <tr>
+                          <th>登録画像/戸</th>
+                          <td>3</td>
+                          <td>10</td>
+                      </tr>
+                  </tbody>
+          </table>
+      </div>
+  </section>
+
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
+  <!-- <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.1.0/jquery.sidebar.min.js"></script>
+  <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+  {% block extrajs %}{% endblock %}
+  <script src="{% static 'js/jquery.inview-master/jquery.inview.js' %}"></script>
+  <script src="{% static 'js/jquery-scrollfade-master/jquery.scrollfade.js' %}"></script>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick.css' %}"/>
+  <!-- <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.woff' %}"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/fonts/slick.ttf' %}"/>
+  <link rel="stylesheet" type="text/css" href="{% static 'js/ajax-loader.gif' %}"/> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'js/slick-theme.css' %}"/>
+  <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+  <!-- <script>
+    alert({{ message }})
+  </script> -->
+
+</body>
+
+</html>

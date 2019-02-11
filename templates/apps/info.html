@@ -11,13 +11,23 @@
     </div>
     <div class='image_field'>
       <div class='image_contents'>
-      {% for images in room_view %}
-        <li><img src="/media/{{images.image}}" alt=""></li>
+      {% for x in room_view %}
+        {% if "http://" not in x %}
+          <li><img src="/media/{{images.image}}" alt=""></li>
+        {% else %}
+          <li><img src="{{x}}" alt=""></li>
+        {% endif %}
       {% endfor %}
+       
+      
       </div>
       <div class='image_sub_contents'>
       {% for images in room_view %}
+        {% if "http://" not in images %}
         <li><img src="/media/{{images.image}}" alt=""></li>
+        {% else %}
+        <li><img src="{{images}}" alt=""></li>
+        {% endif %}
       {% endfor %}
       </div>
     </div>
@@ -26,9 +36,17 @@
           <tr>
               <th>空室状況</th>
               {% if view_list.live_flag.vacancy_info == '0' %}
-                 <td>空室あり</td>
+                {% if view_list.live_flag.vacancy_live == "貸出可" %}
+                    <td>空室あり</td>
+                {% else %}
+                    <td>{{view_list.live_flag.vacancy_live}}</td>
+                {% endif %}
               {% else %}
-                 <td>空室なし({{view_list.live_flag.vacancy_live}})</td>
+                {% if view_list.live_flag.vacancy_live == "現在入居中" %}
+                    <td>空室なし({{view_list.live_flag.vacancy_live}})</td>
+                {% else %}
+                    <td>{{view_list.live_flag.vacancy_live}}</td>
+                {% endif %}
               {% endif %}
           </tr>
           <tr>
@@ -52,6 +70,10 @@
               <td>{{view_list.initial_cost}}</td>
           </tr>
           <tr>
+            <th>階数</th>
+            <td>{{view_list.floor_number}}</td>
+          </tr>
+          <tr>
               <th>間取り</th>
               <td>{{view_list.floor_plan}}</td>
           </tr>
@@ -67,10 +89,10 @@
     </table>
     <div class='map'>
         <div class='map_button'>
-            <a class="square_btn" target="_blank" href="http://maps.google.com/maps?z=20&amp;t=m&amp;hl=ja&amp;iwloc=A&amp;q=26.1943732,127.6639063&amp;ul=1"> 地図</a>
+            <a class="square_btn" target="_blank" href="{{view_list.map_url}}"> 地図</a>
         </div>
         <div class='map_button'>
-            <a class="square_btn" target="_blank" href="http://maps.google.com/maps?z=20&amp;t=m&amp;hl=ja&amp;iwloc=A&amp;q=26.1943732,127.6639063&amp;ul=1"> 航空写真</a>
+            <a class="square_btn" target="_blank" href="{{view_list.map_url_air}}"> 航空写真</a>
         </div>
     </div>
   </div>
@@ -78,3 +100,5 @@
 </div>
 
 {% endblock %}
+
+

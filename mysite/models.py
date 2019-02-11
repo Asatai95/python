@@ -180,6 +180,8 @@ class Article(models.Model):
     floor_number = models.CharField(_('floor number'), max_length=150)
     column = models.CharField(_('column'), max_length=150)
     live_flag = models.ForeignKey(ArticleLive, on_delete=models.CASCADE, related_name="article_live")
+    map_url = models.CharField(_('map url'), max_length=255)
+    map_url_air = models.CharField(_('map url air'), max_length=255)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
     published_at = models.DateTimeField(_('published at'), default=timezone.now)
@@ -261,6 +263,9 @@ class ArticleCreate(models.Model):
 class Company(models.Model):
     """業者モデル"""
     id = models.AutoField(primary_key=True)
+    stripe_id = models.CharField(u'ストライプID', max_length=255)
+    stripe_subscription_id = models.CharField(u'stripe_subscriotion_id', max_length=255)
+    plan_name = models.CharField(u'plan_name', max_length=255)
     is_company = models.BooleanField(
         _('staff status'),
         default=False,
@@ -356,3 +361,17 @@ class Test(models.Model):
 
     class Meta:
         db_table = 'test'
+
+class Plan(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    stripe_plan_id = models.CharField(u'stripe_plan_id', max_length=255)
+    product_name = models.CharField(u'サービス名', max_length=255)
+    name = models.CharField(u'プラン名', max_length=255)
+    namespace = models.CharField(u'Namespace', max_length=255)
+    amount = models.IntegerField(u'プラン料金')
+    detail = models.CharField(u'プラン詳細', max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "plans"

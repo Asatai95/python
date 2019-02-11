@@ -129,18 +129,21 @@
            <div class='customer_list'>
             <ul>
               {% for user_info in tmp_user %}
-                {% for info in user_info %}
-                  <li>
-                    <a href="{% url 'chatroom:index' user.username info.pk main.id %}">
-                      <span>{{info.username}}</span>
-                      <img src="{{info.image}}" alt="">
+               {% if user_info.id != user.id %}
+                {% if message.article_id == main.id and message.user_id == user_info.id %}
+                  <li class='cus_list '>
+                    <a href="{% url 'chatroom:index' user.username user_info.pk main.id %}">
+                      <span>{{user_info.username}}</span>
+                      <img src="{{user_info.image}}" alt="">
                     </a>
                   </li>
-                {% endfor %}
-              {%endfor %}
+                {% endif %}
+               {% endif %}
+              {% endfor %}
             </ul>
           </div>
          </div>
+      
         {% endif %}
       {% endfor %}
     {% endif %}

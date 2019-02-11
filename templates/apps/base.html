@@ -94,7 +94,7 @@
     </div>
   </nav>
   {% if user.is_staff %}
-  <aside class="sidebar left">
+  <aside class="sidebar left first">
       <!-- <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
           <img src="{% static 'img/Untitled1.png' %}" alt="">
         </a> -->
@@ -104,6 +104,56 @@
           {% if user.is_authenticated %}
             {% if user.is_company %}
             <li><a href="{% url 'apps:company_change' %}">業者情報編集</a></li>
+            <li class="article_remake"><a href="#">物件情報編集</a></li>
+            <div class="article_remake_list">
+            
+              <ul class="remake_article ">
+                <li class="article_name nak"><a href="#">中城郡</a></li>
+               
+                <li class="article_name naha"><a href="#">那覇市</a></li>
+                
+                <li class="article_name gi"><a href="#">宜野湾市</a></li>
+                
+                <li class="article_name oki"><a href="#">沖縄市</a></li>
+              </ul>
+              <ul class="remake_article_sub nak">
+                {% for list in tmp_list %}
+                  {% for x in list %}
+                    {% if "中城郡" in x.article_name %}
+                    <li class="area_link"><a href="{% url 'apps:update' x.id %}">{{x.article_name}}</a></li>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+              <ul class="remake_article_sub naha">
+                  {% for list in tmp_list %}
+                    {% for x in list %}
+                      {% if "那覇市" in x.article_name %}
+                      <li class="area_link"><a href="{% url 'apps:update' x.id %}">{{x.article_name}}</a></li>
+                      {% endif %}
+                    {% endfor %}
+                  {% endfor %}
+                </ul>
+                <ul class="remake_article_sub gi">
+                    {% for list in tmp_list %}
+                      {% for x in list %}
+                        {% if "宜野湾市" in x.article_name %}
+                        <li class="area_link"><a href="{% url 'apps:update' x.id %}">{{x.article_name}}</a></li>
+                        {% endif %}
+                      {% endfor %}
+                    {% endfor %}
+                  </ul>
+                  <ul class="remake_article_sub oki">
+                      {% for list in tmp_list %}
+                        {% for x in list %}
+                          {% if "沖縄市" in x.article_name %}
+                          <li class="area_link"><a href="{% url 'apps:update' x.id %}">{{x.article_name}}</a></li>
+                          {% endif %}
+                        {% endfor %}
+                      {% endfor %}
+                    </ul>
+              
+            </div>
             {%else%}
             {% endif %}
             {% if count_over %}
@@ -119,6 +169,7 @@
         </ul>
     </nav> 
   </aside>
+  
   {% endif %}
 
   <!-- メインコンテント -->
@@ -267,6 +318,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'js/ajax-loader.gif' %}"/> -->
   <link rel="stylesheet" type="text/css" href="{% static 'js/slick-theme.css' %}"/>
   <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/user_os.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
 
 </body>

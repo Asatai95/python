@@ -22,9 +22,6 @@ urlpatterns = [
     path('login_after/', views.LoginAfter.as_view(), name='login_after'),
     path('roomii/', views.MainView.as_view(), name='top'),
     path('roomii/', login_required(views.MainView.post), name='get_ajax'),
-
-    # url(r'^roomii/', login_required(views.Redirect), {'location':'fab'}),
-    # path('customer/roomii/', login_required(views.MainCustomerView.as_view()), name='customer_top'),
     path('user_create/', views.UserCreate.as_view(), name='user_create'),
     path('user_create/done/', views.UserCreateDone.as_view(), name='user_create_done'),
     path('user_create/complete/<token>/', views.UserCreateComplete.as_view(), name='user_create_complete'),
@@ -46,6 +43,9 @@ urlpatterns = [
     path('facebook/login/', views.RedirectFacebook.as_view(), name='facebook_login'),
     path('auth/complete/facebook/', views.CallbackFacebook.as_view(), name='facebook_callback'),
     path('test_image/', views.image.as_view(), name='test_image'),
+    path('stripe/', views.Stripe.as_view(), name='stripe'),
+    path('stripe/charge/<str:namespace>/', views.Charge.as_view(), name='charge'),
+    path('test/', views.Insert.as_view(), name='test'),
 ]
 
 

@@ -80,7 +80,7 @@ class ChatView(View):
         article_id = request.path.split('/').pop(5)
         message = self.model.objects.filter(message_flag=1, article=article_id, user=user_id) 
         if not message:
-            return redirect("register:user_detail", pk=request.user.pk)
+            return redirect("register:user_detail", request.user.username, request.user.pk)
         else:
             if not request.user.is_staff:
                 article_info = Article.objects.order_by('id').filter(id=article_id)
@@ -106,17 +106,7 @@ class ChatView(View):
                     for user in user_company:
                         company_info = Company.objects.order_by('id').filter(id=company_info_id, user_id=user.id, email=user.email )
                         print(company_info)
-                        return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 'company_info': company_info, 
+                        return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 'company_info': company_info, 'info_side_bar': info_side_bar,
                             'user_id': mark_safe(json.dumps(user_id)),
                             'article_id': mark_safe(json.dumps(article_id)) } )
                                          
-    
-
-    # def post(self, request, *args, **kwargs):
-    #     user_id = request.user.id
-    #     user_name = request.user.username
-    #     aritcle_id = request.path.split('/').pop(4)
-    #     article_info = Article.objects.order_by('id').filter(id=aritcle_id)
-    #     for article in article_info:
-    #         company_info = Company.objects.filter(id=article.company_id)
-    #         for info in company_info:

@@ -3,7 +3,11 @@
 {% block content %}
 
 {{message}}
-<div class='content_main'>
+{% if user.is_staff %}
+<div class='content_main_top'>
+{% else %}
+<div class='content_main_user'>
+{% endif %}
   <div class="main_container">
     {% for view_list in page_obj %}
     <div class="item box-big{{view_list.id}}">
@@ -30,12 +34,19 @@
     {% endif %}
       <div class='img_item'>
         <div class="hide_text">
+          {% if user.is_staff %}
+          <p class='text article_name'>{{view_list.article_name}}</p>
+          {% else %}
           <p class='text'>{{view_list.comments}}</p>
+          {% endif %}
         </div>
         <a href="{%url 'apps:info' view_list.id %}">
+          {% if 'http' not in view_list.article_image %}
             <img src="/media/{{view_list.article_image}}" alt="">
+          {% else %}
+            <img src="{{view_list.article_image}}" alt="">
+          {% endif %}
           </a>
-        <div class='test'></div>
       </div>
 
       <!-- ログイン後の表示画面 -->

@@ -3,20 +3,28 @@ $(function(){
     $("input[name=company_image]").attr("accept", ".png, .jpg, .jpeg");
   }
 });
+$(function(){
+  $(document).ready(function () {
+    var sides = ["left", "top", "right", "bottom"];
+    for (var i = 0; i < sides.length; ++i) {
+        var cSide = sides[i];
+        $(".sidebar." + cSide).sidebar({side: cSide});
 
-$(document).ready(function () {
-  var sides = ["left", "top", "right", "bottom"];
-  for (var i = 0; i < sides.length; ++i) {
-      var cSide = sides[i];
-      $(".sidebar." + cSide).sidebar({side: cSide});
-  }
+    }
 
-  $(".btn_sidebar[data-action]").on("click", function () {
-      var $this = $(this);
-      var action = $this.attr("data-action");
-      var side = $this.attr("data-side");
-      $(".sidebar." + side).trigger("sidebar:" + action);
-      return false;
+    $(".btn_sidebar[data-action]").on("click", function () {
+      $(".sidebar.first").removeClass("first");
+      // if ($(".content_main_top").css("right") == 0 || $(".content_main_top").css("right") == "0px" ){
+      //   $(".content_main_top").css("right", "");
+      // } else {
+      //   $(".content_main_top").css("right", "0px");
+      // }
+        var $this = $(this);
+        var action = $this.attr("data-action");
+        var side = $this.attr("data-side");
+        $(".sidebar." + side).trigger("sidebar:" + action);
+        return false;
+    });
   });
 });
 
@@ -434,9 +442,9 @@ $(function(){
 });
 
 $(function() {
-  if ( $('#chat-message-input').val().length == 0 ) {
-    $('#chat-message-submit').attr('disabled', 'disabled');
-  }
+  // if ( $('#chat-message-input').val().length == 0 ) {
+  //   $('#chat-message-submit').attr('disabled', 'disabled');
+  // }
   $('#chat-message-input').bind('keydown keyup keypress change', function() {
     if ( $(this).val().length > 0 ) {
       $('#chat-message-submit').removeAttr('disabled');
@@ -453,18 +461,69 @@ $(function(){
   });
 });
 
-$(function(){
-  $(document).on('click', function(e) {
-    if (!$(e.target).closest('.profile_img a img').length && !$(e.target).closest('.main_content').length) {
-      $('.customer_list').fadeOut();
-    } else if ($(e.target).closest('.profile_img a img').length) {
+// $(function(){
+//   $(document).on('click', function(e) {
+//       if (!$(e.target).closest('.profile_img a img').length && !$(e.target).closest('.main_content').length) {
+//         $(e.target).find(".cus_list").fadeOut();
+//         $(".customer_list").fadeOut();
+//       } else if ($(e.target).closest('.profile_img a img').length) {
 
-      if ($('.customer_list').css('display') == 'none') {
-        $('.customer_list').fadeIn();
-      } else {
-        $('.customer_list').fadeOut();
-      }
-    }
-    
-  });
+//         if ($(".customer_list").css('display') == 'none') {
+//           $(this).find("li.cus_list").fadeIn();
+//           $(".customer_list").fadeIn();
+//         } else {
+//           $(".customer_list").fadeOut();
+//           $(this).find("li.cus_list").fadeOut();
+//         }
+//       }
+//   });
+// });
+
+$(function(){
+  
+    $(".stream").on("click", function(){
+      $(this).find(".customer_list").fadeToggle();
+      $(this).find(".cus_list").fadeToggle();
+    });
 });
+
+$(function(){
+  if ($('button.stripe-button-el>span').length) {
+    $('button.stripe-button-el>span').text("プランの変更");
+  }
+});
+
+$(function(){
+  $(".article_remake").on("click", function(){
+    $(this).next('div').children(".remake_article").animate({
+      width : 'toggle'
+    }, 'normal')
+  });
+  
+  $(".article_name.nak").on("click", function(){
+    $(".remake_article").css("width", "50%");
+    $('.remake_article_sub.nak').animate({
+      width : 'toggle'
+    }, 'normal')
+  });
+  $(".article_name.gi").on("click", function(){
+    $(".remake_article").css("width", "50%");
+    $('.remake_article_sub.gi').animate({
+      width : 'toggle'
+    }, 'normal')
+  });
+  $(".article_name.naha").on("click", function(){
+    $(".remake_article").css("width", "50%");
+    $('.remake_article_sub.naha').animate({
+      width : 'toggle'
+    }, 'normal')
+  });
+  $(".article_name.oki").on("click", function(){
+    $(".remake_article").css("width", "50%");
+    $('.remake_article_sub.oki').animate({
+      width : 'toggle'
+    }, 'normal')
+  });
+
+});
+

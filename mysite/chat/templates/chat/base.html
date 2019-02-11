@@ -94,6 +94,7 @@
     </div>
   </nav>
   {% if user.is_authenticated %}
+  {% if info_side_bar %}
   <aside class="sidebar left">
       <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
           <img src="{% static 'img/Untitled1.png' %}" alt="">
@@ -122,7 +123,7 @@
     </nav> 
   </aside>
   {% endif %}
-
+  {% endif %}
   
       {% block content %}{% endblock %}
   <!-- Optional JavaScript -->

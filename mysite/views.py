@@ -28,7 +28,7 @@ from django.contrib import messages
 
 from django.db import models
 from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company, License, test_image
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company, License, test_image, Plan
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -45,6 +45,8 @@ from .forms import (
 import requests
 
 import re
+
+import platform
 
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from pure_pagination.mixins import PaginationMixin
@@ -89,6 +91,23 @@ def paginate_queryset(request, queryset, count):
         page_obj = paginator.page(paginator.num_pages)
     return page_obj
 
+"""
+beautifulsoup
+"""
+import urllib.request, urllib.error
+from bs4 import BeautifulSoup
+import re
+
+# from selenium import webdriver
+# from selenium.webdriver.chrome.options import Options
+
+from time import sleep
+
+"""
+Stripe
+"""
+import stripe
+stripe.api_key = STRIPE_API_KEY
 
 """
 エラーページ
@@ -280,8 +299,11 @@ class UserDetail(PermissionsMypage, generic.DetailView):
     def get(self, request, **kwargs):
 
         user_id = request.path.split('/').pop(3)
-        print(user_id)
         if not request.user.is_staff:
+
+            message = Fab.objects.filter(message_flag=1) 
+            print(message)
+
             tmp_fab = []
             tmp_article = []
             fab = Fab.objects.filter(user=request.user ,message_flag=1, flag=1).values('article', 'updated_at')
@@ -294,27 +316,37 @@ class UserDetail(PermissionsMypage, generic.DetailView):
                 article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
                 tmp_article.append(article_dic)
 
-            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article,  })
+            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article, 'message': message})
 
         else:
+
+            message = Fab.objects.filter(message_flag=1) 
+            for info in message:
+                message = info
+
             tmp_article_live = []
             tmp_article = []
             tmp_user = []
             tmp_fab = []
-            article = Article.objects.filter(customer=request.user.id).order_by("live_flag_id")
-            company = CompanyCreate.objects.filter(user_id=request.user.id)
+            article = Article.objects.filter(customer=request.user.id)
+            company = Company.objects.filter(user_id=request.user.id)
             for main in article:
                 tmp_article.append(main)
                 articleLive = ArticleLive.objects.filter(id=main.live_flag_id).order_by("vacancy_info")
                 for live in articleLive:
                     tmp_article_live.append(live)
-                    fab_user_list = Fab.objects.order_by("id").filter(article_id=main.id)
+
+            user = Get_user.objects.all()
+            for info in user: 
+                for main in article:
+                    fab_user_list = Fab.objects.filter(article_id=main.id, user_id=info.id)
                     tmp_fab.append(fab_user_list)
                     for user_list in fab_user_list:
-                        user_info = Get_user.objects.filter(id=user_list.user_id)
-                        tmp_user.append(user_info)
-                        
-            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, })
+                        user_info = Get_user.objects.filter(id=user_list.user_id) #.values_list('id', flat=True).order_by('id').distinct()
+                        for user in user_info:
+                            tmp_user.append(user)
+
+            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, 'message': message, })
 
 """
 マイページ更新
@@ -377,7 +409,11 @@ class LoginAfter(generic.ListView):
 
     def get(self, request, *args, **kwargs):
 
+        if request.user.is_staff:
+            return redirect('apps:top')
+
         if request.user.fab_selection_id:
+            
             return redirect('apps:top')
 
         return render(request, self.template_name)
@@ -447,6 +483,8 @@ class MainView(PaginationMixin, generic.ListView):
         """
         トップ画面表示(一部)
         """
+
+        http = 'http'
         auth_user_id = self.request.user.id
 
         context = super(MainView, self).get_context_data(**kwargs)
@@ -463,17 +501,21 @@ class MainView(PaginationMixin, generic.ListView):
         else:
             auth_user = 'u'
 
-        tmp_count = []
-        company_info = Company.objects.filter(user_id=auth_user_id)
-        for info in company_info:
-            article_info = Article.objects.filter(company_id=info.id)
-            for info in article_info:
-                tmp_count.append(info.article_name)
-                count_article = len(tmp_count)
-                if int(count_article) > 9:
-                    count_over = False
-                else:
-                    count_over = True
+        if self.request.user.is_staff:
+            
+            tmp_count = []
+            company_info = Company.objects.filter(user_id=auth_user_id)
+            for info in company_info:
+                article_info = Article.objects.filter(company_id=info.id)
+                for info in article_info:
+                    tmp_count.append(info.article_name)
+                    count_article = len(tmp_count)
+                    if int(count_article) > 9:
+                        count_over = False
+                    else:
+                        count_over = True
+        else:
+            count_over = ""
         
         """
         現在の日付取得、最新の記事情報を開示する
@@ -506,6 +548,8 @@ class MainView(PaginationMixin, generic.ListView):
                 user_fab = Article.objects.distinct().filter(
                        address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
                 )
+            else:
+                user_fab = ""
             fab_selection_list.append(user_fab)
 
         """
@@ -746,17 +790,23 @@ class InfoView(generic.ListView):
 
     def get_context_data(self, **kwargs):
 
+        tmp_image = []
         get = self.request.path.replace('/roomii/info/', '')
         context = super(InfoView, self).get_context_data(**kwargs)
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id')
         fab_view = Fab.objects.all().filter(user=self.request.user.id).order_by('article_id','flag')
-        room_view = RoomImage.objects.all().filter(article_id=get).order_by("id" ,"image")
+        image_view = RoomImage.objects.all().filter(article_id=get)
+        for x in image_view:
+            x = x.image.name.replace("[", "").replace("]", "").replace("'", "").replace(" ", "").replace('"', "").split(",")
+            tmp_image.append(x)
+            for room_view in tmp_image:
+
+                context["room_view"] = room_view
 
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
-        context["room_view"] = room_view
 
         return context
 
@@ -1332,3 +1382,214 @@ class image(View):
                  'test': table_list
             }
         return render(request, self.template_name, context)
+
+class Stripe(View):
+
+    model = Company
+    template_name = "apps/stripe.html"
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_staff and not request.user.is_company:
+            return redirect("apps:top")
+
+        plan = Plan.objects.all()
+        company = self.model.objects.all()
+    
+        return render(request, self.template_name, {
+            'company': company,
+            "plan": plan,
+            'data_key': STRIPE_PUBLISHABLE_KEY,
+            'data_name': 'roomii',
+            'data_description': 'プラン変更',
+        })
+
+class Charge(View):
+
+    model = Company
+    template_name = "apps/charge_after.html"
+
+    def post(self, request, *args, **kwargs):
+
+        get_plan_url = request.path.split('/').pop(3)
+
+        company = self.model.objects.filter(user_id=request.user.id)
+        for info in company:
+            if not info.stripe_id:
+       
+                stripe_email = request.POST["stripeEmail"]
+
+                if not stripe_email:
+                    return redirect("apps:stripe")
+
+                if request.user.email == stripe_email :
+
+                    stripe.api_key = STRIPE_API_KEY
+
+                    """
+                    stripe関連
+                    """
+                    token = request.POST['stripeToken']
+                    print(token)
+
+                    """
+                    stirpe
+                    顧客情報作成
+                    """
+                    customer = stripe.Customer.create( 
+                        email = stripe_email, 
+                        source = token 
+                    )
+
+                    company = self.model.objects.filter(user_id=request.user.id)
+                    for info in company:
+                        info.stripe_id = customer.id
+                        info.save()
+
+                    """
+                    メール送信
+                    """
+                    current_site = get_current_site(request)
+                    domain = current_site.domain
+                    context = {
+                        'protocol': request.scheme,
+                        'domain': domain,
+                        'token': dumps(request.user.pk),
+                        'user': request.user,
+                    }
+
+                    # user_email = request.user.email
+                    # subject = get_template('register/mail_template/stripe/subject.txt')
+                    subject = "テスト"
+                    message_template = get_template('register/mail_template/stripe/message.txt')
+                    message = message_template.render(context)
+
+                    request.user.email_user(subject, message)
+
+                    """
+                    stripe, サブスクリプション
+                    """
+                    company_stripe_id = self.model.objects.filter(user_id=request.user.id)
+                    for company_stripe in company_stripe_id:
+                        company_stripe_id = company_stripe.stripe_id
+
+                    plan_id = Plan.objects.filter(namespace=get_plan_url)
+                    for stripe_plan in plan_id:
+                        company_plan_id = stripe_plan.stripe_plan_id
+                        
+                    subscription = stripe.Subscription.create(
+                        customer = company_stripe_id,
+                        items = [{
+                            'plan': company_plan_id,
+                        }]
+                    )
+
+                    """
+                    データベースに保存
+                    stripe情報
+                    """
+
+                    company = self.model.objects.filter(user_id=request.user.id)
+                    for info in company:
+                        info.stripe_id = customer.id
+                        info.stripe_subscription_id = subscription.id
+                        info.plan_name = get_plan_url
+                        info.save()
+
+                    plan = Plan.objects.all()
+                    company = self.model.objects.all()
+
+                    return render(request, self.template_name, {
+                        'company':company,
+                        'plan': plan,
+                        'data_key': STRIPE_PUBLISHABLE_KEY,
+                        'data_name': 'roomii',
+                        'data_description': 'プラン変更',
+                        'message': "確かにプランを変更しました",
+                    })
+
+                else:
+                    messages.info(request, "登録しているEmailアドレスを入力してください")
+
+                    plan = Plan.objects.all()
+                    company = self.model.objects.all()
+
+                    return render(request, self.template_name, {
+                        'company':company,
+                        'plan': plan,
+                        'data_key': STRIPE_PUBLISHABLE_KEY,
+                        'data_name': 'roomii',
+                        'data_description': 'プラン変更',
+                    })
+
+                # return redirect("apps:stripe")
+        
+        else:
+            company = self.model.objects.filter(user_id=request.user.id)
+            plan_id = Plan.objects.filter(namespace=get_plan_url)
+
+            for company_info in company:
+                company_info.plan_name = get_plan_url
+                company_info.save()
+                company_info = company_info
+            
+            for plan in plan_id:
+                plan = plan
+
+            subscription = stripe.Subscription.retrieve(
+               company_info.stripe_subscription_id
+            )
+
+            item_id = subscription['items']['data'][0].id
+            stripe.Subscription.modify(
+                company_info.stripe_subscription_id,
+                cancel_at_period_end=False,
+                items=[{
+                        "id": item_id,
+                        "plan": plan.stripe_plan_id,
+                }],
+            )
+
+            plan = Plan.objects.all()
+            company = self.model.objects.all()
+
+            return render(request, self.template_name, {
+                    'company':company,
+                    'plan': plan,
+                    'data_key': STRIPE_PUBLISHABLE_KEY,
+                    'data_name': 'roomii',
+                    'data_description': 'プラン変更',
+                    'message': "確かにプランを変更しました",
+            })
+
+class Insert(View):
+
+    model = RoomImage
+    template_name = "apps/test.html"
+
+    def get(self, request, *args, **kwargs):
+
+        tmp_list = []
+        for x in self.model.objects.filter(id=327):
+            test_list = x.image.replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",")
+            tmp_list.append(test_list)
+            for test in tmp_list:
+                print(test)
+                print(type(test))
+                for x in test :
+                    print(x)
+
+        # image_table = self.model.objects.filter(id=326).first()
+        # print(image_table)
+        # test = image_table.image.name.replace("[", "").replace("]", "")
+        # image_table.image = test
+        # image_table.save()
+
+
+        # for x in range(328, 352):
+        #     image_ta = self.model.objects.filter(id=x).first()
+        #     test = image_ta.image.name.replace("http", "['http").replace(",", "',")
+        #     image_ta.image = test
+        #     image_ta.save()
+            
+        return render(request, self.template_name)
