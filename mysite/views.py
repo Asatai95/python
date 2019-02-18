@@ -617,10 +617,10 @@ class MainView(PaginationMixin, generic.ListView):
         box_text = self.request.GET.get("search_box")
         if box_text != "" and box_text != None :
 
-            tmp_list_sort = []
             if self.request.GET.get("select-profession"):
                 del tmp_list_sort
 
+            tmp_list_sort = []
             object_list = Article.objects.filter(
                                     Q(article_name__contains=box_text) | Q(address__contains=box_text) 
                             )

@@ -1,0 +1,5 @@
+"id";"stripe_id";"stripe_subscription_id";"plan_name";"is_company";"user_id";"company_name";"address_number";"address";"update_count";"license";"email";"web";"tel_number";"company_image";"created_at";"updated_at"
+13;"";"";"";1;27;"株式会社赤丸";"9020073";"沖縄県";"01";"第123457号";"test.akaunto319@gmail.com";"http://localhost:8000/";"08-123-123";"nin_img.png";"2018-12-29 10:41:01";""
+17;"";"";"";1;27;"株式会社赤丸";"9020073";"沖縄県 那覇市上間 1-21 赤丸ビルディング";"02";"第12347号";"test.sub.akaunto@gmail.com";"http://localhost:8000/";"08-123-123";"002p2.jpg";"2019-01-09 09:49:43";""
+18;"cus_EU6BQlSn0yRTky";"sub_EU6BtoI4WIWgJC";"beginner";1;7;"株式会社赤丸";"9020072";"沖縄県 那覇市真地 1-21 赤丸ビルディング";"01";"第004753号";"defense433@gmail.com";"http://localhost:8000/";"08-123-123";"002p5.jpg";"2019-01-10 01:44:23";""
+19;"";"";"";1;29;"上間不動産";"904-0116";"沖縄県中頭郡北谷町北谷２丁目１９−４";"09";"第1785号";"uemah_test@true.ocn.ne.jp";"http://www.uema-housing.com/";"098-936-7500";"http://www.img-asp.jp/company/13674_1_350_250_2.jpg?t=1540438218";"2019-02-10 01:44:23";""

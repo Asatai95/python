@@ -391,10 +391,10 @@ class Article_request(models.Model):
 
     id = models.AutoField(primary_key=True)
     user_id = models.IntegerField(u'user_id')
-    article_image = models.CharField(u"物件画像", max_length=255)
+    article_image = models.CharField(u"建物イメージ画像", max_length=255)
     article_name = models.CharField(u'建物名', max_length=255)
     address = models.CharField(u'住所', max_length=255)
-    map = models.CharField(u'マップ', max_length=255)
+    map = models.CharField(u'マップURL', max_length=255)
     comments = models.CharField(u'その他', max_length=255)
     created_at = models.DateTimeField(default=timezone.now)
 

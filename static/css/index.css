@@ -1353,7 +1353,7 @@ li.new_account {
   padding: 1vw;
   background-color: rgba(255,255,255);
   border: solid 10px #f7b52c;
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 .preview {
