@@ -481,7 +481,7 @@ class ArticleRequest(forms.ModelForm):
     )
 
     article_image = forms.FileField(
-           label='建物\nイメージ画像',
+           label='建物外観画像',
            widget=forms.ClearableFileInput(attrs={'multiple':True}),
     )
 
