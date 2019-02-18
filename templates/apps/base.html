@@ -9,7 +9,8 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (min-width: 431px)" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (max-width: 430px)" href="{% static 'css/index_sp.css' %} " />
 
 
   <title>roomii</title>
@@ -39,6 +40,9 @@
             <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
           </li>
           <li>
+            <a class="nav-item nav-link" href="{% url 'apps:article_request' %}">物件リクエスト</a>
+          </li>
+          <li>
             <a class="nav-item nav-link" href="{%url 'register:logout' %}">ログアウト</a>
           </li>
           {% else %}
@@ -51,26 +55,26 @@
           {% endif %}
         {% else %}
           {% if user.is_authenticated %}
-          <li>
+          <li class="da">
             <a class="nav-item nav-link btn_sidebar" data-action="toggle" data-side="left" href="javascript:void(0)">ダッシュボード</a>
           </li>
           <li>
             <a class="nav-item nav-link" href="{% url 'register:top'%}">TOP</a>
           </li>
           {% if user.is_company %}
-          <!-- <li>
+          <li class='cm-info-remake'>
             <a class="nav-item nav-link" href="{% url 'apps:company_change' %}">業者情報編集</a>
-          </li> -->
+          </li>
           {% else%}
           {% endif %}
           {% if count_over %}
-            <!-- <li>
+            <li class='ar-info-remake'>
               <a class="nav-item nav-link" href="{% url 'apps:company' %}">物件登録</a>
-            </li> -->
+            </li>
           {% else %}
-            <!-- <li>
+            <li class='upgrade-data'>
               <a class="nav-item nav-link" href="{% url 'apps:company' %}">アップグレード</a>
-            </li> -->
+            </li>
           {% endif %}
           <li>
             <a class="nav-item nav-link" href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a>
@@ -159,7 +163,7 @@
             {% if count_over %}
               <li><a href="{% url 'apps:company' %}">物件登録</a></li>
             {% else %}
-              <li><a href="{% url 'apps:company' %}">アップグレード</a></li>
+              <li><a href="#">アップグレード</a></li>
             {% endif %}
             <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
             <li><a href="#">メッセージBOX</a></li>
@@ -297,6 +301,29 @@
 
       </header>
       {% endif %}
+      <!-- レスポンシブ 検索 -->
+      <header class="res-header">
+        <form action="">
+          <div class='address_box search-box'>
+            <input id="search" name="search_box" type="text" placeholder="キーワード" />
+            <input id="sbtn" type="submit" value="検索" />
+          </div>
+          <div class="sel sel--black-panther">
+            <select name="select-profession" id="select-profession">
+              <option value="" disabled>条件指定</option>
+              <option value="0">家賃安い</option>
+              <option value="1">1F ~ 3F</option>
+              <option value="2">3F ~ </option>
+              <option value="3">物件更新日</option>
+              <option value="4">空室あり</option>
+              <!-- <option value="5"> </option> -->
+            </select>
+            
+          </div>
+          <input id="sbtn" class="sbox search-list" type="submit" value="検索" />
+          <hr class="rule">
+        </form>
+      </header>
       {% block content %}{% endblock %}
     </div>
   </div>

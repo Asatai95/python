@@ -64,9 +64,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         self.company_id_info = info.company_id
                         self.company_name_info = company_detail.company_name
                         self.user = user_detail.username
-                            
-                            
-                
+                                                                     
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -78,25 +76,46 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data=None, bytes_data=None):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        print(message)
         
-
         await self.channel_layer.group_send (
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message
+                'message': message,
             }
         )
 
+    # async def receive(self, text_data=None, bytes_data=None):
+    #     text_data_json = json.loads(text_data)
+    #     image = text_data_json["image"]
+    #     print(image)
+        
+    #     await self.channel_layer.group_send (
+    #         self.room_group_name,
+    #         {
+    #             'type': 'chat_image',
+    #             "image": image
+    #         }
+    #     )
         
     async def chat_message(self, event):
-        
+       
         message = event['message']
         if message != "":
             await self._save_message(message)
         await self.send(text_data=json.dumps({
-            'message': message
+            'message': message,
         }))
+
+    # async def chat_image(self, event):
+        
+    #     image = event["image"]
+    #     print(image)
+
+    #     await self.send(text_data=json.dumps({
+    #         "image": image
+    #     }))
 
     @database_sync_to_async
     def _save_message(self , message):

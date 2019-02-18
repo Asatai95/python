@@ -32,6 +32,7 @@ urlpatterns = [
     path('password_reset/confirm/<uidb64>/<token>/', views.PasswordResetConfirm.as_view(), name='password_reset_confirm'),
     path('password_reset/complete/', views.PasswordResetComplete.as_view(), name='password_reset_complete'),
     path('user_detail/<username>/<int:pk>/', login_required(views.UserDetail.as_view()), name='user_detail'),
+    path('send/mail/<str:article_name>/', login_required(views.Send_email.as_view()), name='send_email'),
     path('user_update/<int:pk>/', login_required(views.UserUpdate.as_view()), name='user_update'),
     path('roomii/info/<int:article_id>', (views.InfoView.as_view()), name='info'),
     path('roomii/create/', login_required(views.ArticleEdit.as_view()), name='create'),
@@ -43,9 +44,12 @@ urlpatterns = [
     path('facebook/login/', views.RedirectFacebook.as_view(), name='facebook_login'),
     path('auth/complete/facebook/', views.CallbackFacebook.as_view(), name='facebook_callback'),
     path('test_image/', views.image.as_view(), name='test_image'),
-    path('stripe/', views.Stripe.as_view(), name='stripe'),
-    path('stripe/charge/<str:namespace>/', views.Charge.as_view(), name='charge'),
+    path('plan/', login_required(views.Stripe.as_view()), name='stripe'),
+    path('stripe/charge/<str:namespace>/', login_required(views.Charge.as_view()), name='charge'),
     path('test/', views.Insert.as_view(), name='test'),
+    path('request/', login_required(views.Article_request.as_view()), name='article_request'),
+    
+    # path('mail_test/', views.Message_test.as_view(), name='message_get_info'),
 ]
 
 

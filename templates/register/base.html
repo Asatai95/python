@@ -7,11 +7,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    {% if message_info %}
+      <meta http-equiv="refresh" content="5;URL='{{url}}'" />
+    {% endif %}
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
           integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
 
-    <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+          <link rel="stylesheet" media="screen and (min-width: 436px)" href="{% static 'css/index.css' %} " />
+          <link rel="stylesheet" media="screen and (max-width: 435px)" href="{% static 'css/index_sp.css' %} " />
     <link rel="shortcut icon" href="{% static 'img/wanko.png' %}">
     <title>roomii</title>
 </head>
@@ -65,11 +70,19 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
             integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
             crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/user_os.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
 
-
+    {% if message_info %}
+     <script>
+        swal(
+          "Success!", "確かにメールを送信いたしました！", "success"
+        );
+         
+     </script>
+    {% endif %}
     <!-- <script>
       document.querySelector('#room-name-submit').onclick = function(e) {
             var roomName = document.querySelector('#room-name-input').value;

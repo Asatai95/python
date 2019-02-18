@@ -1,0 +1,31 @@
+{% extends "register/base.html" %}
+{% block content %}
+
+<div class="main_contents">
+    <div class="caution">
+        <p class="caution_text">下記のユーザーにEmailを送信しますか？</p>
+    </div>
+    <div class="user_list">
+        {% for x in users %}
+          {% for user_info in x %}
+          <ul>
+            <li><img src="{{user_info.image}}" alt="ユーザー画像"></li>
+            <li class="user">{{user_info.username}}</li>
+          </ul>
+          {% endfor %}
+        {% endfor %}
+    </div>
+    <div class="send_button">
+        <form action="" method="POST">
+            {% for x in users %}
+              {% for user_info in x %}
+                <input type="hidden" name="hidden_user_id" value="{{user_info.id}}">
+              {% endfor %}
+            {% endfor %}
+            <button type="submit" class="btn btn-success btn-lg btn-block mail user_list_mail">メール送信</button>
+        {% csrf_token %}
+        </form>
+    </div>
+</div>
+
+{% endblock %}

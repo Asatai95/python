@@ -41,10 +41,44 @@
         </div>
         </div>
       </div>
+      {% if user.is_mail %}
+      <div class='switch-button'>
+        <span class="get_not_info">空室情報を受け取る</span>
+        <span class="get_info">空室情報を受け取らない</span>
+        <div class="switch">
+            
+            <label class="switch__label">
+              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch" value="0">
+              <input type="hidden" name="checkbox_switch" class="checkbox_switch_hidden" value="1">
+              <input type="checkbox" class="switch__input" checked="checked"/>
+              <span class="switch__content"></span>
+              <span class="switch__circle"></span>
+            </label>
+        </div>
+    
+      </div>
+      {% else %}
+      <div class='switch-button'>
+        <span class="get_info">空室情報を受け取る</span>
+        <span class="get_not_info">空室情報を受け取らない</span>
+        <div class="switch">    
+            <label class="switch__label">
+              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch_hidden" value="0">
+              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch" value="1">
+              <input type="checkbox" class="switch__input"/>
+              <span class="switch__content"></span>
+              <span class="switch__circle"></span>
+            </label>
+        </div>
+      
+      </div>
+    
+      {% endif %}
+
       {% csrf_token %}
       <div class='button'>
         <input type="submit" id='submit' value="編集完了" disabled/>
-        <button class='back' type="button"><a href="{% url 'register:user_detail' user.username user.pk %}">戻る</a></button>
+        <button class='back' type="button"><a href="#" onclick="javascript:window.history.back(-1);return false;">戻る</a></button>
       </div>
       <div class='point'>
         <p class='point_title'>【プロフィール画像について】</p>

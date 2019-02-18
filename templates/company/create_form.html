@@ -17,7 +17,7 @@
         {% for field in form %}
         <table class="form-article">
           <tbody>
-            <tr>
+            <tr class="ar-import">
               <th>{{ field.label_tag }}</th>
               <td>{{ field }}{{ field.errors }}</td>
             </tr>
@@ -47,7 +47,7 @@
         <div class="preview_files">
         </div>
         {% csrf_token %}
-        <button type="submit" class="btn btn-success btn-lg btn-block">登録</button>
+        <button type="submit" class="btn btn-success btn-lg btn-block ar-create-button">登録</button>
       <div classs='comment'>
         <ul class='note'>
           <li class='title'>【ご登録に関して、注意事項】</li>

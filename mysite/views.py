@@ -27,19 +27,22 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib import messages
 
 from django.db import models
-from django.db.models import Q
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company, License, test_image, Plan
+from django.db.models import Q, Count
+from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate, CompanyCreate, Company, License, test_image, Plan, Article_request
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
+from django.core.mail import EmailMessage
+from django.core.mail import EmailMultiAlternatives
+# from email.MIMEImage import MIMEImage
 from django.urls import reverse_lazy
 from django.views.decorators.http import require_POST
 
 from .forms import (
     LoginForm, UserCreateForm, MyPasswordChangeForm, MyPasswordResetForm, MySetPasswordForm,
-    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm, CreateCompany, CompanyUpdateForm
+    UserUpdateForm, Createform, LoginCustomerForm, ArticleUpdateForm, CreateCompany, CompanyUpdateForm, ArticleRequest
 )
 
 import requests
@@ -76,6 +79,10 @@ import cloudinary.api
 """
 MAX_MEMORY_SIZE = 10485760
 
+def my_round(val, digit=0):
+    p = 10 ** digit
+    return (val * p * 2 + 1) // 2 / p
+
 """
 ページネーション
 """
@@ -94,6 +101,7 @@ def paginate_queryset(request, queryset, count):
 """
 beautifulsoup
 """
+
 import urllib.request, urllib.error
 from bs4 import BeautifulSoup
 import re
@@ -301,8 +309,8 @@ class UserDetail(PermissionsMypage, generic.DetailView):
         user_id = request.path.split('/').pop(3)
         if not request.user.is_staff:
 
-            message = Fab.objects.filter(message_flag=1) 
-            print(message)
+            # message = Fab.objects.filter(message_flag=1) 
+            # print(message)
 
             tmp_fab = []
             tmp_article = []
@@ -316,7 +324,7 @@ class UserDetail(PermissionsMypage, generic.DetailView):
                 article_dic = {'id': tmp['id'], 'name': tmp['article_name'] ,'image': tmp['article_image'], 'comment': tmp['comments']}
                 tmp_article.append(article_dic)
 
-            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article, 'message': message})
+            return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
 
         else:
 
@@ -361,10 +369,13 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
         """
         画像サイズ制限
         """
-        img_file_size = self.request.FILES['img_file']
-        if img_file_size.size > MAX_MEMORY_SIZE:
-            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-        else:
+        try:
+            img_file_size = self.request.FILES['img_file']
+            if img_file_size.size > MAX_MEMORY_SIZE:
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+            else:
+                return super(UserUpdate, self).form_valid(form)
+        except:
             return super(UserUpdate, self).form_valid(form)
 
     def get_success_url(self):
@@ -372,21 +383,28 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
         User = Get_user.objects.all().filter(pk=self.kwargs['pk'])
 
         try:
+            check_box = self.request.POST.get("checkbox_switch_button")
+            print(check_box)
             img_file = self.request.FILES['img_file'].name
             img_filename = Image.open(self.request.FILES['img_file'])
             img_filename.save(os.path.join('./static/img/', img_file))
             img_file = os.path.join('/static/img/', img_file)
             for user in User:
                 user.image = user
+
             user.image = img_file
+            user.is_mail = int(check_box)
             user.save()
 
             return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
         except:
+            check_box = self.request.POST.get("checkbox_switch_button")
+            
             img_file = self.request.POST.get("user_img")
             for user in User:
                 user.image = user
             user.image = img_file
+            user.is_mail = int(check_box)
             user.save()
 
             return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
@@ -480,6 +498,8 @@ class MainView(PaginationMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
 
+        import operator
+
         """
         トップ画面表示(一部)
         """
@@ -551,9 +571,67 @@ class MainView(PaginationMixin, generic.ListView):
             else:
                 user_fab = ""
             fab_selection_list.append(user_fab)
+        """
+        検索(SP)  
+        """
+
+        select_one = self.request.GET.get("select-profession")
+
+        tmp_list_sort = []
+    
+        if select_one == "0":
+            object_list = self.model.objects.order_by("rent") 
+            for x in object_list:
+               tmp_list_sort.append(x)
+        elif select_one == "1":
+            object_list = self.model.objects.order_by("rent").filter(
+                                Q(floor_number__startswith="3") | Q(floor_number__startswith="1") | Q(floor_number__startswith="2")
+                        )
+            for x in object_list:
+                tmp_list_sort.append(x)
+
+        elif select_one == "2":
+            object_list = self.model.objects.order_by("rent").exclude(
+                                Q(floor_number__startswith="3") | Q(floor_number__startswith="1") | Q(floor_number__startswith="2")
+                        )
+            for x in object_list:
+                tmp_list_sort.append(x)
+
+        elif select_one == "3":
+            object_list = self.model.objects.order_by("updated_at") 
+            for x in object_list:
+               tmp_list_sort.append(x)
+        elif select_one == "4":
+            live_flag = ArticleLive.objects.all()
+            for x in live_flag:
+                if x.vacancy_info == "0":
+                    object_list = self.model.objects.filter(live_flag=x.id)
+                    if object_list:
+                        for x in object_list:
+                            tmp_list_sort.append(x)
 
         """
-        検索部分
+        検索ボックス
+        """
+
+        box_text = self.request.GET.get("search_box")
+        if box_text != "" and box_text != None :
+
+            tmp_list_sort = []
+            if self.request.GET.get("select-profession"):
+                del tmp_list_sort
+
+            object_list = Article.objects.filter(
+                                    Q(article_name__contains=box_text) | Q(address__contains=box_text) 
+                            )
+            if not object_list:
+                object_list = Article.objects.all()
+
+            for x in object_list: 
+                tmp_list_sort.append(x)
+        
+        """
+        検索部分(PC)
         """
 
         article = self.request.GET.get('name')
@@ -737,7 +815,10 @@ class MainView(PaginationMixin, generic.ListView):
                 object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
                 tmp_list.append(object_list)
         
-        page_obj = paginate_queryset(self.request, object_list, 10)
+        if not tmp_list_sort:
+            page_obj = paginate_queryset(self.request, object_list, 10)
+        else:
+            page_obj = paginate_queryset(self.request, tmp_list_sort, 10)
       
         return super(MainView, self).get_context_data(
                 tmp_list=tmp_list, page_obj=page_obj, fab_selection_list=fab_selection_list, fab_not_view=fab_not_view, live_table=live_table, floor_table=floor_table, 
@@ -1593,3 +1674,161 @@ class Insert(View):
         #     image_ta.save()
             
         return render(request, self.template_name)
+
+
+
+"""
+メール受信OK, お気に入りに登録しているユーザー
+メールの送信
+"""
+
+class Send_email(View):
+
+    template_name = "company/send_email_list.html"
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_staff:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk) 
+        
+        tmp_user = []
+        article_name = request.path.split('/').pop(3)
+        article = Article.objects.filter(article_name=article_name)
+        if not article:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+        for x in article:
+            fab = Fab.objects.filter(article_id=x.id, message_flag=1, message_send_flag=0)
+            if not fab:
+                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+            for x in fab:
+                user = Get_user.objects.filter(id=x.user_id, is_mail=1)
+                tmp_user.append(user)
+
+                if not user:
+                    return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+
+        return render(request, self.template_name, {"users":tmp_user})
+
+    def post(self, request, *args, **kwargs):
+
+        user_id = request.POST.getlist("hidden_user_id")
+       
+        if user_id == []:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+
+        tmp_article = []
+        article_name = request.path.split('/').pop(3)
+        article = Article.objects.filter(article_name=article_name).values("id")
+
+        tmp_mail = []
+        for x in user_id:
+            user = Get_user.objects.filter(id=x)
+            if not user :
+                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+            tmp_mail.append(user)
+
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+        for x in tmp_mail:
+            for user in x:
+                for x_id in article:
+                    context = {
+                        'protocol': self.request.scheme,
+                        'domain': domain,
+                        'token': dumps(user.pk),
+                        'user': user,
+                        'article_id': x_id["id"]
+                    }
+
+                    fab_mail_flag = Fab.objects.filter(article_id=x_id["id"], user_id=user.id, message_flag=1)
+                    for mail_flag in fab_mail_flag:
+                        mail_flag.message_send_flag = 1
+                        mail_flag.save()
+
+            subject = 'テスト'
+
+            message_template = get_template('register/mail_template/article_info/message.txt')
+            message = message_template.render(context)
+
+            user.email_user(subject, message)
+            
+        message_info = "確かにメールを送信しました！"
+        username = request.user.username
+        user_pk = request.user.pk
+
+        url = "http://localhost:8000/user_detail/"+str(username)+"/"+str(user_pk)+"/ "
+
+        return render(request, "company/message_info.html", {"message_info":message_info, "url":url})
+
+class Article_request(CreateView):
+
+    model = Article_request
+    form_class = ArticleRequest
+    template_name = "apps/request_article.html"
+    success_url = reverse_lazy('apps:article_request')
+
+
+    def form_valid(self, form):
+
+        tmp_image = []
+        main_file = form.save(commit=False)
+    
+        main_file.article_name = self.request.POST["article_name"]
+        main_file.address = self.request.POST["address"]
+        main_file.comments = self.request.POST["comments"]
+        files = self.request.FILES.getlist("article_image")
+        for x in files:
+            try:
+                tmp_image.append(x.name)
+                img_filename = Image.open(x)
+                img_filename.save(os.path.join('./media/', x.name))
+            except:
+                error = "登録できない画像ファイルが含まれています"
+                return render(self.request, self.template_name, {"error": error, "form": form})
+
+        main_file.article_image = tmp_image
+        main_file.map = self.request.POST["map"]
+        main_file.user_id = self.request.user.id
+
+        subject = "物件リクエスト"
+        message = ""+self.request.user.username+" さんより物件リクエスト情報 \n\n物件名 : "+ main_file.article_name +"\n物件所在地 : "+main_file.address+"\n"+self.request.user.username+"さんよりコメント : "+main_file.comments+"\n地図情報 : "+main_file.map+"\n\n上記の情報が欲しいとの意思表示あり"
+        # message = "test"
+        from_email = self.request.user.email
+        user_info = Get_user.objects.filter(is_superuser=1)
+        for user in user_info:
+            to = [user.email]
+        email = EmailMessage(subject, message, from_email, to)
+        for x in files:
+            response = urllib.request.urlopen("http://localhost:8000/media/"+x.name+"")
+            email.attach(x.name , response.read() , mimetype="image/jpg")
+           
+        email.send()
+    
+        main_file.save()
+
+        return super(Article_request, self).form_valid(form)
+
+# class Message_test(View):
+
+#     template_name = "company/message_info.html"
+
+#     def get(self, request, *args, **kwargs):
+
+#         message_info = "test"
+
+#         return render(request, self.template_name , {"message_info":message_info})
+
+
+# class Message_get_info(View):
+
+#     template_name = "company/message_info.html"
+
+#     def get(self, request, *args, **kwargs):
+
+#         message_info = "確かにメッセージを送信しました！"
+#         username = request.user.username
+#         user_pk = request.user.pk
+
+#         url = "http://localhost:8000/"+username+"/"+user_pk+"/ "
+
+#         return render(request, self.template_name, {"message_info":message_info, "url":url)

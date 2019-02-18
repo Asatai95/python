@@ -1,0 +1,52 @@
+{% extends "register/base.html" %}
+{% block content %}
+{% load static %}
+
+    <div class='article_request'>
+        <div class='article_form'>
+            <main id="profile_edit">
+              <div class='logo'>
+                <p class='logo text'>roomii <br/> 【物件リクエスト】</p>
+                <p class="logo sub_text">気になる物件がありましたか？</p>
+                <p class="logo sub_text">フォームに必要情報入力し、<br>メールを送信して下さい！</p>
+              </div>
+              <form action="" method="POST" enctype="multipart/form-data">
+                <div class='error'>
+                  <span class="error_meaasage" id="username_error"></span>
+                </div>
+                <!-- <div class="preview">
+                  <img class='sample_img' src="/media/living.jpg" alt="">
+                </div> -->
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                <table class="form-request">
+                  <tbody>
+                    <tr class="ar-import">
+                  
+                        
+                        <th>{{ field.label_tag }}</th>
+                        <td>{{ field }}{{ field.errors }}</td>
+                       
+                    </tr>
+                    </tbody>
+                </table>
+                {% endfor %}
+                <li class="goole_map"><a href="https://www.google.co.jp/maps/">グーグルマップにアクセス</a></li>
+                <div class="preview_files"></div>
+                <div>
+                  <span class="error_text">{{error}}</span>
+                </div>
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success btn-lg btn-block ar-create-button">登録</button>
+                <div classs='comment'>
+                <ul class='note'>
+                  <li class='title'>【ご登録に関して、注意事項】</li>
+                  <li>全ての項目入力してください</li>
+                  <li>マップ情報に関して、グーグルマップのURLを貼り付けてください</li>
+                  <li>画像は、.pdf, .gifなどは登録できません</li>
+                </ul>
+                </div>
+            </main>
+        </div>
+    </div>
+{% endblock %}

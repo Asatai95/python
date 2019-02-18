@@ -1,0 +1,11 @@
+{{ user.username }} さんより物件リクエスト情報
+
+物件名 : {{article_name}}
+物件所在地 : {{address}}
+{{ user.username }}よりコメント : {{comments}}
+地図情報 : {{map}}
+
+上記の情報が欲しいとの意思表示あり
+
+
+test

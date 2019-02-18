@@ -13,7 +13,11 @@
           <span class="error_meaasage" id="username_error"></span>
         </div>
         <div class="preview">
-          <img class="sample_img" src="/media/{{view.article_image}}" alt="">
+          {% if 'http' not in view.article_image %}
+            <img class="sample_img" src="/media/{{view.article_image}}" alt="">
+          {% else %}
+            <img class="sample_img" src="{{view.article_image}}" alt="">
+          {% endif %}
         </div>
         <table class="form-article">
           <tbody>

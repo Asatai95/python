@@ -1,0 +1,13 @@
+空室情報に関するメール通知
+
+{{ user.username }} 様
+
+お気に入りに登録されている物件が空室になりました
+もし、こちらの物件をご検討されている場合、
+下記URLよりサイトにアクセスの上、業者の方とメッセージのやりとりを行ってください。
+
+本登録用URL
+{{ protocol}}://{{ domain }}{% url 'chat:index' user.username user.pk article_id %}
+
+
+test

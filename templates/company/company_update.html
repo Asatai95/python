@@ -15,7 +15,11 @@
         </div>
         {% for list_view in company %}
         <div class="preview">
-          <img class="sample_img" src="/media/{{list_view.company_image}}" alt="">
+          {% if "http" not in list_view.company_image %}
+            <img class="sample_img" src="/media/{{list_view.company_image}}" alt="">
+          {% else %}
+          <img class="sample_img" src="{{list_view.company_image}}" alt="">
+          {% endif %}
         </div>
 
         <table class="form-company update">
@@ -134,7 +138,7 @@
           </tbody>
         </table>
 
-        <button type="submit" class="btn btn-success btn-lg btn-block">情報変更</button>
+        <button type="submit" class="btn btn-success btn-lg btn-block cm-remake-button">情報変更</button>
 
         <div classs="comment">
           <ul class="note">

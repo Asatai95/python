@@ -64,6 +64,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=150, blank=True)
 
+    is_mail = models.BooleanField(
+        _('mail status'),
+        default=False,
+    )
+
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -171,7 +176,7 @@ class Article(models.Model):
     article_image = models.ImageField(_('article image'), upload_to='media')
     address_number = models.CharField(u'郵便番号', max_length=45)
     address = models.CharField(_('address'), max_length=150)
-    rent = models.CharField(_('rent'), max_length=150)
+    rent = models.IntegerField(_('rent'))
     park = models.CharField(_('park'), max_length=150)
     initial_cost = models.CharField(_('initial cost'), max_length=150)
     floor_plan = models.CharField(_('floor plan'), max_length=150)
@@ -202,6 +207,11 @@ class Fab(models.Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="article_key")
     flag = models.IntegerField()
     message_flag = models.IntegerField()
+    
+    message_send_flag = models.BooleanField(
+        _('message send flag'),
+        default=False,
+    )
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'))
 
@@ -337,6 +347,7 @@ class Chat_room(models.Model):
     chat = models.CharField(u'メッセージ', max_length=200)
     to_person = models.CharField(u'送信相手', max_length=45, null=True)
     from_person = models.CharField(u'送信主', max_length=45, null=True)
+    img = models.CharField(u'アイコン', max_length=150)
     created_at = models.DateTimeField(_('created at'), default=timezone.now)
     updated_at = models.DateTimeField(_('updated at'))
 
@@ -375,3 +386,17 @@ class Plan(models.Model):
 
     class Meta:
         db_table = "plans"
+
+class Article_request(models.Model):
+
+    id = models.AutoField(primary_key=True)
+    user_id = models.IntegerField(u'user_id')
+    article_image = models.CharField(u"物件画像", max_length=255)
+    article_name = models.CharField(u'建物名', max_length=255)
+    address = models.CharField(u'住所', max_length=255)
+    map = models.CharField(u'マップ', max_length=255)
+    comments = models.CharField(u'その他', max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "article_request"

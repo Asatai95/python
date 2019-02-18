@@ -2,14 +2,15 @@
 {% load static %}
 {% block content %}
 
-{{message}}
 {% if user.is_staff %}
-<div class='content_main_top'>
+<div class='content_main_top action'>
 {% else %}
-<div class='content_main_user'>
+  <div class='content_main_user'>
 {% endif %}
-  <div class="main_container">
-    {% for view_list in page_obj %}
+    <div class="main_container">
+   
+  {% for view_list in page_obj %}
+   
     <div class="item box-big{{view_list.id}}">
     {% if user.is_staff is False%}
       {% for fab_selections in fab_selection_list %}
@@ -129,35 +130,35 @@
 </div>
 
 <div class='login_menu'>
-  <div class="back_login_botton">
-    <a href="#"><span class="css-cancel"></span></a>
-  </div> 
-  <div class='login_content'>
-    <form action="{% url 'register:login' %}" method="POST">
-      <div class="col-md-6 offset-md-3">
-          <div class="login_card">
-              <div class="card-body">
-                <div>
-                  <label for="title">Welcome</label>
+    <div class="back_login_botton">
+      <a href="#"><span class="css-cancel"></span></a>
+    </div> 
+    <div class='login_content'>
+      <form action="{% url 'register:login' %}" method="POST">
+        <div class="col-md-6 offset-md-3">
+            <div class="login_card">
+                <div class="card-body">
+                  <div>
+                    <label for="title">Welcome</label>
+                  </div>
+                    <input type="text" name="username" placeholder="Email" class="form-control" id="id_username" required="">
+                    <hr>
+                    <input type="password" name="password" placeholder="パスワード" class="form-control" id="id_password" required="">
+                    <hr>
+                    <button type="submit" class="btn btn-success btn-lg btn-block" >ログイン</button>
+                    {% csrf_token %}
                 </div>
-                  <input type="text" name="username" placeholder="Email" class="form-control" id="id_username" required="">
-                  <hr>
-                  <input type="password" name="password" placeholder="パスワード" class="form-control" id="id_password" required="">
-                  <hr>
-                  <button type="submit" class="btn btn-success btn-lg btn-block" >ログイン</button>
-                  {% csrf_token %}
-              </div>
-          </div>
-      </div>
-      <div classs='comment'>
-        <ul class='note'>
-          <li class='forget'><a href="{% url 'register:password_reset' %}">パスワードをお忘れの方</a></li>
-          <li class='new_account'>ユーザー登録がまだの方は<a href="{% url 'register:user_create'%}">こちら</a></li>
-        </ul>
-      </div>
-    </form>
+            </div>
+        </div>
+        <div classs='comment'>
+          <ul class='note'>
+            <li class='forget'><a href="{% url 'register:password_reset' %}">パスワードをお忘れの方</a></li>
+            <li class='new_account'>ユーザー登録がまだの方は<a href="{% url 'register:user_create'%}">こちら</a></li>
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 {% include 'commons/commons_page.html' %}
 
 {% endblock %}

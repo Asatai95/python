@@ -9,7 +9,8 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (min-width: 436px)" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (max-width: 435px)" href="{% static 'css/index_sp.css' %} " />
 
 
   <title>roomii</title>
@@ -141,17 +142,26 @@
   <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
 
 <script>
-        
+        $(function(){
+          $('input[type=button]').click(function(){
+            $('form').submit();
+          });
+        });
         var user_id = {{user_id}};
         var article_id = {{article_id}};
         var user_name = "{{user.username}}";
-       
-        var chatSocket = new WebSocket(
-            'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' );
-    
+        var image_file_path = "image"
+        try {
+          var chatSocket = new WebSocket(
+              'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' );
+        } catch {
+          var chatSocket = new WebSocket(
+              'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' + image_file_path );
+        }
         chatSocket.onmessage = function(e) {
             var data = JSON.parse(e.data);
             var message = data['message'];
+            var image = data['image'];
             var div = document.getElementById('chat_test');
             var doc = document.getElementById("chat-log");
             var chat_message_input = document.getElementById("chat-message-input")
@@ -161,31 +171,14 @@
             var display_none_right = document.getElementsByClassName("msg-sub");
             var display_msg_right = document.getElementsByClassName("msg-right");
             var msg_class = document.getElementsByClassName("msg-right-sub");
-            if (msg_class[0]) {
 
-              document.querySelector('#chat-log').value += (message + '\n')
-              div.classList.remove("msg-sub")
-              msg_class[0].classList.remove("msg-right-sub")
-              msg_id.classList.add("msg-right")
-              doc.removeAttribute("id")
-              remove[0].classList.remove("now")
-              chat_message_input.parentNode.insertAdjacentHTML('beforebegin', 
-                                     "<div id='msg' class='msg-right'><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>"
-              )
-              div.classList.add("active")
-
-            }else {
-
-              document.querySelector('#chat-log').value += (message + '\n')
-              doc.removeAttribute("id")
-              remove[0].classList.remove("now")
-              display_none_right[0].parentNode.insertAdjacentHTML('beforebegin', 
-                                     "<div id='msg' class='msg-right'><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>"
-              )
-              div.classList.add("active")
-
-            }
-            
+            document.querySelector('#chat-log').value += (message + '\n')
+            doc.removeAttribute("id")
+            remove[0].classList.remove("now")
+            display_msg_right[0].parentNode.insertAdjacentHTML('beforeend', 
+                                   "<div id='msg' class='msg-right'><ul id='chat_test'><li id='ontime' class='chat_msg right now'><textarea readonly id='chat-log' class='chat-log-right'></textarea></li></ul></div>"
+            )
+            div.classList.add("active")
         };
     
         chatSocket.onclose = function(e) {
@@ -206,10 +199,23 @@
             chatSocket.send(JSON.stringify({
                 'message': message
             }));
+            console.log(message)
             var scroll = document.getElementsByClassName("chat_room_contents")
             scroll[0].scrollTop = scroll[0].scrollHeight;
             
             messageInputDom.value = '';
+        };
+
+        document.querySelector('#chat-image-submit').onclick = function(e) {
+            var messageInputDom = document.querySelector('#icon-hidden');
+            var image = messageInputDom.value;
+            var image = image.replace(/^.*(\\|\/|\:)/, '');
+            console.log(image)
+            chatSocket.send(JSON.stringify({
+                'image': image
+            }));
+            messageInputDom.value = '';
+            
         };
 </script>
 </body>

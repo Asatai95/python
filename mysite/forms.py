@@ -6,7 +6,7 @@ from django.contrib.auth.forms import (
 )
 
 from django.contrib.auth import get_user_model
-from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company, License
+from mysite.models import Article, RoomImage, Fab, ArticleCreate, ArticleLive, CompanyCreate, Company, License, Article_request
 from django.db import models
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
@@ -467,3 +467,58 @@ class ChatRoom(forms.ModelForm):
 
             field.widget.attrs['class'] = 'form-control'
 
+class ArticleRequest(forms.ModelForm):
+    """物件リクエスト"""
+
+    # user_id = forms.IntegerField()
+
+    address = forms.CharField(label='住所', max_length=255,
+            widget=forms.TextInput(
+            attrs={'placeholder':'例: 郵便番号なし'}))
+
+    comments = forms.CharField(
+        label="その他",
+        max_length=255,
+        widget=forms.Textarea(attrs={'placeholder':'任意'})
+    )
+
+    article_image = forms.FileField(
+           label='その他の画像',
+           widget=forms.ClearableFileInput(attrs={'multiple':True}),
+    )
+
+    map = forms.CharField(
+           label = 'マップ',
+           max_length=255,
+    )
+
+    class Meta:
+        model = Article_request
+        fields = ( "article_name",)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['comments'].required = False
+        for field in self.fields.values():
+            field.widget.attrs['class'] = 'form-control'
+
+    # def save(self, commit=True):
+
+    #     tmp_image_id = []
+    #     upload_files = self.files.getlist('article_image')
+    #     print(files)
+    #     self.instance.files = upload_files[0]
+    #     self.instance.others = []
+    #     other_files = upload_files[1:]
+    #     file_id = Article_request.objects.order_by('id').reverse()[0]
+    #     for file_image in other_files:
+    #         for x in file_id:
+    #             x.article_image = file_image
+    #         if commit:
+    #             x.save()
+    #     return super().save(commit)
+
+UploadModelFormSet = forms.modelformset_factory(
+    Article_request, form=ArticleRequest,
+    extra=5
+)

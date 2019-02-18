@@ -106,7 +106,21 @@ class ChatView(View):
                     for user in user_company:
                         company_info = Company.objects.order_by('id').filter(id=company_info_id, user_id=user.id, email=user.email )
                         print(company_info)
-                        return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 'company_info': company_info, 'info_side_bar': info_side_bar,
+                        return render(request, self.template_name, {'view': user_info, 'chat': chat_room, 'company_info': company_info,
                             'user_id': mark_safe(json.dumps(user_id)),
                             'article_id': mark_safe(json.dumps(article_id)) } )
-                                         
+
+
+    # def post(self, request, *args, **kwargs):
+
+    #     image = request.FILES["icon"]
+    #     print(image)
+    #     image = image.name
+    #     print(image)
+
+    #     image_table = Chat_room.objects.all()
+    #     for table_list in image_table:
+    #         table_list.img = image
+
+    #     table_list.save()
+    #     print(table_list)

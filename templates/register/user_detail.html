@@ -39,13 +39,18 @@
   </div>
   <div class='main_content'>
   {% if not user.is_staff %}
+   {% if user.is_mail %}
     {% for tmp in list %}
        {% for fab_list in fab %}
           {% if tmp.id == fab_list.article %}
           <div class="stream">
             <div class="content">
               <div class='preview'>
-                <img src="/media/{{tmp.image}}" alt="">
+                {% if 'http' not in tmp.image %}
+                  <img src="/media/{{tmp.image}}" alt="">
+                {% else %}
+                  <img src="{{tmp.image}}" alt="">
+                {% endif %}
               </div>
               <div class="stream-header">
                 <p>
@@ -82,6 +87,7 @@
           {% endif %}
        {% endfor %}
      {% endfor %}
+    {% endif %}
   {% else %}
    {% for live in tmp_article_live %}
      {% if live.vacancy_info == "0" %}
@@ -90,7 +96,11 @@
         <div class="stream">
           <div class="content">
             <div class='preview'>
-              <img src="/media/{{main.article_image}}" alt="">
+              {% if 'http' not in main.article_image %}
+                <img src="/media/{{main.article_image}}" alt="">
+              {% else %}
+                <img src="{{main.article_image}}" alt="">      
+              {% endif %}          
             </div>
             <div class="stream-header">
               <p>
@@ -111,6 +121,25 @@
                   </a>
 
                 </div>
+                <div>
+                  <li class="info_live_li">
+                    <span>空室情報送信</span>
+                    <a href="/send/mail/{{main.article_name}}/" class="send_info_mail">
+                      <span class="info_live_mail">
+                      <!-- <form action="/send/mail/{{main.article_name}}/" method="GET">
+                        <input type="button" name="send_info" class="send_info_mail">
+                      </form> -->
+                      </span>
+                    </a>
+    
+                    <div class="live_info_comment">
+                      <span class="user_mail_send">
+                        空室情報をユーザーに<br>送信しますか？
+                      </span>
+                    </div>
+
+                  </li>
+                </div>
               </div>
             </div>
             <!-- <div class='outline'>
@@ -128,18 +157,20 @@
            </div>
            <div class='customer_list'>
             <ul>
+             {% if user.is_mail %}
               {% for user_info in tmp_user %}
                {% if user_info.id != user.id %}
                 {% if message.article_id == main.id and message.user_id == user_info.id %}
+                <a href="{% url 'chatroom:index' user.username user_info.pk main.id %}">
                   <li class='cus_list '>
-                    <a href="{% url 'chatroom:index' user.username user_info.pk main.id %}">
-                      <span>{{user_info.username}}</span>
-                      <img src="{{user_info.image}}" alt="">
-                    </a>
+                    <span>{{user_info.username}}</span>
+                    <img src="{{user_info.image}}" alt="">
                   </li>
+                </a>
                 {% endif %}
                {% endif %}
               {% endfor %}
+             {% endif %}
             </ul>
           </div>
          </div>

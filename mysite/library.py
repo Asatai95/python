@@ -12,8 +12,14 @@ import urllib3
 from models.social import *
 from models.user_auth import *
 from django.db import models
-from mysite.models import Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate
+from mysite.models import User, Article, RoomImage, Fab, ArticleRoom, ArticleFloor, ArticleLive, ArticleCreate
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+
+from django.core.mail import EmailMessage
+from django.template.loader import get_template
+from django.views.decorators.http import require_POST
+
 
 import requests
 
@@ -213,3 +219,16 @@ def google_login_flow(code):
 
     return result
 
+# """
+# 物件リクエスト
+# メール
+# """
+
+# def article_mail(request):
+#     subject = "物件リクエスト"
+#     message = "{{ user.username }} さんより物件リクエスト情報\n\n物件名 : {{article_name}}\n物件所在地 : {{address}}\n{{ user.username }}よりコメント : {{comments}}\n地図情報 : {{map}}\n上記の情報が欲しいとの意思表示あり"
+#     from_email = EMAIL_HOST_USER
+#     to = [DEFAULT_FROM_EMAIL]
+#     email = EmailMessage(subject, message, from_email, to)
+#     email.attach()
+#     email.send()

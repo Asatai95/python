@@ -15,7 +15,7 @@ from . import views
 app_name = 'chat'
 
 urlpatterns = [
-    path('<slug:username>/<int:pk>/<int:article_id>/', login_required(views.ChatView.as_view()), name='index'),
+    path('<username>/<int:pk>/<int:article_id>/', login_required(views.ChatView.as_view()), name='index'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

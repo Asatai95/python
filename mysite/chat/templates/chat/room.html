@@ -9,7 +9,11 @@
                 {% for info in view %}
                 <div class='users_profile'>
                     <div>
-                        <img src="../../../../../media/{{info.company_image}}" alt="">
+                        {% if 'http' not in info.company_image %}
+                            <img src="../../../../../media/{{info.company_image}}" alt="">
+                        {% else %}
+                            <img src="{{info.company_image}}" alt="">
+                        {% endif %}
                     </div>
                     <div>
                         <ul>
@@ -61,7 +65,11 @@
                                           <div id="msg">
                                       
                                           {% for info in view %}
+                                            {% if 'http' not in info.company_image %}
                                               <img src="../../../../../media/{{info.company_image}}" alt="">
+                                            {% else %}
+                                                <img src="{{info.company_image}}" alt="">
+                                            {% endif %}
                                           {% endfor %}
                                             <ul>                                           
                                               <li class="chat_msg fk"> 
@@ -96,18 +104,21 @@
                                             </li>
                                         </ul>               
                                     </div>  
-                                {% endif %}
-                                <div id="msg" class="msg-right-sub">
-                                        <ul id="chat_test" class='msg-sub'>
+                                {% else %}
+                                    <div id="msg" class="msg-right">
+                                        <ul id="chat_test">
                                             <li id='ontime' class="chat_msg right now"> 
                                                 <textarea readonly id="chat-log" class="chat-log-right"></textarea>
                                             </li>
-                                        </ul>
-                                </div> 
-                            <div class="chat_room">
-                                <input type="text" id="chat-message-input" size="100" required/>
-                                <input id="chat-message-submit" type="button" value="Send"/>
-                            </div>
+                                        </ul>               
+                                    </div>
+                                {% endif %}
+                                <form onsubmit="return false;">
+                                    <div class="chat_room">
+                                        <input type="text" id="chat-message-input" size="100" required/>
+                                        <input id="chat-message-submit" type="button" onclick="submit();" value="Send" />
+                                    </div>
+                                </form>
                     </div>
             </div>
             {% else %}
@@ -157,22 +168,37 @@
                                                 <textarea readonly id="chat-log" class="chat-log-right"></textarea>
                                             </li>
                                         </ul>               
-                                    </div>  
-                                {% endif %}
-                                <div id="msg" class="msg-right-sub">
-                                        <ul id="chat_test" class='msg-sub'>
+                                    </div>
+                                {% else %}
+                                    <div id="msg" class="msg-right">
+                                        <ul id="chat_test">
                                             <li id='ontime' class="chat_msg right now"> 
                                                 <textarea readonly id="chat-log" class="chat-log-right"></textarea>
                                             </li>
-                                        </ul>
-                                </div> 
-                            <div class="chat_room">
-                                <input type="text" id="chat-message-input" size="100" required/>
-                                <input id="chat-message-submit" type="button" value="Send"/>
-                            </div>
+                                        </ul>               
+                                    </div>
+                                {% endif %}
+                                    <div class="chat_room">
+                                            <div class='add-image'>
+                                                <span>
+                                                    <label for="icon">
+                                                        <input type="file" name="icon" accept="image/png, image/jpeg, image/jpg" class="icon-hi" onchange="$('#icon-hidden').val($(this).val())" >
+                                                        <input type="hidden" id="icon-hidden" class="icon-hidden" value="">
+                                                    </label>
+                                                    <label for="icon-hi" class="icon-hi">
+                                                        <input type="button" id="chat-image-submit" >
+                                                    </label>
+                                                </span>
+                                            </div>
+                                            
+                                        <input type="text" id="chat-message-input" size="100" required/>
+                                        <input id="chat-message-submit" type="button" value="Send" />
+                                    </div>
+                                
                     </div>
             </div>
             {% endif %}
     </div>
 
 {% endblock %}
+

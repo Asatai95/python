@@ -520,3 +520,173 @@ ajax
                             object_list |= Article.objects.filter(
                                      Q(rent__startswith='7') | Q(rent__startswith='8')
                             )
+
+
+index.html
+
+-----------
+<div class='login_menu'>
+  <div class="back_login_botton">
+    <a href="#"><span class="css-cancel"></span></a>
+  </div> 
+  <div class='login_content'>
+    <form action="{% url 'register:login' %}" method="POST">
+      <div class="col-md-6 offset-md-3">
+          <div class="login_card">
+              <div class="card-body">
+                <div>
+                  <label for="title">Welcome</label>
+                </div>
+                  <input type="text" name="username" placeholder="Email" class="form-control" id="id_username" required="">
+                  <hr>
+                  <input type="password" name="password" placeholder="パスワード" class="form-control" id="id_password" required="">
+                  <hr>
+                  <button type="submit" class="btn btn-success btn-lg btn-block" >ログイン</button>
+                  {% csrf_token %}
+              </div>
+          </div>
+      </div>
+      <div classs='comment'>
+        <ul class='note'>
+          <li class='forget'><a href="{% url 'register:password_reset' %}">パスワードをお忘れの方</a></li>
+          <li class='new_account'>ユーザー登録がまだの方は<a href="{% url 'register:user_create'%}">こちら</a></li>
+        </ul>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+
+index.html
+
+-------
+
+ {% if tmp_list %}
+    {% for view_list in page_obj %}
+     {% for x in tmp_list %}
+      {% if x.id == view_list.id %}
+    
+        <div class="item box-big{{view_list.id}}">
+        {% if user.is_staff is False%}
+          {% for fab_selections in fab_selection_list %}
+            {% for fab_label in fab_selections %}
+              {%if fab_label.id == view_list.id %}
+              <div class='ribbon'>
+              <span class="ribbon12">★</span>
+              <div class='balloon1-top'>
+                <p>オススメ！</p>
+              </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+          {% for date in fab_article %}
+            {% if date.id == view_list.id %}
+            <div class="ribbon_area">
+              <span class="ribbon14">NEW</span>
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+          <div class='img_item'>
+            <div class="hide_text">
+              {% if user.is_staff %}
+              <p class='text article_name'>{{view_list.article_name}}</p>
+              {% else %}
+              <p class='text'>{{view_list.comments}}</p>
+              {% endif %}
+            </div>
+            <a href="{%url 'apps:info' view_list.id %}">
+              {% if 'http' not in view_list.article_image %}
+                <img src="/media/{{view_list.article_image}}" alt="">
+              {% else %}
+                <img src="{{view_list.article_image}}" alt="">
+              {% endif %}
+              </a>
+          </div>
+
+          <!-- ログイン後の表示画面 -->
+          {% if user.is_staff is False%}
+            <!-- ログイン前の表示 -->
+              {% for article_live in live_table %}
+                {% if article_live.article_id == view_list.id %}
+                  {% if article_live.vacancy_info == '0' %}
+                  <div class='empty_flag'>
+                    <span>空室あり</span>
+                  </div>
+                  {% else %}
+                  <div class='empty_flag'>
+                    <span>空室なし<br/>{{article_live.vacancy_live}}</span>
+                  </div>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+           {% if user.is_authenticated %}
+            {% if not fab_not_view %}
+            <form id="fab_id" action="{% url 'apps:get_ajax' %}" method="POST">
+              {% csrf_token %}
+              <div class="heart">
+                <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                <input id="heart" class='fab_bt' type="submit" value="" />
+              </div>
+            </form>
+            {% endif %}
+            {% for view in fab_view %}
+              {% if view.article_id == view_list.id %}
+                {% if view.user_id == user.id %}
+                  {% if view.flag == 1 %}
+                  <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST" >
+                    {% csrf_token %}
+                    <div class="heart">
+                      <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                      <input id="commit" class='fab_bt' type="submit" value="" />
+                    </div>
+                  </form>
+                  {% elif view.flag == 0 %}
+                  <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                    {% csrf_token %}
+                    <div class="heart">
+                      <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                      <input id="heart" class='fab_bt' type="submit" value="" />
+                    </div>
+                  </form>
+                  {% else %}
+                  <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+                    {% csrf_token %}
+                    <div class="heart">
+                      <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                      <input id="heart" class='fab_bt' type="submit" value="" />
+                    </div>
+                  </form>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+            <form id='fab_id' action="{% url 'apps:get_ajax'%}" method="POST">
+              {% csrf_token %}
+              <div class="dark">
+                <input id="heart" name='fab' type="hidden" value="{{view_list.id}}" />
+                <input id="heart" class='fab_bt' type="submit" value="" />
+              </div>
+            </form>
+            {% else %}
+            <div class="heart">
+              <input id='heart_hidden' class='fab_bt heart' type="submit" value="" />
+            </div>
+            {% endif %}
+          {%else%}
+          <div class='update'>
+            <button type="button" name="button"><a href="{%url 'apps:update' view_list.id %}">物件編集</a></button>
+          </div>
+          {% endif %}
+        </div>
+        
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+    
+    
+  {% endfor %}
+  {% else %}
