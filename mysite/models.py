@@ -374,7 +374,7 @@ class Test(models.Model):
         db_table = 'test'
 
 class Plan(models.Model):
-
+    """課金ページ(Stripe)"""
     id = models.AutoField(primary_key=True)
     stripe_plan_id = models.CharField(u'stripe_plan_id', max_length=255)
     product_name = models.CharField(u'サービス名', max_length=255)
@@ -388,7 +388,7 @@ class Plan(models.Model):
         db_table = "plans"
 
 class Article_request(models.Model):
-
+    """物件リクエスト"""
     id = models.AutoField(primary_key=True)
     user_id = models.IntegerField(u'user_id')
     article_image = models.CharField(u"建物イメージ画像", max_length=255)

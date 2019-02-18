@@ -139,19 +139,29 @@ def error_500(request):
 
 
 """
+不適切な入力、トップページにリダイレクト
+"""
+
+def Redirect(request, location=None):
+
+    return redirect('apps:top')
+
+
+"""
 ログインしていない場合、Loginページ
 """
 class MyView(LoginRequiredMixin, TemplateView):
     login_url = '/login/'
 
 """
-業者、ユーザー識別
+仮)業者、ユーザー識別
+
 """
 def user_check(user):
     return user.is_staff
 
 """
-ログイン機能（ユーザー）
+ログイン機能(ユーザー、業者)
 """
 class Login(LoginView):
 
@@ -159,7 +169,7 @@ class Login(LoginView):
     template_name = 'register/login.html'
 
 """
-ログアウト機能
+ログアウト機能(ユーザー、業者)
 """
 
 class Logout(LogoutView):
@@ -170,9 +180,8 @@ class Logout(LogoutView):
 
 
 """
-ユーザー登録
+ユーザー登録(ユーザー、業者)
 """
-
 class UserCreate(generic.CreateView):
     """ユーザー仮登録"""
     template_name = 'register/user_create.html'
@@ -257,7 +266,7 @@ class PasswordChangeDone(PasswordChangeDoneView):
     template_name = 'register/password_change_done.html'
 
 """
-パスワード再設定
+パスワード再設定(ユーザー、業者)
 """
 class PasswordReset(PasswordResetView):
     """パスワード変更用URLの送付ページ"""
@@ -286,7 +295,7 @@ class PasswordResetComplete(PasswordResetCompleteView):
     template_name = 'register/password_reset_complete.html'
 
 """
-個人のみ、閲覧可能（バリデーション）
+個人のみ、閲覧可能（バリデーション）(ユーザー、業者)
 """
 class PermissionsMypage(UserPassesTestMixin):
 
@@ -298,7 +307,7 @@ class PermissionsMypage(UserPassesTestMixin):
         return user.pk == self.kwargs['pk'] or user.is_superuser
 
 """
-マイページ
+マイページ(ユーザー、業者)
 """
 class UserDetail(PermissionsMypage, generic.DetailView):
     model = Get_user
@@ -357,7 +366,7 @@ class UserDetail(PermissionsMypage, generic.DetailView):
             return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, 'message': message, })
 
 """
-マイページ更新
+マイページ更新(ユーザー、業者)
 """
 class UserUpdate(PermissionsMypage, generic.UpdateView):
     model = Get_user
@@ -409,17 +418,93 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
 
             return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
 
-"""
-不適切な入力、トップページにリダイレクト
-"""
-
-def Redirect(request, location=None):
-
-    return redirect('apps:top')
-
 
 """
-個人のおすすめ項目
+メール受信OK, お気に入りに登録しているユーザー
+一括メールの送信(業者)
+"""
+
+class Send_email(View):
+
+    template_name = "company/send_email_list.html"
+
+    def get(self, request, *args, **kwargs):
+
+        if not request.user.is_staff:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk) 
+        
+        tmp_user = []
+        article_name = request.path.split('/').pop(3)
+        article = Article.objects.filter(article_name=article_name)
+        if not article:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+        for x in article:
+            fab = Fab.objects.filter(article_id=x.id, message_flag=1, message_send_flag=0)
+            if not fab:
+                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+            for x in fab:
+                user = Get_user.objects.filter(id=x.user_id)
+                tmp_user.append(user)
+
+                if not user:
+                    return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+
+        return render(request, self.template_name, {"users":tmp_user})
+
+    def post(self, request, *args, **kwargs):
+
+        user_id = request.POST.getlist("hidden_user_id")
+       
+        if user_id == []:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+
+        tmp_article = []
+        article_name = request.path.split('/').pop(3)
+        article = Article.objects.filter(article_name=article_name).values("id")
+
+        tmp_mail = []
+        for x in user_id:
+            user = Get_user.objects.filter(id=x)
+            if not user :
+                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+            tmp_mail.append(user)
+
+        current_site = get_current_site(self.request)
+        domain = current_site.domain
+        for x in tmp_mail:
+            for user in x:
+                for x_id in article:
+                    context = {
+                        'protocol': self.request.scheme,
+                        'domain': domain,
+                        'token': dumps(user.pk),
+                        'user': user,
+                        'article_id': x_id["id"]
+                    }
+
+                    fab_mail_flag = Fab.objects.filter(article_id=x_id["id"], user_id=user.id, message_flag=1)
+                    for mail_flag in fab_mail_flag:
+                        mail_flag.message_send_flag = 1
+                        mail_flag.save()
+
+            subject = 'テスト'
+
+            message_template = get_template('register/mail_template/article_info/message.txt')
+            message = message_template.render(context)
+
+            user.email_user(subject, message)
+            
+        message_info = "確かにメールを送信しました！"
+        username = request.user.username
+        user_pk = request.user.pk
+
+        url = "http://localhost:8000/user_detail/"+str(username)+"/"+str(user_pk)+"/ "
+
+        return render(request, "company/message_info.html", {"message_info":message_info, "url":url})
+
+
+"""
+個人のおすすめ項目(ユーザー)
 """
 class LoginAfter(generic.ListView):
 
@@ -488,7 +573,7 @@ class TopSearch(generic.ListView):
         return render(request, self.template_name)
 
 """
-TOPページ, 検索機能
+TOPページ, 検索機能(ユーザー、業者) 
 """
 class MainView(PaginationMixin, generic.ListView):
     model = Article
@@ -863,7 +948,7 @@ class MainView(PaginationMixin, generic.ListView):
                 return False
         
 """
-詳細情報
+詳細情報(ユーザー、業者)
 """
 class InfoView(generic.ListView):
     model = Article
@@ -897,573 +982,10 @@ class InfoView(generic.ListView):
         object_list = self.model.objects.filter(id=get)
 
         return object_list
-"""
-業者登録
-"""
-
-class CompanyView(generic.CreateView):
-    model = CompanyCreate
-    form_class = CreateCompany
-    template_name = "company/company.html"
-    success_url = reverse_lazy("apps:create")
-
-    def get(self, request, *args, **kwargs):
-
-        if not request.user.is_staff:
-            return redirect("apps:top")
-
-        if CompanyCreate.objects.filter(user_id=request.user.id, is_company=1):
-            return redirect("apps:create")
-
-        tmp_count = []
-        company_info = Company.objects.filter(user_id=self.request.user.id)
-        for info in company_info:
-            article_info = Article.objects.filter(company_id=info.id)
-            for info in article_info:
-                tmp_count.append(info.article_name)
-                count_article = len(tmp_count)
-                if int(count_article) > 9:
-                    count_over = False
-                else:
-                    count_over = True
-
-        form = self.form_class()
-        return render(request, self.template_name, {'form':form, 'count_over': count_over})
-
-    def form_valid(self, form):
-
-        company = form.save(commit=False)
-
-        """
-        画像サイズ制限
-        """
-        img_file_size = self.request.FILES['company_image']
-        if img_file_size.size > MAX_MEMORY_SIZE:
-            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-
-        address_number = self.request.POST.get("address_number")
-        address = self.request.POST.get("address")
-        address_city = self.request.POST.get("address_city")
-        address_others = self.request.POST.get("address_others")
-        user_table = Get_user.objects.filter(id=int(self.request.user.id))
-        for user_is_company in user_table:
-            user_is_company.is_company = 1
-        img_file = self.request.FILES['company_image'].name
-        img_filename = Image.open(self.request.FILES['company_image'])
-        img_filename.save(os.path.join('./static/img/', img_file))
-
-        if company:
-            company.is_company = 1
-            company.user_id = int(self.request.user.id)
-            company.update_count = self.request.POST.get("update_count")
-            company.address_number = address_number
-            company.address = address + ' ' + address_city + ' ' + address_others
-            company.license = self.request.POST.get("license")
-        company.save()
-        user_is_company.save()
-        if form:
-            return super(CompanyView, self).form_valid(form)
-        else:
-            return redirect("apps:company")
 
 """
-業者編集
+Stripe, 課金ページ(業者)
 """
-class CompanyChange(generic.UpdateView):
-    model = Company
-    form_class = CompanyUpdateForm
-    template_name = 'company/company_update.html'
-    success_url = reverse_lazy('apps:user_detail')
-
-    def get(self, request, *args, **kwargs):
-        user = request.user.id
-        tmp_count = []
-        company_info = Company.objects.filter(user_id=self.request.user.id)
-        for info in company_info:
-            article_info = Article.objects.filter(company_id=info.id)
-            for info in article_info:
-                tmp_count.append(info.article_name)
-                count_article = len(tmp_count)
-                if int(count_article) > 9:
-                    count_over = False
-                else:
-                    count_over = True
-
-        company = Company.objects.filter(user_id=user)
-        if not request.user.is_staff:
-            return redirect('apps:top')
-        return render(request, self.template_name, {'company': company, 'count_over': count_over})
-
-    def post(self, request, *args, **kwargs):
-
-        company = Company.objects.filter(user_id=request.user.id)
-        company_name = request.POST.get("company_name")
-        address_number = request.POST.get("address_number")
-        print(address_number)
-        address = request.POST.get("address")
-
-        email = request.POST.get('email')
-        email_pattern = r"[^@]+@[^@]+\.[^@]+"
-        email_match = re.match(email_pattern, email)
-
-        license_year = request.POST.get("license_year")
-        if license_year == '':
-            for license in company:
-                license_year = license.update_count
-
-        tel = request.POST.get("tel_number")
-        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
-        tel_number = re.match(pattern, tel)
-
-        license_number = request.POST.get("license")
-        license = license_number.replace("第", "").replace("号", "")
-        check = re.match(r'^[0-9]+$', license)
-
-        if check is None or tel_number is None or email_match is None:
-            context = {
-                 'error_tel': '正しい番号を入力してください',
-                 'error_license': '数字は半角英数字で入力してください',
-                 "error_email": "正しいEmailを入力してください",
-                 'company': company
-            }
-            return render(request, self.template_name, context)
-
-        url = request.POST.get("web")
-        if 'http://' not in url :
-            if 'https://' not in url:
-                context = {
-                     'error_url': '正しいURLを入力してください',
-                     'company': company
-                }
-                return render(request, self.template_name, context)
-            else:
-                pass
-        else:
-            pass
-        """
-        画像サイズ制限
-        """
-        img_file_size = self.request.FILES['company_image']
-        if img_file_size.size > MAX_MEMORY_SIZE:
-            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-
-        company_table = Company.objects.filter(user_id=request.user.id)
-        try:
-            upload_file = request.FILES.get('company_image')
-            img_filename = Image.open(upload_file)
-            img_filename.save(os.path.join('./media/', upload_file.name))
-        except:
-            upload_file = request.POST.get("company_image_hidden")
-
-        for company_info in company_table:
-            company_info.company_name= company_name
-            company_info.address_number = address_number
-            company_info.address = address
-            company_info.update_count = license_year
-            company_info.license = license_number
-            company_info.email = email
-            company_info.web = url
-            company_info.tel_number = tel
-            try:
-                company_info.company_image = upload_file.name
-            except:
-                company_info.company_image = upload_file
-
-        company_info.save()
-
-        return redirect('apps:top')
-
-"""
-物件登録
-"""
-class ArticleEdit(generic.CreateView):
-    model = ArticleCreate
-    form_class= Createform
-    template_name = 'company/create_form.html'
-    success_url = reverse_lazy('apps:top')
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            return redirect('apps:top')
-
-        tmp_count = []
-        company_info = Company.objects.filter(user_id=self.request.user.id)
-        for info in company_info:
-            article_info = Article.objects.filter(company_id=info.id)
-            for info in article_info:
-                tmp_count.append(info.article_name)
-                count_article = len(tmp_count)
-                if int(count_article) > 9:
-                    count_over = False
-                else:
-                    count_over = True
-
-        form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'count_over': count_over})
-
-    def form_valid(self, form):
-
-        """
-        画像サイズ制限
-        """
-        upload_files = self.request.FILES.getlist("files")
-        for img_file_size in upload_files:
-            if img_file_size.size > MAX_MEMORY_SIZE:    
-                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-        
-        tmp_list = []
-        company_id = Company.objects.filter(user_id=self.request.user.id)
-        live_id = ArticleLive.objects.order_by('id').reverse()[0]
-        user = self.request.user.id
-        main_file = form.save(commit=False)
-        vacant = self.request.POST["live_flag"]
-        info = self.request.POST["info"]
-        if info == '':
-            info = '貸出可'
-        start_date = self.request.POST["start_date"]
-        if start_date is None:
-            if start_date != "":
-                start_date = '選択なし'
-        update_date = self.request.POST["update_date"]
-        if update_date is None:
-            if update_date != "":
-                update_date = "選択なし"
-        cancel_date = self.request.POST["cancel_date"]
-        if cancel_date is None:
-            if cancel_date != "":
-                cancel_date = "選択なし"
-
-        file_id = Article.objects.order_by('id').reverse()[0]
-        count = file_id.id + 1
-        vacant_info = ArticleLive.objects.create(article_id=count, vacancy_info=vacant, vacancy_live=info,
-                                                 start_date=start_date, update_date=update_date, cancel_date=cancel_date)
-        address_town = self.request.POST["address"]
-        address_city = self.request.POST["address_city"]
-        address_others = self.request.POST["address_others"]
-        for company in company_id:
-            main_file.company_id = company.id
-        main_file.address_number = self.request.POST["address_number"]
-        main_file.address = address_town + ' ' + address_city + ' ' + address_others
-        main_file.rent = self.request.POST["rent"]
-        main_file.park = self.request.POST["park"]
-        main_file.floor_plan = self.request.POST["floor_plan"]
-        main_file.floor_number = self.request.POST["floor_number"]
-        main_file.initial_cost = self.request.POST["initial_cost"]
-        main_file.common_service_expense = self.request.POST["common_service_expense"]
-        main_file.term_of_contract = self.request.POST["term_of_contract"]
-        main_file.column = self.request.POST["column"]
-        main_file.live_flag_id = vacant_info.id
-        main_file.customer = self.request.user.id
-
-        for other_file in main_file.others:
-            tmp_list.append(other_file.id)
-            other_file.save()
-        main_file.room_images_id = tmp_list
-        main_file.save()
-        vacant_info.save()
-
-        return super(ArticleEdit, self).form_valid(form)
-
-"""
-物件編集
-"""
-class ArticleUpdate(generic.UpdateView):
-    model =Article
-    form_class = ArticleUpdateForm
-    template_name = 'company/update_form.html'
-    success_url = reverse_lazy('apps:top')
-
-    def get_context_data(self, **kwargs):
-        context = super(ArticleUpdate, self).get_context_data(**kwargs)
-
-        get = self.request.path.replace('/roomii/update/', '')
-        list_view = Article.objects.order_by('id').filter(id=get)
-        live_list = ArticleLive.objects.order_by('id').filter(article_id=get)
-
-        tmp_count = []
-        company_info = Company.objects.filter(user_id=self.request.user.id)
-        for info in company_info:
-            article_info = Article.objects.filter(company_id=info.id)
-            for info in article_info:
-                tmp_count.append(info.article_name)
-                count_article = len(tmp_count)
-                if int(count_article) > 9:
-                    count_over = False
-                else:
-                    count_over = True
-
-        return super(ArticleUpdate, self).get_context_data(
-                live_list=live_list, list_view=list_view, count_over=count_over, **kwargs
-            )
-
-    def render_to_response(self, context, **response_kwargs):
-       if not self.request.user.is_staff:
-           return redirect("apps:top")
-       get = self.request.path.replace('/roomii/update/', '')
-       article_check = Article.objects.order_by('id').filter(id=get, customer=self.request.user.id)
-       if article_check:
-           return super(ArticleUpdate, self).render_to_response(
-               context, **response_kwargs
-           )
-       else:
-           return redirect('apps:top')
-
-    def post(self, request, **kwargs):
-
-        get_id = self.request.path.replace('/roomii/update/', '')
-        article = self.model.objects.filter(id=get_id)
-        tmp_list = []
-
-        vacant = self.request.POST["live_flag"]
-        info = self.request.POST["info"]
-        if info == '':
-            info = '貸出可'
-        start_date = self.request.POST["start_date"]
-        if start_date is None:
-            if start_date != "":
-                if info != "":
-                    start_date = '選択なし'
-                else:
-                    start_date = '選択なし'
-        update_date = self.request.POST["update_date"]
-        if update_date is None:
-            if update_date != "":
-                if info != "":
-                    update_date = "選択なし"
-                else:
-                    update_date = "選択なし"
-
-        cancel_date = self.request.POST["cancel_date"]
-        if cancel_date is None:
-            if cancel_date != "":
-                if info != "":
-                    cancel_date = "選択なし"
-                else:
-                    cancel_date = "選択なし"
-
-        vacant_info_table = ArticleLive.objects.filter(article_id=get_id)
-        for vacant_info in vacant_info_table:
-            vacant_info.vacancy_info = vacant
-            vacant_info.vacancy_live = info
-            vacant_info.start_date = start_date
-            vacant_info.update_date = update_date
-            vacant_info.cancel_date = cancel_date
-
-        main_table = Article.objects.filter(id=get_id)
-
-        try:
-            upload_file = self.request.FILES.get('article_image')
-            img_filename = Image.open(upload_file)
-            img_filename.save(os.path.join('./media/', upload_file.name))
-        except:
-            upload_file = self.request.POST.get("article_image_hidden")
-
-        for main in main_table:
-            try:
-                main.article_image = upload_file.name
-            except:
-                main.article_image = upload_file
-            main.article_name = self.request.POST["article_name"]
-            main.comments = self.request.POST["comments"]
-            main.address_number = self.request.POST["address_number"]
-            main.address = self.request.POST["address"]
-            main.rent = self.request.POST["rent"]
-            try:
-                main.park = self.request.POST["park"]
-            except:
-                for article_park in article:
-                    main.park = article_park.park
-            try:
-                main.floor_plan = self.request.POST["floor_plan"]
-            except:
-                for article_floor_plan in article:
-                    main.floor_plan = article_floor_plan.floor_plan
-            try:
-                main.floor_number = self.request.POST["floor_number"]
-            except:
-                for article_floor_number in article:
-                    main.floor_number = article_floor_number.floor_number
-            main.initial_cost = self.request.POST["initial_cost"]
-            main.common_service_expense = self.request.POST["common_service_expense"]
-            main.term_of_contract = self.request.POST["term_of_contract"]
-            main.column = self.request.POST["column"]
-            main.live_flag_id = vacant_info.id
-            main.customer = self.request.user.id
-        
-        """
-        画像サイズ制限
-        """
-        upload_files = self.request.FILES.getlist('files')
-        for img_file_size in upload_files:
-            if img_file_size.size > MAX_MEMORY_SIZE:
-                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-                
-        other_files = []
-        try:
-            for files in upload_files:
-                img_filename = Image.open(files)
-                img_filename.save(os.path.join('./media/', files.name))
-                other_files.append(files.name)
-
-            tmp_room_images_id = []
-            for file_image in other_files:
-                RoomImage(article_id=self.request.path.replace('/roomii/update/', ''), image=file_image).save()
-                tmp_room_images_id.append(RoomImage.id)
-            main.room_images_id = str(tmp_room_id)
-
-            """
-            画像ファイル制限
-            """
-            img_file_size = self.request.FILES['article_image']
-            if img_file_size.size > MAX_MEMORY_SIZE:
-                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
-
-            img_file = self.request.FILES['article_image'].name
-            img_filename = Image.open(self.request.FILES['article_image'])
-            img_filename.save(os.path.join('./media/', img_file))
-        except:
-            main.room_images_id = self.request.POST.get("files_hidden")
-
-        main.save()
-        vacant_info.save()
-
-        return redirect('apps:top')
-
-"""
-Googleログイン
-"""
-
-class RedirectGoogle(View):
-
-    def get(self, request, *args, **kwargs):
-        SCOPE = [
-                "https://www.googleapis.com/auth/userinfo.profile",
-                "https://www.googleapis.com/auth/userinfo.email"
-        ]
-
-
-        flow = flow_from_clientsecrets(
-           './client_id.json',
-           scope=SCOPE,
-           redirect_uri= "http://localhost:8000/auth/complete/google-oauth2/")
-
-        auth_uri = flow.step1_get_authorize_url()
-
-        return redirect(auth_uri)
-
-class Accesstoken(View):
-
-    def get(self, request, **kwargs):
-
-        if request.GET.get('code'):
-            data = google_login_flow(request.GET.get('code'))
-            if data['id']:
-                check = check_socials(data['id'], 'google')
-                if check is not False:
-                    social = session.query(UserAuth).join(
-                             Social, UserAuth.id == Social.user_id).filter(
-                             Social.provider == 'google',
-                             Social.provider_id == data['id']).first()
-                    if social:
-                        check_user = Get_user.objects.filter(username=social.username, password=social.password)
-                        for user in check_user:
-                            if social.is_active:
-                                login(self.request, user)
-                                return redirect("apps:login_after")
-                            else:
-                                return redirect("apps:login")
-                    else:
-                        return redirect("apps:login")
-
-                else:
-                    user = create_socials_user(data)
-                    create_socials(user.id, data, 'google')
-
-                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
-                    for user in check_user:
-                        if user.is_active:
-                            login(self.request, user)
-                            return redirect("apps:login_after")
-                        else:
-                            return redirect("apps:login")
-            else:
-                return redirect('apps:login')
-        else:
-            return redirect('apps:login')
-
-"""
-Facebook, ログイン認証
-"""
-class RedirectFacebook(View):
-
-    def get(self, request, **kwargs):
-
-        url = 'http://www.facebook.com/v3.2/dialog/oauth'
-        params = {
-            'response_type': 'code',
-            'redirect_uri': FACEBOOK_CALLBACK_URL,
-            'client_id': SOCIAL_AUTH_FACEBOOK_KEY,
-        }
-
-        redirect_url = requests.get(url, params=params).url
-
-        return redirect(redirect_url)
-
-class CallbackFacebook(View):
-
-    def get(self, request, **kwargs):
-
-        if request.GET.get('code'):
-            access_token = get_facebook_access_token(request.GET.get('code'))
-            data = check_facebook_access_token(access_token)
-            if data['is_valid']:
-                data = get_facebook_user_info(access_token, data['user_id'])
-
-                social = check_socials(data, 'facebook')
-                if social is not False:
-                    check_user = Get_user.objects.filter(id=social.user_id)
-                    if check_user:
-                        for user in check_user:
-                            if user.is_active:
-                                login(self.request, user)
-                                return redirect("apps:login_after")
-                            else:
-                                return redirect("apps:login")
-                    else:
-                        return redirect("apps:login")
-                else:
-                    user = create_facebook_user(data)
-                    social = create_socials(user, data, 'facebook')
-                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
-                    for user in check_user:
-                        if user.is_active:
-                            login(request, user)
-                            return redirect("apps:login_after")
-                        else:
-                            return redirect("apps:login")
-            else:
-                return redirect('apps:login')
-
-
-class image(View):
-
-    model = test_image
-    template_name = 'apps/test_image.html'
-
-    def upload(file, **options):
-        table = self.model.objects.all()
-        for table_list in table:
-            cloudinary.uploader.upload(table_list.image)
-
-    def get(self, request, *args, **kwargs):
-
-        table = self.model.objects.all()
-        for table_list in table:
-            context = {
-                 'test': table_list
-            }
-        return render(request, self.template_name, context)
-
 class Stripe(View):
 
     model = Company
@@ -1643,123 +1165,186 @@ class Charge(View):
                     'message': "確かにプランを変更しました",
             })
 
-class Insert(View):
-
-    model = RoomImage
-    template_name = "apps/test.html"
-
-    def get(self, request, *args, **kwargs):
-
-        tmp_list = []
-        for x in self.model.objects.filter(id=327):
-            test_list = x.image.replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",")
-            tmp_list.append(test_list)
-            for test in tmp_list:
-                print(test)
-                print(type(test))
-                for x in test :
-                    print(x)
-
-        # image_table = self.model.objects.filter(id=326).first()
-        # print(image_table)
-        # test = image_table.image.name.replace("[", "").replace("]", "")
-        # image_table.image = test
-        # image_table.save()
-
-
-        # for x in range(328, 352):
-        #     image_ta = self.model.objects.filter(id=x).first()
-        #     test = image_ta.image.name.replace("http", "['http").replace(",", "',")
-        #     image_ta.image = test
-        #     image_ta.save()
-            
-        return render(request, self.template_name)
-
-
-
 """
-メール受信OK, お気に入りに登録しているユーザー
-メールの送信
+業者登録(業者)
 """
 
-class Send_email(View):
-
-    template_name = "company/send_email_list.html"
+class CompanyView(generic.CreateView):
+    model = CompanyCreate
+    form_class = CreateCompany
+    template_name = "company/company.html"
+    success_url = reverse_lazy("apps:create")
 
     def get(self, request, *args, **kwargs):
 
         if not request.user.is_staff:
-            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk) 
-        
-        tmp_user = []
-        article_name = request.path.split('/').pop(3)
-        article = Article.objects.filter(article_name=article_name)
-        if not article:
-            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
-        for x in article:
-            fab = Fab.objects.filter(article_id=x.id, message_flag=1, message_send_flag=0)
-            if not fab:
-                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
-            for x in fab:
-                user = Get_user.objects.filter(id=x.user_id, is_mail=1)
-                tmp_user.append(user)
+            return redirect("apps:top")
 
-                if not user:
-                    return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+        if CompanyCreate.objects.filter(user_id=request.user.id, is_company=1):
+            return redirect("apps:create")
 
-        return render(request, self.template_name, {"users":tmp_user})
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
+        form = self.form_class()
+        return render(request, self.template_name, {'form':form, 'count_over': count_over})
+
+    def form_valid(self, form):
+
+        company = form.save(commit=False)
+
+        """
+        画像サイズ制限
+        """
+        img_file_size = self.request.FILES['company_image']
+        if img_file_size.size > MAX_MEMORY_SIZE:
+            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+
+        address_number = self.request.POST.get("address_number")
+        address = self.request.POST.get("address")
+        address_city = self.request.POST.get("address_city")
+        address_others = self.request.POST.get("address_others")
+        user_table = Get_user.objects.filter(id=int(self.request.user.id))
+        for user_is_company in user_table:
+            user_is_company.is_company = 1
+        img_file = self.request.FILES['company_image'].name
+        img_filename = Image.open(self.request.FILES['company_image'])
+        img_filename.save(os.path.join('./static/img/', img_file))
+
+        if company:
+            company.is_company = 1
+            company.user_id = int(self.request.user.id)
+            company.update_count = self.request.POST.get("update_count")
+            company.address_number = address_number
+            company.address = address + ' ' + address_city + ' ' + address_others
+            company.license = self.request.POST.get("license")
+        company.save()
+        user_is_company.save()
+        if form:
+            return super(CompanyView, self).form_valid(form)
+        else:
+            return redirect("apps:company")
+
+"""
+業者編集(業者)
+"""
+class CompanyChange(generic.UpdateView):
+    model = Company
+    form_class = CompanyUpdateForm
+    template_name = 'company/company_update.html'
+    success_url = reverse_lazy('apps:user_detail')
+
+    def get(self, request, *args, **kwargs):
+        user = request.user.id
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
+        company = Company.objects.filter(user_id=user)
+        if not request.user.is_staff:
+            return redirect('apps:top')
+        return render(request, self.template_name, {'company': company, 'count_over': count_over})
 
     def post(self, request, *args, **kwargs):
 
-        user_id = request.POST.getlist("hidden_user_id")
-       
-        if user_id == []:
-            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+        company = Company.objects.filter(user_id=request.user.id)
+        company_name = request.POST.get("company_name")
+        address_number = request.POST.get("address_number")
+        print(address_number)
+        address = request.POST.get("address")
 
-        tmp_article = []
-        article_name = request.path.split('/').pop(3)
-        article = Article.objects.filter(article_name=article_name).values("id")
+        email = request.POST.get('email')
+        email_pattern = r"[^@]+@[^@]+\.[^@]+"
+        email_match = re.match(email_pattern, email)
 
-        tmp_mail = []
-        for x in user_id:
-            user = Get_user.objects.filter(id=x)
-            if not user :
-                return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
-            tmp_mail.append(user)
+        license_year = request.POST.get("license_year")
+        if license_year == '':
+            for license in company:
+                license_year = license.update_count
 
-        current_site = get_current_site(self.request)
-        domain = current_site.domain
-        for x in tmp_mail:
-            for user in x:
-                for x_id in article:
-                    context = {
-                        'protocol': self.request.scheme,
-                        'domain': domain,
-                        'token': dumps(user.pk),
-                        'user': user,
-                        'article_id': x_id["id"]
-                    }
+        tel = request.POST.get("tel_number")
+        pattern = r"[\(]{0,1}[0-9]{2,4}[\)\-\(]{0,1}[0-9]{2,4}[\)\-]{0,1}[0-9]{3,4}"
+        tel_number = re.match(pattern, tel)
 
-                    fab_mail_flag = Fab.objects.filter(article_id=x_id["id"], user_id=user.id, message_flag=1)
-                    for mail_flag in fab_mail_flag:
-                        mail_flag.message_send_flag = 1
-                        mail_flag.save()
+        license_number = request.POST.get("license")
+        license = license_number.replace("第", "").replace("号", "")
+        check = re.match(r'^[0-9]+$', license)
 
-            subject = 'テスト'
+        if check is None or tel_number is None or email_match is None:
+            context = {
+                 'error_tel': '正しい番号を入力してください',
+                 'error_license': '数字は半角英数字で入力してください',
+                 "error_email": "正しいEmailを入力してください",
+                 'company': company
+            }
+            return render(request, self.template_name, context)
 
-            message_template = get_template('register/mail_template/article_info/message.txt')
-            message = message_template.render(context)
+        url = request.POST.get("web")
+        if 'http://' not in url :
+            if 'https://' not in url:
+                context = {
+                     'error_url': '正しいURLを入力してください',
+                     'company': company
+                }
+                return render(request, self.template_name, context)
+            else:
+                pass
+        else:
+            pass
+        """
+        画像サイズ制限
+        """
+        img_file_size = self.request.FILES['company_image']
+        if img_file_size.size > MAX_MEMORY_SIZE:
+            return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
 
-            user.email_user(subject, message)
-            
-        message_info = "確かにメールを送信しました！"
-        username = request.user.username
-        user_pk = request.user.pk
+        company_table = Company.objects.filter(user_id=request.user.id)
+        try:
+            upload_file = request.FILES.get('company_image')
+            img_filename = Image.open(upload_file)
+            img_filename.save(os.path.join('./media/', upload_file.name))
+        except:
+            upload_file = request.POST.get("company_image_hidden")
 
-        url = "http://localhost:8000/user_detail/"+str(username)+"/"+str(user_pk)+"/ "
+        for company_info in company_table:
+            company_info.company_name= company_name
+            company_info.address_number = address_number
+            company_info.address = address
+            company_info.update_count = license_year
+            company_info.license = license_number
+            company_info.email = email
+            company_info.web = url
+            company_info.tel_number = tel
+            try:
+                company_info.company_image = upload_file.name
+            except:
+                company_info.company_image = upload_file
 
-        return render(request, "company/message_info.html", {"message_info":message_info, "url":url})
+        company_info.save()
 
+        return redirect('apps:top')
+
+
+"""
+物件リクエスト(ユーザー)
+"""
 class Article_request(CreateView):
 
     model = Article_request
@@ -1808,27 +1393,435 @@ class Article_request(CreateView):
 
         return super(Article_request, self).form_valid(form)
 
-# class Message_test(View):
-
-#     template_name = "company/message_info.html"
-
-#     def get(self, request, *args, **kwargs):
-
-#         message_info = "test"
-
-#         return render(request, self.template_name , {"message_info":message_info})
 
 
-# class Message_get_info(View):
+"""
+物件登録(業者)
+"""
+class ArticleEdit(generic.CreateView):
+    model = ArticleCreate
+    form_class= Createform
+    template_name = 'company/create_form.html'
+    success_url = reverse_lazy('apps:top')
 
-#     template_name = "company/message_info.html"
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return redirect('apps:top')
 
-#     def get(self, request, *args, **kwargs):
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
 
-#         message_info = "確かにメッセージを送信しました！"
-#         username = request.user.username
-#         user_pk = request.user.pk
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form, 'count_over': count_over})
 
-#         url = "http://localhost:8000/"+username+"/"+user_pk+"/ "
+    def form_valid(self, form):
 
-#         return render(request, self.template_name, {"message_info":message_info, "url":url)
+        """
+        画像サイズ制限
+        """
+        upload_files = self.request.FILES.getlist("files")
+        for img_file_size in upload_files:
+            if img_file_size.size > MAX_MEMORY_SIZE:    
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+        
+        tmp_list = []
+        company_id = Company.objects.filter(user_id=self.request.user.id)
+        live_id = ArticleLive.objects.order_by('id').reverse()[0]
+        user = self.request.user.id
+        main_file = form.save(commit=False)
+        vacant = self.request.POST["live_flag"]
+        info = self.request.POST["info"]
+        if info == '':
+            info = '貸出可'
+        start_date = self.request.POST["start_date"]
+        if start_date is None:
+            if start_date != "":
+                start_date = '選択なし'
+        update_date = self.request.POST["update_date"]
+        if update_date is None:
+            if update_date != "":
+                update_date = "選択なし"
+        cancel_date = self.request.POST["cancel_date"]
+        if cancel_date is None:
+            if cancel_date != "":
+                cancel_date = "選択なし"
+
+        file_id = Article.objects.order_by('id').reverse()[0]
+        count = file_id.id + 1
+        vacant_info = ArticleLive.objects.create(article_id=count, vacancy_info=vacant, vacancy_live=info,
+                                                 start_date=start_date, update_date=update_date, cancel_date=cancel_date)
+        address_town = self.request.POST["address"]
+        address_city = self.request.POST["address_city"]
+        address_others = self.request.POST["address_others"]
+        for company in company_id:
+            main_file.company_id = company.id
+        main_file.address_number = self.request.POST["address_number"]
+        main_file.address = address_town + ' ' + address_city + ' ' + address_others
+        main_file.rent = self.request.POST["rent"]
+        main_file.park = self.request.POST["park"]
+        main_file.floor_plan = self.request.POST["floor_plan"]
+        main_file.floor_number = self.request.POST["floor_number"]
+        main_file.initial_cost = self.request.POST["initial_cost"]
+        main_file.common_service_expense = self.request.POST["common_service_expense"]
+        main_file.term_of_contract = self.request.POST["term_of_contract"]
+        main_file.column = self.request.POST["column"]
+        main_file.live_flag_id = vacant_info.id
+        main_file.customer = self.request.user.id
+
+        for other_file in main_file.others:
+            tmp_list.append(other_file.id)
+            other_file.save()
+        main_file.room_images_id = tmp_list
+        main_file.save()
+        vacant_info.save()
+
+        return super(ArticleEdit, self).form_valid(form)
+
+"""
+物件編集(業者)
+"""
+class ArticleUpdate(generic.UpdateView):
+    model =Article
+    form_class = ArticleUpdateForm
+    template_name = 'company/update_form.html'
+    success_url = reverse_lazy('apps:top')
+
+    def get_context_data(self, **kwargs):
+        context = super(ArticleUpdate, self).get_context_data(**kwargs)
+
+        get = self.request.path.replace('/roomii/update/', '')
+        list_view = Article.objects.order_by('id').filter(id=get)
+        live_list = ArticleLive.objects.order_by('id').filter(article_id=get)
+
+        tmp_count = []
+        company_info = Company.objects.filter(user_id=self.request.user.id)
+        for info in company_info:
+            article_info = Article.objects.filter(company_id=info.id)
+            for info in article_info:
+                tmp_count.append(info.article_name)
+                count_article = len(tmp_count)
+                if int(count_article) > 9:
+                    count_over = False
+                else:
+                    count_over = True
+
+        return super(ArticleUpdate, self).get_context_data(
+                live_list=live_list, list_view=list_view, count_over=count_over, **kwargs
+            )
+
+    def render_to_response(self, context, **response_kwargs):
+       if not self.request.user.is_staff:
+           return redirect("apps:top")
+       get = self.request.path.replace('/roomii/update/', '')
+       article_check = Article.objects.order_by('id').filter(id=get, customer=self.request.user.id)
+       if article_check:
+           return super(ArticleUpdate, self).render_to_response(
+               context, **response_kwargs
+           )
+       else:
+           return redirect('apps:top')
+
+    def post(self, request, **kwargs):
+
+        get_id = self.request.path.replace('/roomii/update/', '')
+        article = self.model.objects.filter(id=get_id)
+        tmp_list = []
+
+        vacant = self.request.POST["live_flag"]
+        info = self.request.POST["info"]
+        if info == '':
+            info = '貸出可'
+        start_date = self.request.POST["start_date"]
+        if start_date is None:
+            if start_date != "":
+                if info != "":
+                    start_date = '選択なし'
+                else:
+                    start_date = '選択なし'
+        update_date = self.request.POST["update_date"]
+        if update_date is None:
+            if update_date != "":
+                if info != "":
+                    update_date = "選択なし"
+                else:
+                    update_date = "選択なし"
+
+        cancel_date = self.request.POST["cancel_date"]
+        if cancel_date is None:
+            if cancel_date != "":
+                if info != "":
+                    cancel_date = "選択なし"
+                else:
+                    cancel_date = "選択なし"
+
+        vacant_info_table = ArticleLive.objects.filter(article_id=get_id)
+        for vacant_info in vacant_info_table:
+            vacant_info.vacancy_info = vacant
+            vacant_info.vacancy_live = info
+            vacant_info.start_date = start_date
+            vacant_info.update_date = update_date
+            vacant_info.cancel_date = cancel_date
+
+        main_table = Article.objects.filter(id=get_id)
+
+        try:
+            upload_file = self.request.FILES.get('article_image')
+            img_filename = Image.open(upload_file)
+            img_filename.save(os.path.join('./media/', upload_file.name))
+        except:
+            upload_file = self.request.POST.get("article_image_hidden")
+
+        for main in main_table:
+            try:
+                main.article_image = upload_file.name
+            except:
+                main.article_image = upload_file
+            main.article_name = self.request.POST["article_name"]
+            main.comments = self.request.POST["comments"]
+            main.address_number = self.request.POST["address_number"]
+            main.address = self.request.POST["address"]
+            main.rent = self.request.POST["rent"]
+            try:
+                main.park = self.request.POST["park"]
+            except:
+                for article_park in article:
+                    main.park = article_park.park
+            try:
+                main.floor_plan = self.request.POST["floor_plan"]
+            except:
+                for article_floor_plan in article:
+                    main.floor_plan = article_floor_plan.floor_plan
+            try:
+                main.floor_number = self.request.POST["floor_number"]
+            except:
+                for article_floor_number in article:
+                    main.floor_number = article_floor_number.floor_number
+            main.initial_cost = self.request.POST["initial_cost"]
+            main.common_service_expense = self.request.POST["common_service_expense"]
+            main.term_of_contract = self.request.POST["term_of_contract"]
+            main.column = self.request.POST["column"]
+            main.live_flag_id = vacant_info.id
+            main.customer = self.request.user.id
+        
+        """
+        画像サイズ制限
+        """
+        upload_files = self.request.FILES.getlist('files')
+        for img_file_size in upload_files:
+            if img_file_size.size > MAX_MEMORY_SIZE:
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+                
+        other_files = []
+        try:
+            for files in upload_files:
+                img_filename = Image.open(files)
+                img_filename.save(os.path.join('./media/', files.name))
+                other_files.append(files.name)
+
+            tmp_room_images_id = []
+            for file_image in other_files:
+                RoomImage(article_id=self.request.path.replace('/roomii/update/', ''), image=file_image).save()
+                tmp_room_images_id.append(RoomImage.id)
+            main.room_images_id = str(tmp_room_id)
+
+            """
+            画像ファイル制限
+            """
+            img_file_size = self.request.FILES['article_image']
+            if img_file_size.size > MAX_MEMORY_SIZE:
+                return render(self.request, self.template_name, {'error': "画像容量が超えております。"})
+
+            img_file = self.request.FILES['article_image'].name
+            img_filename = Image.open(self.request.FILES['article_image'])
+            img_filename.save(os.path.join('./media/', img_file))
+        except:
+            main.room_images_id = self.request.POST.get("files_hidden")
+
+        main.save()
+        vacant_info.save()
+
+        return redirect('apps:top')
+
+"""
+Googleログイン(ユーザー)
+"""
+
+class RedirectGoogle(View):
+
+    def get(self, request, *args, **kwargs):
+        SCOPE = [
+                "https://www.googleapis.com/auth/userinfo.profile",
+                "https://www.googleapis.com/auth/userinfo.email"
+        ]
+
+
+        flow = flow_from_clientsecrets(
+           './client_id.json',
+           scope=SCOPE,
+           redirect_uri= "http://localhost:8000/auth/complete/google-oauth2/")
+
+        auth_uri = flow.step1_get_authorize_url()
+
+        return redirect(auth_uri)
+
+class Accesstoken(View):
+
+    def get(self, request, **kwargs):
+
+        if request.GET.get('code'):
+            data = google_login_flow(request.GET.get('code'))
+            if data['id']:
+                check = check_socials(data['id'], 'google')
+                if check is not False:
+                    social = session.query(UserAuth).join(
+                             Social, UserAuth.id == Social.user_id).filter(
+                             Social.provider == 'google',
+                             Social.provider_id == data['id']).first()
+                    if social:
+                        check_user = Get_user.objects.filter(username=social.username, password=social.password)
+                        for user in check_user:
+                            if social.is_active:
+                                login(self.request, user)
+                                return redirect("apps:login_after")
+                            else:
+                                return redirect("apps:login")
+                    else:
+                        return redirect("apps:login")
+
+                else:
+                    user = create_socials_user(data)
+                    create_socials(user.id, data, 'google')
+
+                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
+                    for user in check_user:
+                        if user.is_active:
+                            login(self.request, user)
+                            return redirect("apps:login_after")
+                        else:
+                            return redirect("apps:login")
+            else:
+                return redirect('apps:login')
+        else:
+            return redirect('apps:login')
+
+"""
+Facebook, ログイン認証(ユーザー)
+"""
+class RedirectFacebook(View):
+
+    def get(self, request, **kwargs):
+
+        url = 'http://www.facebook.com/v3.2/dialog/oauth'
+        params = {
+            'response_type': 'code',
+            'redirect_uri': FACEBOOK_CALLBACK_URL,
+            'client_id': SOCIAL_AUTH_FACEBOOK_KEY,
+        }
+
+        redirect_url = requests.get(url, params=params).url
+
+        return redirect(redirect_url)
+
+class CallbackFacebook(View):
+
+    def get(self, request, **kwargs):
+
+        if request.GET.get('code'):
+            access_token = get_facebook_access_token(request.GET.get('code'))
+            data = check_facebook_access_token(access_token)
+            if data['is_valid']:
+                data = get_facebook_user_info(access_token, data['user_id'])
+
+                social = check_socials(data, 'facebook')
+                if social is not False:
+                    check_user = Get_user.objects.filter(id=social.user_id)
+                    if check_user:
+                        for user in check_user:
+                            if user.is_active:
+                                login(self.request, user)
+                                return redirect("apps:login_after")
+                            else:
+                                return redirect("apps:login")
+                    else:
+                        return redirect("apps:login")
+                else:
+                    user = create_facebook_user(data)
+                    social = create_socials(user, data, 'facebook')
+                    check_user = Get_user.objects.filter(username=user.username, password=user.password)
+                    for user in check_user:
+                        if user.is_active:
+                            login(request, user)
+                            return redirect("apps:login_after")
+                        else:
+                            return redirect("apps:login")
+            else:
+                return redirect('apps:login')
+
+
+"""
+以下のコード
+テスト用コード
+最後に削除予定
+"""
+
+class image(View):
+
+    model = test_image
+    template_name = 'apps/test_image.html'
+
+    def upload(file, **options):
+        table = self.model.objects.all()
+        for table_list in table:
+            cloudinary.uploader.upload(table_list.image)
+
+    def get(self, request, *args, **kwargs):
+
+        table = self.model.objects.all()
+        for table_list in table:
+            context = {
+                 'test': table_list
+            }
+        return render(request, self.template_name, context)
+
+
+class Insert(View):
+
+    model = RoomImage
+    template_name = "apps/test.html"
+
+    def get(self, request, *args, **kwargs):
+
+        tmp_list = []
+        for x in self.model.objects.filter(id=327):
+            test_list = x.image.replace("[", "").replace("]", "").replace("'", "").replace(" ", "").split(",")
+            tmp_list.append(test_list)
+            for test in tmp_list:
+                print(test)
+                print(type(test))
+                for x in test :
+                    print(x)
+
+        # image_table = self.model.objects.filter(id=326).first()
+        # print(image_table)
+        # test = image_table.image.name.replace("[", "").replace("]", "")
+        # image_table.image = test
+        # image_table.save()
+
+
+        # for x in range(328, 352):
+        #     image_ta = self.model.objects.filter(id=x).first()
+        #     test = image_ta.image.name.replace("http", "['http").replace(",", "',")
+        #     image_ta.image = test
+        #     image_ta.save()
+            
+        return render(request, self.template_name)
+

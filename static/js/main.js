@@ -659,3 +659,66 @@ $(function(){
     $(this).next("div").fadeOut();
   });
 });
+
+
+// メール一括送信
+// ユーザーの表示数制限
+// もっと見るリンク
+
+$(function() {
+  // 表示させる要素の総数をlengthメソッドで取得
+  var $numberListLen = $("#number_list ul").length;
+  // デフォルトの表示数
+  var defaultNum = 5;
+  // ボタンクリックで追加表示させる数
+  var addNum = 5;
+  // 現在の表示数
+  var currentNum = 0;
+
+  $("#number_list").each(function() {
+    // moreボタンを表示し、closeボタンを隠す
+    $(this).next(".more_button").find("#more_btn").show();
+    $(this).next(".more_button").find("#close_btn").hide();
+
+    // defaultNumの数だけ要素を表示
+    // defaultNumよりインデックスが大きい要素は隠す
+    $(this).find("ul:not(:lt("+defaultNum+"))").hide();
+
+    // 初期表示ではデフォルト値が現在の表示数となる
+    currentNum = defaultNum;
+
+    // moreボタンがクリックされた時の処理
+    $(this).next(".more_button").find("#more_btn").click(function() {
+     
+      // 現在の表示数に追加表示数を加えていく
+      currentNum += addNum;
+
+      // 現在の表示数に追加表示数を加えた数の要素を表示する
+      $("#number_list").find("ul:lt("+currentNum+")").slideDown();
+
+      // 表示数の総数よりcurrentNumが多い=全て表示された時の処理
+      if($numberListLen <= currentNum) {
+        // 現在の表示数をデフォルト表示数へ戻す
+        currentNum = defaultNum;
+        
+        // インデックス用の値をセット
+        indexNum = currentNum - 1;
+       
+        // moreボタンを隠し、closeボタンを表示する
+       
+        $("#number_list").next(".more_button").find("#more_btn").hide();
+        $("#number_list").next(".more_button").find("#close_btn").show();
+
+        // closeボタンがクリックされた時の処理
+        $("#number_list").next(".more_button").find("#close_btn").click(function() {
+          // デフォルト数以降=インデックスがindexNumより多い要素は非表示にする
+          $("#number_list").find("ul:gt("+indexNum+")").slideUp();
+
+          // closeボタンを隠し、moreボタンを表示する
+          $("#number_list").next(".more_button").find("#close_btn").hide();
+          $("#number_list").next(".more_button").find("#more_btn").show();
+        });
+      }
+    });
+  });
+});

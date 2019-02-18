@@ -2935,6 +2935,7 @@ span.get_not_info {
 .caution_text {
   font-size: 20px;
   font-weight: 800;
+  margin-bottom: 30px;
 }
 
 .user_list li {
@@ -2949,6 +2950,7 @@ span.get_not_info {
 .user_list {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .user_list ul {
@@ -3040,4 +3042,15 @@ textarea.form-control {
 .error_text {
   font-size: 18px;
   color: red;
+}
+
+.more_button {
+  margin: 20px auto;
+  font-size: 20px;
+  font-weight: 800;
+  transform: scale(1.1);
+}
+
+.more_button a:hover {
+  color: black;
 }

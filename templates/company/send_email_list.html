@@ -5,16 +5,24 @@
     <div class="caution">
         <p class="caution_text">下記のユーザーにEmailを送信しますか？</p>
     </div>
-    <div class="user_list">
+    <div id="number_list" class="user_list">
         {% for x in users %}
           {% for user_info in x %}
-          <ul>
-            <li><img src="{{user_info.image}}" alt="ユーザー画像"></li>
-            <li class="user">{{user_info.username}}</li>
-          </ul>
+            {% if user_info.is_mail != 1 %}
+            <ul>
+                <li><img src="{{user_info.image}}" alt=""></li>
+                <li class="user">{{user_info.username}}</li>
+            </ul>
+            {% endif %}
           {% endfor %}
         {% endfor %}
     </div>
+
+    <div class="more_button"> 
+        <a href="#" id="more_btn">もっと見る</a>
+        <a href="#" id="close_btn">表示数を戻す</a>
+    </div>
+    
     <div class="send_button">
         <form action="" method="POST">
             {% for x in users %}
