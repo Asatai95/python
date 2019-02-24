@@ -690,3 +690,27 @@ index.html
     
   {% endfor %}
   {% else %}
+
+  export FACEBOOK_CALLBACK_URL=https://roomii.jp/auth/complete/facebook/
+export CLOUD_NAME=dn72zl9c7
+export SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=979839320684-ru46386tvgh35kdh7cog9mm27lpulvr9.apps.googleusercontent.com
+export MySQL_PASSWORD=roomii1156
+export GOOGLE_SCOPE=https://www.googleapis.com/auth/plus.profile.emails.read
+export MySQL_TABLE_NAME=roomii_main
+export DJANGO_SECRET_KEY=75c6@w6i1c=xsb$#$_117$zk-v!@n*5r9!@tgcj+n=jj+ff*g!
+export CLOUDINARY_STORAGE_API_SECRET=FfdZ0IanWSyLLoHBRnqrHhVlECw
+export GOOGLE_SCOPE_REDIRECT_URL=https://roomii.jp/auth/complete/google-oauth2/
+export FACEBOOK_HASH_PASSWORD=facebook
+export GOOGLE_HASH_PASSWORD=google
+export CLOUDINARY_STORAGE_API_KEY=558834748665224
+export EMAIL_HOST_USER=official@webapp2.com
+export SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=mG3KZnJfs9JBMFym8fLdjYIC
+export EMAIL_HOST=smtp.muumuu-mail.com
+export GOOGLE_SCOPE_Profile=https://www.googleapis.com/auth/userinfo.profile
+export SOCIAL_AUTH_FACEBOOK_SECRET=1077fcc7e686d3c4ff08fbb05fcc94ab
+export EMAIL_PORT=587
+export APP_ENVIRONMENT=production
+export SOCIAL_AUTH_FACEBOOK_KEY=292183621408680
+export GOOGLE_SCOPE_EMAIL=https://www.googleapis.com/auth/userinfo.email
+export EMAIL_HOST_PASSWORD=asatai951156
+export DEFAULT_FROM_EMAIL=official@webapp2.com

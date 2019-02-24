@@ -475,14 +475,6 @@ $(function(){
   } catch {}
 });
 
-// $(function(){
-//   if ( $(".msg-right").length ) {
-//     $(".msg-right-sub").css("display", "none")
-//   } else {
-//     $(".msg-right-sub").css("display", "block");
-//   }
-// });
-
 $(function() {
   if ( $('#chat-message-input').val() == "" ) {
     $('#chat-message-submit').attr('disabled', 'disabled');
@@ -520,17 +512,6 @@ $(function(){
 //       }
 //   });
 // });
-
-$(function(){
-  $(".content").each(function(){ 
-    $(this).find("").on("click", function(){
-      console.log("test")
-      
-
-      // $("div.customer_list").fadeToggle();
-    });
-  });
-});
 
 $(function() {
   $(".content").on('click', function(e) {
@@ -614,12 +595,10 @@ $('.sel').each(function() {
   });
 });
 
-// Toggling the `.active` state on the `.sel`.
 $('.sel').click(function() {
   $(this).toggleClass('active');
 });
 
-// Toggling the `.selected` state on the options.
 $('.sel__box__options').click(function() {
   var txt = $(this).text();
   var index = $(this).index();
@@ -664,6 +643,7 @@ $(function(){
 // メール一括送信
 // ユーザーの表示数制限
 // もっと見るリンク
+// 元に戻すリンク
 
 $(function() {
   // 表示させる要素の総数をlengthメソッドで取得
@@ -705,7 +685,6 @@ $(function() {
         indexNum = currentNum - 1;
        
         // moreボタンを隠し、closeボタンを表示する
-       
         $("#number_list").next(".more_button").find("#more_btn").hide();
         $("#number_list").next(".more_button").find("#close_btn").show();
 
