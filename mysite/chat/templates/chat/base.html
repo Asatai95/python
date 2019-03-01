@@ -21,7 +21,7 @@
   <!-- ナビバー -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     {% if user.is_authenticated %}
-      <a class="navbar-brand" href="#">roomii</a>
+      <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
     {% else %}
       <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
     {% endif %}
@@ -151,17 +151,26 @@
         var article_id = {{article_id}};
         var user_name = "{{user.username}}";
         var image_file_path = "image"
+
         try {
           var chatSocket = new WebSocket(
-              'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' );
+              'wss://roomii.jp/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' );
         } catch {
           var chatSocket = new WebSocket(
-              'ws://127.0.0.1:8000/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' + image_file_path );
+              'wss://roomii.jp/ws/chat/'+ user_name + '/' + user_id + '/' + article_id + '/' + image_file_path );
         }
         chatSocket.onmessage = function(e) {
             var data = JSON.parse(e.data);
             var message = data['message'];
-            var image = data['image'];
+            // var image = data['image'];
+            // console.log(image)
+            // var ctx = cv.getContext('2d');
+            // var img = new Image();
+            // img.src = "data:image/png;base64," + image;
+            // img.onload = function () {
+            //     ctx.drawImage(img,0,0);
+            // }
+            // console.log(img)
             var div = document.getElementById('chat_test');
             var doc = document.getElementById("chat-log");
             var chat_message_input = document.getElementById("chat-message-input")
@@ -196,27 +205,89 @@
         document.querySelector('#chat-message-submit').onclick = function(e) {
             var messageInputDom = document.querySelector('#chat-message-input');
             var message = messageInputDom.value;
+            var imageInputDom = document.querySelector('#chat_img_preview');
+            var image = imageInputDom.value;
+            console.log(image)
+
+            if (message == ""){
+              return false
+            }
             chatSocket.send(JSON.stringify({
-                'message': message
+                'message': message, 
             }));
-            console.log(message)
+            
             var scroll = document.getElementsByClassName("chat_room_contents")
             scroll[0].scrollTop = scroll[0].scrollHeight;
             
             messageInputDom.value = '';
         };
 
-        document.querySelector('#chat-image-submit').onclick = function(e) {
-            var messageInputDom = document.querySelector('#icon-hidden');
-            var image = messageInputDom.value;
-            var image = image.replace(/^.*(\\|\/|\:)/, '');
-            console.log(image)
-            chatSocket.send(JSON.stringify({
-                'image': image
-            }));
-            messageInputDom.value = '';
+        // document.querySelector('#chat-image-submit').onclick = function(e) {
+        //     var imageInputDom = document.querySelector('#chat_img_preview');
+        //     console.log(imageInputDom);
+        //     var image = imageInputDom.file;
+        //     console.log(image);
+        //     // var image = image.replace(/^.*(\\|\/|\:)/, '');
+        //     // console.log(image)
+        //     // chatSocket.send(JSON.stringify({
+        //     //     'image': image
+        //     // }));
+        //     // messageInputDom.value = '';
             
-        };
+        // };
 </script>
+<!-- 
+<script type="text/javascript">
+
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = jQuery.trim(cookies[i]);
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  
+  var csrftoken = getCookie('csrftoken');
+  
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  
+  $.ajaxSetup({
+      beforeSend: function (xhr, settings) {
+          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });
+  
+  // var token = '{{csrf_token}}';
+  
+  // 送信ボタンで呼ばれる
+  $('#chat-message-submit').on('submit', function(e) {
+    // デフォルトのイベントをキャンセルし、ページ遷移しないように!
+    e.preventDefault();
+    $.ajax({
+      'url': "/ws/chat/{{user.username}}/{{user.pk}}/{{article_id}}/",
+      'type': 'POST',
+      // 'data': {
+      //   'fab': $(this).find('#heart').val(),
+      // },
+      // 'dataType': 'json',
+    });
+    return false;
+  });
+  
+</script>  -->
+ 
 </body>
 </html>

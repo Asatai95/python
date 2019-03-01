@@ -157,20 +157,18 @@
            </div>
            <div class='customer_list'>
             <ul>
-             {% if user.is_mail %}
-              {% for user_info in tmp_user %}
+            {% for user_info in tmp_user %}
+              {% if user_info.is_mail %}
                {% if user_info.id != user.id %}
-                {% if message.article_id == main.id and message.user_id == user_info.id %}
                 <a href="{% url 'chatroom:index' user.username user_info.pk main.id %}">
                   <li class='cus_list '>
                     <span>{{user_info.username}}</span>
                     <img src="{{user_info.image}}" alt="">
                   </li>
                 </a>
-                {% endif %}
                {% endif %}
-              {% endfor %}
-             {% endif %}
+              {% endif %}
+             {% endfor %}
             </ul>
           </div>
          </div>

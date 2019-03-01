@@ -553,9 +553,40 @@ header {
   display: none;
 } 
 
+.view_checkbox {
+  display: none;
+  transition: 1s;
+  position: fixed;
+  z-index: 1;
+  top: 235px;
+  font-family: 游ゴシック体, 'Yu Gothic', YuGothic, 'ヒラギノ角ゴシック Pro', 'Hiragino Kaku Gothic Pro', メイリオ, Meiryo, Osaka, 'ＭＳ Ｐゴシック', 'MS PGothic', sans-serif;
+}
+
+.contents_checkbox ul {
+  width: 1130px;
+  height: 50px;
+  display: flex;
+  justify-content: left;
+  margin: 0;
+  padding: 0;
+  background-color: rgba(255, 255, 255, .6); 
+}
+
+.contents_checkbox ul li {
+  margin: auto 10px;
+  font-weight: 800;
+  font-size: 18px; 
+  display: none;
+}
+
+.checkbox_title {
+  display: block!important;
+}
+
 
 form[name='filter_name'] {
   position: fixed;
+  z-index: 10;
 }
 
 .form-inline {
@@ -1135,6 +1166,7 @@ div.main.loginform {
 
 .container.facebook {
   display: none;
+  padding: 10px;
 }
 
 .container-button.google {
@@ -1163,6 +1195,8 @@ div.main.loginform {
 
 .container.google {
   display: none;
+  padding: 10px;
+
 }
 
 .container.btn {
@@ -1422,6 +1456,7 @@ li.new_account {
 
 p span {
   display: inline-block;
+  font-size: 18px;
 }
 
 p span.user-name {
@@ -1640,9 +1675,12 @@ a:hover {
 }
 
 .container.center-align.btn.waves-effect {
+  padding: 0;
   background-color: rgba(30, 50, 132, .9)!important;
   margin: 0!important;
   padding-top: 2px!important;
+  padding-left: 38px;
+  line-height: 1.7em;
 }
 
 @media (min-width: 768px){
@@ -1661,6 +1699,8 @@ a:hover {
   width: 100%;
   border-radius: 10px;
   margin-top: 50px;
+  height: 300px;
+  padding: 80px;
 }
 
 .main_remake_password {
@@ -1671,6 +1711,11 @@ a:hover {
   margin-top: 100px;
   width: 800px;
   background-color: rgba(255, 255, 255);
+}
+
+.main_remake_password p {
+  font-size: 25px;
+  font-weight: 800;
 }
 
 .content_main {
@@ -1703,7 +1748,7 @@ a:hover {
   z-index: 5;
   position: absolute;
   max-width: 1130px;
-  margin-top: 100px;
+  margin-top: 130px;
   margin-bottom : 80px ;
   padding: 0 50px;
 }
@@ -2454,7 +2499,7 @@ label.license_year {
 .customer_list {
   background: rgba(255, 255, 255, .9);
   margin: 10px auto;
-  max-width: 45%;
+  max-width: 80%;
   border-radius: 10px;
   display: none;
 }

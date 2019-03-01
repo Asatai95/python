@@ -41,39 +41,33 @@
         </div>
         </div>
       </div>
-      {% if user.is_mail %}
+
+      {% if not user.is_staff %}
       <div class='switch-button'>
-        <span class="get_not_info">空室情報を受け取る</span>
-        <span class="get_info">空室情報を受け取らない</span>
+        {% if user.is_mail %}
+          <span class="get_not_info">空室情報を受け取る</span>
+        {% else %}
+          <span class="get_not_info">空室情報を受け取らない</span>
+        {% endif %}
         <div class="switch">
             
             <label class="switch__label">
-              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch" value="0">
-              <input type="hidden" name="checkbox_switch" class="checkbox_switch_hidden" value="1">
-              <input type="checkbox" class="switch__input" checked="checked"/>
+              {% if user.is_mail %}
+                <input id="checkbutton" type="hidden" name="checkbox_switch_button" class="checkbox_switch" value="1">
+                <input type="checkbox" class="switch__input" checked="checked" />
+              {% else %}
+                <input id="checkbutton" type="hidden" name="checkbox_switch_button" class="checkbox_switch_hidden" value="0">
+                <input type="checkbox" class="switch__input" />
+              {% endif %}
+              
               <span class="switch__content"></span>
               <span class="switch__circle"></span>
             </label>
         </div>
     
       </div>
-      {% else %}
-      <div class='switch-button'>
-        <span class="get_info">空室情報を受け取る</span>
-        <span class="get_not_info">空室情報を受け取らない</span>
-        <div class="switch">    
-            <label class="switch__label">
-              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch_hidden" value="0">
-              <input type="hidden" name="checkbox_switch_button" class="checkbox_switch" value="1">
-              <input type="checkbox" class="switch__input"/>
-              <span class="switch__content"></span>
-              <span class="switch__circle"></span>
-            </label>
-        </div>
-      
-      </div>
-    
       {% endif %}
+  
 
       {% csrf_token %}
       <div class='button'>

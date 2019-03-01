@@ -206,7 +206,7 @@ class Fab(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_key")
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="article_key")
     flag = models.IntegerField()
-    message_flag = models.IntegerField()
+    # message_flag = models.IntegerField()
     
     message_send_flag = models.BooleanField(
         _('message send flag'),

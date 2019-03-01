@@ -1,0 +1,66 @@
+if self.request.user.is_staff is True:
+            tmp_list = []
+            if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
+                if live == '選択なし':
+                    if price == '選択なし':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '1':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '2':
+
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5") , Q(rent__gte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "7") , Q(rent__gte="5")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.filter(
+                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                else:
+                    if price == '選択なし':
+                        object_list = Article.objects.filter(
+                                Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+
+                    elif price == '1':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '2':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="3")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '3':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__lte= "5"), Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+                    elif price == '4':
+                        object_list = Article.objects.filter(
+                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                                Q(rent__gte="7")
+                        ).filter(customer=self.request.user.id)
+                        tmp_list.append(object_list)
+        else:

@@ -1,8 +1,11 @@
+// inputで受け取れる画像タイプの指定
 $(function(){
   if ( $("input[name=company_image]").length ) {
     $("input[name=company_image]").attr("accept", ".png, .jpg, .jpeg");
   }
 });
+
+// 業者ページ, サイドバー表示の切り替え
 $(function(){
   $(document).ready(function () {
     var sides = ["left", "top", "right", "bottom"];
@@ -36,14 +39,13 @@ $(function(){
       var action = $this.attr("data-action");
       var side = $this.attr("data-side");
       $(".sidebar." + side).trigger("sidebar:" + action);
-      
-        
-        
+       
       return false;
     });
   });
 });
 
+// ボタンエフェクト
 $(function() {
   $(document).on('click', function(e) {
     if ($(e.target).closest('.back_login_botton').length) {
@@ -54,6 +56,7 @@ $(function() {
   });
 });
 
+// トップページの要素を下からフェードイン
 $(function(){
   $(document).ready(function(){
     $('body').each(function(){
@@ -75,6 +78,7 @@ $(function() {
   });
 });
 
+// ナビゲーションバー
 $(document).ready(function() {
   var pagetop = $('.navbar-brand');
   pagetop.click(function () {
@@ -118,6 +122,7 @@ $(function(){
   });
 });
 
+// 必要ないかも?
 $(function() {
   $('.ribbon').on('click', function(e) {
     if (!$(e.target).closest(this).length ) {
@@ -135,6 +140,8 @@ $(function() {
   });
 });
 
+
+// いいね機能, ハートの表示の切り替え
 $(function() {
   $('input[id=commit]').on("click", function(){
     $(this).attr('id', 'heart');
@@ -159,7 +166,7 @@ $(function() {
   });
 });
 
-
+// ログインページ、SNSログインのURLを押して、要素をドロップダウン
 $(function() {
   $(document).on('click', function(e) {
     if (!$(e.target).closest('.sns_text a').length && !$(e.target).closest('.container').length) {
@@ -185,6 +192,7 @@ $(function(){
   });
 });
 
+// 画像をプレビューに表示
 $(function(){
   $('form').on('change', 'input[type="file"]', function(e) {
     var file = e.target.files[0],
@@ -210,6 +218,7 @@ $(function(){
   });
 });
 
+// 画像をプレビューに表示
 $(function(){
   $('#id_files').change(function(){
     if ( !this.files.length ) {
@@ -236,6 +245,7 @@ $(function(){
   });
 });
 
+// 画像をプレビューに表示
 $(function(){
   $('#id_article_image').change(function(){
     if ( !this.files.length ) {
@@ -278,19 +288,24 @@ $(function(){
   });
 });
 
+
+// 検索ボックス表示、ドロップメニュー
 $(function() {
   $(document).on('click', function(e) {
-    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.last ul a').length) {
+    if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main_user').length && !$(e.target).closest('li.last ul a').length) {
       $('#fade-in li.last ul li').fadeOut();
     } else if ($(e.target).closest('li.last ul').length) {
 
       if ($('#fade-in li.last ul li').css('display') == 'none') {
         $('#fade-in li.last ul li').fadeIn();
+      } else {
+        $('#fade-in li.last ul li').fadeOut();
       }
     }
   });
 });
 
+// 検索ボックス表示、ドロップメニュー
 $(function() {
   $(document).on('click', function(e) {
     if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.middle ul a').length) {
@@ -299,11 +314,14 @@ $(function() {
 
       if ($('#fade-in li.middle ul li').css('display') == 'none') {
         $('#fade-in li.middle ul li').fadeIn();
+      } else {
+        $('#fade-in li.middle ul li').fadeOut();
       }
     }
   });
 });
 
+// 検索ボックス表示、ドロップメニュー
 $(function() {
   $(document).on('click', function(e) {
     if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.first ul a').length) {
@@ -312,11 +330,14 @@ $(function() {
 
       if ($('#fade-in li.first ul li').css('display') == 'none') {
         $('#fade-in li.first ul li').fadeIn();
+      } else {
+        $('#fade-in li.first ul li').fadeOut();
       }
     }
   });
 });
 
+// 検索ボックス表示、ドロップメニュー
 $(function() {
   $(document).on('click', function(e) {
     if (!$(e.target).closest('.container').length && !$(e.target).closest('.content_main').length && !$(e.target).closest('li.first ul a').length) {
@@ -325,41 +346,226 @@ $(function() {
 
       if ($('#fade-in li.price ul li').css('display') == 'none') {
         $('#fade-in li.price ul li').fadeIn();
+      } else {
+        $('#fade-in li.price ul li').fadeOut();
+      }
+    }
+  });
+});
+
+// 検索中の項目表示
+$(function(){
+
+  $(".view_checkbox").each(function(){
+    if ($(this).find("li").hasClass("check")){
+      console.log($(".live_word").text());
+      $(this).fadeIn();
+      if ($(".room_word").text() != "間取り: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".room_word").fadeIn();
+        });
+      } 
+      if ($(".live_word").text() != "空室状況: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".live_word").fadeIn();
+        });
+      } 
+      if ($(".rent_word").text() != "家賃: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".rent_word").fadeIn();
+        });
+      } 
+      if ($(".name_word").text() != "物件名称: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".name_word").fadeIn();
+        });
+      } 
+      if ($(".floor_word").text() != "階数: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".floor_word").fadeIn();
+        });
+      } 
+      if ($(".address_word").text() != "物件所在地: ") {
+        $(".view_checkbox").each(function(){
+          $(this).find(".address_word").fadeIn();
+        });
+      } 
+    }
+  });
+});
+
+// 検索ボックス, チェックボックス入力内容表示
+$(function() {
+  $('#fade-in li ul li a').click(function(){
+    $(".view_checkbox").fadeIn();
+    if ($(this).find('input[name="room"]').prop('checked')) {
+      $(this).find('input[name="room"]').prop('checked', false);
+      var word = $(this).find('input[name="room"]').val(); 
+      $(".room_word").each(function(){
+        var txt = $(this).text();
+        $(this).text(
+          txt.replace(word , "")
+        )
+        
+      });
+    } else {
+      $(this).find('input[name="room"]').prop('checked', true);
+      var word = $(this).find('input[name="room"]').val(); 
+      // console.log(word)
+      if (word == undefined) {
+        console.log(word)
+      } else {
+        if ($(".room_word").css("display") == "none") {
+          $(".room_word").fadeIn();
+        } 
+        
+        if ( $(".room_word").text().indexOf(word) != -1 ) {
+          return false
+        } else {
+          $(".room_word").append(word+" ");
+        }
+      }
+    }
+
+    if ($(this).find('input[name="live"]').prop('checked')) {
+      $(this).find('input[name="live"]').prop('checked', false);
+      var word = $(this).find('input[name="live"]').val(); 
+      if (word == "0"){
+        word = "空室あり"
+      } else if (word=="1") {
+        word = "空室なし"
+      }
+      $(".live_word").each(function(){
+        var txt = $(this).text();
+        $(this).text(
+          txt.replace(word , "")
+        )
+      });
+
+    } else {
+      $(this).find('input[name="live"]').prop('checked', true);
+      var word = $(this).find('input[name="live"]').val(); 
+
+      if (word == "0") {
+        word = "空室あり"
+      } else if (word == "1") {
+        word = "空室なし"
+      } 
+      if (word == undefined) {
+        console.log(word)
+      } else {
+        if ($(".live_word").css("display") == "none") {
+          $(".live_word").fadeIn();
+        }
+        if ( $(".live_word").text().indexOf(word) != -1 ) {
+          return false
+        } else {
+          $(".live_word").append(word+" ");
+        }
+      }
+    }
+
+    if ($(this).find('input[name="floor"]').prop('checked')) {
+      $(this).find('input[name="floor"]').prop('checked', false);
+      var word = $(this).find('input[name="floor"]').val(); 
+      $(".floor_word").each(function(){
+        var txt = $(this).text();
+        $(this).text(
+          txt.replace(word , "")
+        )
+      });
+    } else {
+      $(this).find('input[name="floor"]').prop('checked', true);
+      var word = $(this).find('input[name="floor"]').val(); 
+      
+      if (word == undefined) {
+        console.log(word)
+      } else {
+        if ($(".floor_word").css("display") == "none" ) {
+          $(".floor_word").fadeIn();
+        }
+        if ( $(".floor_word").text().indexOf(word) != -1 ) {
+          return false
+        } else {
+          $(".floor_word").append(word+" ");
+        }
+      }
+    }
+
+    if ($(this).find('input[name="price"]').prop('checked')) {
+      $(this).find('input[name="price"]').prop('checked', false);
+      var word = $(this).find('input[name="price"]').val(); 
+    
+      if (word == "1") {
+        word = "3万円以上"
+      } else if (word == "2") {
+        word = "4万円~6万円"
+      } else if (word == "3") {
+        word = "7万円以上"
+      }
+      $(".rent_word").each(function(){
+        var txt = $(this).text();
+        $(this).text(
+          txt.replace(word , "")
+        )
+      });
+    } else {
+      $(this).find('input[name="price"]').prop('checked', true);
+      var word = $(this).find('input[name="price"]').val(); 
+      
+      if (word == "1") {
+        word = "3万円以下"
+      } else if (word == "2") {
+        word = "4万円~6万円"
+      } else if (word == "3") {
+        word = "7万円以上"
+      }
+      if (word == undefined) {
+        console.log(word)
+      } else {
+        if ($(".rent_word").css("display") == "none") {
+          $(".rent_word").fadeIn();
+        }
+        if ( $(".rent_word").text().indexOf(word) != -1 ) {
+          return false
+        }
+        $(".rent_word").append(word+" ");
       }
     }
   });
 });
 
 
-$(function() {
-  $('#fade-in li ul li a').click(function(){
-
-    if ($(this).find('input[name="room"]').prop('checked')) {
-      $(this).find('input[name="room"]').prop('checked', false);
-    } else {
-      $(this).find('input[name="room"]').prop('checked', true);
+// 物件の名称, 検索ワード表示
+$(function(){
+  var $input = $('#sbox');
+  var $output = $('.name_word');
+  $input.on('input', function(event) {
+    if ($(".view_checkbox").css("display") == "none") {
+      $(".view_checkbox").fadeIn();
     }
-
-    if ($(this).find('input[name="live"]').prop('checked')) {
-      $(this).find('input[name="live"]').prop('checked', false);
-    } else {
-      $(this).find('input[name="live"]').prop('checked', true);
-    }
-
-    if ($(this).find('input[name="floor"]').prop('checked')) {
-      $(this).find('input[name="floor"]').prop('checked', false);
-    } else {
-      $(this).find('input[name="floor"]').prop('checked', true);
-    }
-
-    if ($(this).find('input[name="price"]').prop('checked')) {
-      $(this).find('input[name="price"]').prop('checked', false);
-    } else {
-      $(this).find('input[name="price"]').prop('checked', true);
-    }
+    $(".name_word").fadeIn();
+    var value = $input.val();
+    $output.text("物件名称: " + value);
   });
 });
 
+// 物件所在地, 検索ワード表示
+$(function(){
+  var $input = $('#search');
+  var $output = $('.address_word');
+  $input.on('input', function(event) {
+    if ($(".view_checkbox").css("display") == "none") {
+      $(".view_checkbox").fadeIn();
+    }
+    $(".address_word").fadeIn();
+    var value = $input.val();
+    $output.text("物件所在地: " + value);
+  });
+});
+
+
+// 物件情報入力、カレンダー関連
 $(function(){
   $("#id_live_flag").change(function(){
     var val = $(this).val();
@@ -384,6 +590,7 @@ $(function(){
   });
 });
 
+// 物件情報入力フォーム、空室情報
 $(function(){
   $(document).on('click', function(e) {
     if (!$(e.target).closest('#id_live_flag option[value=1]').length && !$(e.target).closest('.article').length) {
@@ -399,6 +606,7 @@ $(function(){
   });
 });
 
+// 物件詳細、画像スライドショー
 $(function(){
   $(document).ready(function(){
     $('div.image_contents').slick({
@@ -430,6 +638,7 @@ $(function(){
   });
 });
 
+// エラー表示
 $(function(){
   $('span.error').each(function(){
     if ( $(this).text() != "" ) {
@@ -437,6 +646,7 @@ $(function(){
     }
   });
 });
+
 
 $(function(){
   $('label').each(function(){
@@ -447,6 +657,8 @@ $(function(){
   });
 });
 
+
+// ロゴを押したら、トップにスクロール
 $(window).on('scroll', function () {
   var doch = $(document).innerHeight(); 
   var winh = $(window).innerHeight(); 
@@ -458,6 +670,9 @@ $(window).on('scroll', function () {
   }
 
 });
+
+// チャット機能、
+// 内容送信 → コメントボックス表示
 
 $(function(){
   try{
@@ -475,6 +690,7 @@ $(function(){
   } catch {}
 });
 
+// チャット入力確認後に送信ボタン表示
 $(function() {
   if ( $('#chat-message-input').val() == "" ) {
     $('#chat-message-submit').attr('disabled', 'disabled');
@@ -488,30 +704,13 @@ $(function() {
   });
 });
 
+// ユーザーページ(業者)、チャット可能ユーザーの表示
 $(function(){
   $(".customer_list ul li a").on("click", function(e){
     e.preventDefault();
     $(".customer_list").fadeIn();
   });
 });
-
-// $(function(){
-//   $(document).on('click', function(e) {
-//       if (!$(e.target).closest('.profile_img a img').length && !$(e.target).closest('.main_content').length) {
-//         $(e.target).find(".cus_list").fadeOut();
-//         $(".customer_list").fadeOut();
-//       } else if ($(e.target).closest('.profile_img a img').length) {
-
-//         if ($(".customer_list").css('display') == 'none') {
-//           $(this).find("li.cus_list").fadeIn();
-//           $(".customer_list").fadeIn();
-//         } else {
-//           $(".customer_list").fadeOut();
-//           $(this).find("li.cus_list").fadeOut();
-//         }
-//       }
-//   });
-// });
 
 $(function() {
   $(".content").on('click', function(e) {
@@ -526,6 +725,7 @@ $(function() {
     }
   });
 });
+
 
 $(function(){
   if ($('button.stripe-button-el>span').length) {
@@ -624,20 +824,32 @@ $(function(){
 
 $(function(){
   $(".switch__input").on("click", function(){
-    $(".get_info").toggle();
-    $(".get_not_info").toggle();
-    $(".checkbox_switch").toggle();
-    $(".checkbox_switch_hidden").toggle();
+    if ($(".get_not_info").text() == "空室情報を受け取る") {
+      $(".get_not_info").text("空室情報を受け取らない");
+    } else {
+      $(".get_not_info").text("空室情報を受け取る");
+    }
   });
 });
 
 $(function(){
-  $(".info_live_mail").mouseover(function(){
-    $(this).next("div").fadeIn();
-  }).mouseout(function() {
-    $(this).next("div").fadeOut();
+  $(".switch__input").on("click", function(){
+    if ( $("#checkbutton").val() == "0" )  {
+      $("#checkbutton").val("1");
+    } else {
+      $("#checkbutton").val("0");
+    }
   });
 });
+
+// $(function(){
+//   $(".info_live_li").each(function(){
+//     $(this).find(".send_info_mail").children(".info_live_mail").mouseover(function(){
+//       $(this).find("live_info_comment").fadeIn();
+//     }).mouseout(function() {
+//       $(this).find("live_info_comment").fadeOut();
+//   });
+// });
 
 
 // メール一括送信
@@ -701,3 +913,29 @@ $(function() {
     });
   });
 });
+
+// マイページ
+// 画面幅に合わせて、要素のwidthのサイズを変更
+$(function(){
+  if ($("body").width() > 435 ){
+    $(".view_checkbox").fadeOut();
+    console.log("test")
+    if( $(".main_mypage div.main_content .stream").length ) {
+      $(".profilecard").css("height", "25vw");
+    } else {
+      $(".profilecard").css("height", "30vw");
+      $(".profilecard").css("width", "45vw");
+      $(".profilecard").css("margin", "0 auto")
+    }
+  } else {
+    $(".profilecard").css("height", "");
+  }
+});
+
+// $(function(){
+//   if ($("body").width() < 435 ){
+//     $(".content").on("click", function(){
+//       $(this).find(".stream-content a").click();
+//     });
+//   }
+// });

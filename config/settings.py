@@ -34,17 +34,19 @@ INSTALLED_APPS = [
     'mysite',
     # 'social_django',
     'jet',
-    'cloudinary',
-    'cloudinary_storage',
+    #'cloudinary',
+    #'cloudinary_storage',
     'mysite.chat',
     'channels',
 ]
+
+ASGI_APPLICATION = 'routing.application'
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }
@@ -99,10 +101,10 @@ ASGI_APPLICATION = 'mysite.routing.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'roomii_sample',
-        'USER': 'root',
-        'PASSWORD': 'Asatai951156',
-        'HOST': 'localhost',
+        'NAME': os.environ.get("MySQL_TABLE_NAME"),
+        'USER': 'roomii',
+        'PASSWORD': os.environ.get("MySQL_PASSWORD"),
+        'HOST': 'roomii.jp',
         'PORT': '3306',
     }
 }
@@ -143,28 +145,27 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'mysite.User'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '979839320684-ru46386tvgh35kdh7cog9mm27lpulvr9.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'mG3KZnJfs9JBMFym8fLdjYIC'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
-FACEBOOK_CALLBACK_URL='http://localhost:8000/auth/complete/facebook/'
-SOCIAL_AUTH_FACEBOOK_KEY = '292183621408680'
-SOCIAL_AUTH_FACEBOOK_SECRET = '1077fcc7e686d3c4ff08fbb05fcc94ab'
+FACEBOOK_CALLBACK_URL= os.environ.get("FACEBOOK_CALLBACK_URL")
+SOCIAL_AUTH_FACEBOOK_KEY = os.environ.get("SOCIAL_AUTH_FACEBOOK_KEY")
+SOCIAL_AUTH_FACEBOOK_SECRET = os.environ.get("SOCIAL_AUTH_FACEBOOK_SECRET")
 
-EMAIL_HOST = 'smtp.muumuu-mail.com'
-DEFAULT_FROM_EMAIL = 'official@webapp2.com'
-EMAIL_HOST_USER = 'official@webapp2.com'
-EMAIL_HOST_PASSWORD = 'asatai951156'
-EMAIL_PORT = 587
+EMAIL_HOST = os.environ.get("EMAIL_HOST")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = os.environ.get("EMAIL_PORT")
 EMAIL_USE_TLS = False
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-
 DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8mb4' % (
-    "root",
-    "Asatai951156",
-    "127.0.0.1:3306",
-    "roomii_sample",
+     "roomii",
+     os.environ.get("MySQL_PASSWORD"),
+     "127.0.0.1:3306",
+     os.environ.get("MySQL_TABLE_NAME"),
 )
 
 ENGINE = create_engine(

@@ -95,8 +95,8 @@
                                    
                                         </div>
                                         {% endif %}
-                                      
                                     {% endfor %}
+                                    
                                     <div id="msg" class="msg-right">
                                         <ul id="chat_test">
                                             <li id='ontime' class="chat_msg right now"> 
@@ -104,6 +104,7 @@
                                             </li>
                                         </ul>               
                                     </div>  
+                                    
                                 {% else %}
                                     <div id="msg" class="msg-right">
                                         <ul id="chat_test">
@@ -112,15 +113,36 @@
                                             </li>
                                         </ul>               
                                     </div>
+                                    
                                 {% endif %}
-                                <form onsubmit="return false;">
+                                    
                                     <div class="chat_room">
-                                        <input type="text" id="chat-message-input" size="100" required/>
-                                        <input id="chat-message-submit" type="button" onclick="submit();" value="Send" />
+                                        <div class='add-image'>       
+                                            <span>
+                                                <label for="icon">                                        
+                                                    <input id="chat_img_preview" type="file" name="icon" accept="image/png, image/jpeg, image/jpg" onchange="$('#icon-hidden').val($(this).val())" class="icon-hi" >
+                                                    <input type="hidden" id="icon-hidden" class="icon-hidden" value="hi">
+                                                </label>            
+                                            </span>
+                                        </div>
+
+                                        <input type="text" id="chat-message-input" class="chat-message-input-text" size="100" required/>
+                                        <input id="chat-message-submit" class="chat-message-button" type="submit" value="Send" />
+                                        
+                                        
                                     </div>
-                                </form>
+                                    
                     </div>
+                    <div class="img-view">
+                            <div class="css-cancel"><a href="#"></a></div>
+                            <div class="preview_chat"></div>
+                            <div class="input-button">
+                                <p>まだ送信されていません！(Push Send)</p>
+                            </div>
+                        </div>
+                    
             </div>
+            
             {% else %}
             <div class="main_room">
                     <!-- <div id="room">チャットルーム</div> -->
@@ -179,17 +201,6 @@
                                     </div>
                                 {% endif %}
                                     <div class="chat_room">
-                                            <div class='add-image'>
-                                                <span>
-                                                    <label for="icon">
-                                                        <input type="file" name="icon" accept="image/png, image/jpeg, image/jpg" class="icon-hi" onchange="$('#icon-hidden').val($(this).val())" >
-                                                        <input type="hidden" id="icon-hidden" class="icon-hidden" value="">
-                                                    </label>
-                                                    <label for="icon-hi" class="icon-hi">
-                                                        <input type="button" id="chat-image-submit" >
-                                                    </label>
-                                                </span>
-                                            </div>
                                             
                                         <input type="text" id="chat-message-input" size="100" required/>
                                         <input id="chat-message-submit" type="button" value="Send" />

@@ -89,14 +89,15 @@ def my_round(val, digit=0):
 def paginate_queryset(request, queryset, count):
 
     paginator = Paginator(queryset, count)
+    print(queryset)
     page = request.GET.get('page')
     try:
-        page_obj = paginator.page(page)
+        pager_obj = paginator.page(page)
     except PageNotAnInteger:
-        page_obj = paginator.page(1)
+        pager_obj = paginator.page(1)
     except EmptyPage:
-        page_obj = paginator.page(paginator.num_pages)
-    return page_obj
+        pager_obj = paginator.page(paginator.num_pages)
+    return pager_obj
 
 """
 beautifulsoup
@@ -167,6 +168,8 @@ class Login(LoginView):
 
     form_class= LoginForm
     template_name = 'register/login.html'
+
+
 
 """
 ログアウト機能(ユーザー、業者)
@@ -318,12 +321,9 @@ class UserDetail(PermissionsMypage, generic.DetailView):
         user_id = request.path.split('/').pop(3)
         if not request.user.is_staff:
 
-            # message = Fab.objects.filter(message_flag=1) 
-            # print(message)
-
             tmp_fab = []
             tmp_article = []
-            fab = Fab.objects.filter(user=request.user ,message_flag=1, flag=1).values('article', 'updated_at')
+            fab = Fab.objects.filter(user=request.user , flag=1).values('article', 'updated_at')
             for tmp in fab:
                 fab_dic = {'article': tmp['article'], 'updated': tmp['updated_at']}
                 tmp_fab.append(fab_dic)
@@ -336,10 +336,10 @@ class UserDetail(PermissionsMypage, generic.DetailView):
             return render(request, self.template_name, {'fab': tmp_fab, 'list': tmp_article})
 
         else:
-
-            message = Fab.objects.filter(message_flag=1) 
-            for info in message:
-                message = info
+            message = Fab.objects.filter(message_send_flag=1, flag=1) 
+            for x in message:
+                message = x
+                print(message.user_id)
 
             tmp_article_live = []
             tmp_article = []
@@ -356,14 +356,15 @@ class UserDetail(PermissionsMypage, generic.DetailView):
             user = Get_user.objects.all()
             for info in user: 
                 for main in article:
-                    fab_user_list = Fab.objects.filter(article_id=main.id, user_id=info.id)
+                    fab_user_list = Fab.objects.filter(article_id=main.id, user_id=info.id, message_send_flag=1, flag=1)
                     tmp_fab.append(fab_user_list)
                     for user_list in fab_user_list:
                         user_info = Get_user.objects.filter(id=user_list.user_id) #.values_list('id', flat=True).order_by('id').distinct()
                         for user in user_info:
                             tmp_user.append(user)
+                            tmp_user = list(set(tmp_user))
 
-            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, 'message': message, })
+            return render(request, self.template_name, {'tmp_article': tmp_article, 'tmp_article_live': tmp_article_live, 'company': company, 'tmp_fab':tmp_fab ,'tmp_user': tmp_user, "message":message, })
 
 """
 マイページ更新(ユーザー、業者)
@@ -393,27 +394,25 @@ class UserUpdate(PermissionsMypage, generic.UpdateView):
 
         try:
             check_box = self.request.POST.get("checkbox_switch_button")
-            print(check_box)
             img_file = self.request.FILES['img_file'].name
             img_filename = Image.open(self.request.FILES['img_file'])
             img_filename.save(os.path.join('./static/img/', img_file))
             img_file = os.path.join('/static/img/', img_file)
             for user in User:
-                user.image = user
-
-            user.image = img_file
-            user.is_mail = int(check_box)
+                user.image = img_file
+                user.is_mail = int(check_box)
+            
             user.save()
 
             return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
         except:
             check_box = self.request.POST.get("checkbox_switch_button")
-            
+
             img_file = self.request.POST.get("user_img")
             for user in User:
-                user.image = user
-            user.image = img_file
-            user.is_mail = int(check_box)
+                user.image = img_file
+                user.is_mail = int(check_box)
+            
             user.save()
 
             return resolve_url('register:user_detail', username=self.request.user.username, pk=self.kwargs['pk'])
@@ -432,24 +431,31 @@ class Send_email(View):
 
         if not request.user.is_staff:
             return redirect("register:user_detail", username=request.user.username, pk=request.user.pk) 
-        
-        tmp_user = []
-        article_name = request.path.split('/').pop(3)
-        article = Article.objects.filter(article_name=article_name)
-        if not article:
-            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
-        for x in article:
-            fab = Fab.objects.filter(article_id=x.id, message_flag=1, message_send_flag=0)
-            if not fab:
+        if request.user.is_mail:
+            tmp_user = []
+            article_name = request.path.split('/').pop(3)
+            article = Article.objects.filter(article_name=article_name)
+            if not article:
                 return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
-            for x in fab:
-                user = Get_user.objects.filter(id=x.user_id)
-                tmp_user.append(user)
-
-                if not user:
+            for x in article:
+                fab = Fab.objects.filter(article_id=x.id, message_send_flag=0)
+                if not fab:
                     return redirect("register:user_detail", username=request.user.username, pk=request.user.pk)
+                for x in fab:
+                    user = Get_user.objects.filter(id=x.user_id)
+                    count = len(user) 
+                    if count > 5:
+                        count = True
+                    else:
+                        count = False
+                    tmp_user.append(user)
 
-        return render(request, self.template_name, {"users":tmp_user})
+                    if not user:
+                        return redirect("register:user_detail", username=request.user.username, pk=request.user.pk, count=count)
+
+            return render(request, self.template_name, {"users":tmp_user})
+        else:
+            return redirect("register:user_detail", username=request.user.username, pk=request.user.pk) 
 
     def post(self, request, *args, **kwargs):
 
@@ -473,6 +479,7 @@ class Send_email(View):
         domain = current_site.domain
         for x in tmp_mail:
             for user in x:
+
                 for x_id in article:
                     context = {
                         'protocol': self.request.scheme,
@@ -482,7 +489,7 @@ class Send_email(View):
                         'article_id': x_id["id"]
                     }
 
-                    fab_mail_flag = Fab.objects.filter(article_id=x_id["id"], user_id=user.id, message_flag=1)
+                    fab_mail_flag = Fab.objects.filter(article_id=x_id["id"], user_id=user.id)
                     for mail_flag in fab_mail_flag:
                         mail_flag.message_send_flag = 1
                         mail_flag.save()
@@ -498,7 +505,7 @@ class Send_email(View):
         username = request.user.username
         user_pk = request.user.pk
 
-        url = "http://localhost:8000/user_detail/"+str(username)+"/"+str(user_pk)+"/ "
+        url = "https://roomii.jp/user_detail/"+str(username)+"/"+str(user_pk)+"/ "
 
         return render(request, "company/message_info.html", {"message_info":message_info, "url":url})
 
@@ -568,7 +575,31 @@ class TopSearch(generic.ListView):
     model = Article
     template_name = "apps/top.html"
 
-    def get(self, request, *args, **kwargs):
+    def get_context_data(self, **kwargs):
+
+        tmp_list = []
+        object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+        tmp_list.append(object_list)
+
+        tmp_company_list = []
+        company = Company.objects.all().order_by("company_name")[:5]
+        tmp_company_list.append(company)
+
+        page_obj_list = []
+        for object_list in tmp_list:
+            page_obj = paginate_queryset(self.request, object_list, 8)
+            page_obj_list.append(page_obj)
+            page_obj = page_obj_list
+
+        return super(TopSearch, self).get_context_data(
+                tmp_list=tmp_list, page_obj=page_obj, tmp_company_list=tmp_company_list ,**kwargs
+            )
+            
+    def render_to_response(self, context, **response_kwargs):
+
+        return super(TopSearch, self).render_to_response(
+               context, **response_kwargs
+           )
 
         return render(request, self.template_name)
 
@@ -589,9 +620,9 @@ class MainView(PaginationMixin, generic.ListView):
         トップ画面表示(一部)
         """
 
-        http = 'http'
         auth_user_id = self.request.user.id
-
+        get_param = self.request.GET.urlencode()
+        get_param = "?"+get_param
         context = super(MainView, self).get_context_data(**kwargs)
         user = User.objects.all().filter(id=self.request.user.id).order_by("fab_selection_id")
         floor_table = ArticleFloor.objects.all().order_by('floor_id')
@@ -605,6 +636,23 @@ class MainView(PaginationMixin, generic.ListView):
             auth_user = 'c'
         else:
             auth_user = 'u'
+
+        check_room = self.request.GET.get("room")
+        article_check_name = self.request.GET.get("name")
+        check_address = self.request.GET.get("article_address")
+        check_floor = self.request.GET.get("floor")
+        check_live = self.request.GET.get("live")
+        if check_live == "0":
+            check_live = "空室なし"
+        elif check_live == "1" :
+            check_live = "空室あり"
+        check_price = self.request.GET.get("price")
+        if check_price == "1":
+            check_price = "3万円以下"
+        elif check_price == "2":
+            check_price = "4万円以上6万円以下"
+        elif check_price == "3":
+            check_price = "7万円以上"
 
         if self.request.user.is_staff:
             
@@ -637,23 +685,26 @@ class MainView(PaginationMixin, generic.ListView):
         """
         fab_selection_list = []
         for user_list in user:
-            if '1' in user_list.fab_selection_id:
-                user_fab = Article.objects.distinct().filter(
-                       address__contains=user_list.fab_selection_id.replace("1,", ""), park="駐車場あり", rent__lte='5'
-                )
-            elif '2' in user_list.fab_selection_id:
-                user_fab = Article.objects.distinct().filter(
-                       address__contains=user_list.fab_selection_id.replace("2,", ""), park="駐車場なし", rent__lte='5'
-                )
-            elif '3' in user_list.fab_selection_id:
-                user_fab = Article.objects.distinct().filter(
-                       address__contains=user_list.fab_selection_id.replace("3,", ""), park="駐車場あり", rent__gte='5'
-                )
-            elif '4' in user_list.fab_selection_id:
-                user_fab = Article.objects.distinct().filter(
-                       address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
-                )
-            else:
+            try:
+                if '1' in user_list.fab_selection_id:
+                    user_fab = Article.objects.distinct().filter(
+                        address__contains=user_list.fab_selection_id.replace("1,", ""), park="駐車場あり", rent__lte='5'
+                    )
+                elif '2' in user_list.fab_selection_id:
+                    user_fab = Article.objects.distinct().filter(
+                        address__contains=user_list.fab_selection_id.replace("2,", ""), park="駐車場なし", rent__lte='5'
+                    )
+                elif '3' in user_list.fab_selection_id:
+                    user_fab = Article.objects.distinct().filter(
+                        address__contains=user_list.fab_selection_id.replace("3,", ""), park="駐車場あり", rent__gte='5'
+                    )
+                elif '4' in user_list.fab_selection_id:
+                    user_fab = Article.objects.distinct().filter(
+                        address__contains=user_list.fab_selection_id.replace("4,", ""), park="駐車場なし", rent__gte='5'
+                    )
+                else:
+                    user_fab = ""
+            except:
                 user_fab = ""
             fab_selection_list.append(user_fab)
         """
@@ -661,39 +712,38 @@ class MainView(PaginationMixin, generic.ListView):
         """
 
         select_one = self.request.GET.get("select-profession")
-
+        get_params = self.request.GET.urlencode()
         tmp_list_sort = []
-    
         if select_one == "0":
             object_list = self.model.objects.order_by("rent") 
-            for x in object_list:
-               tmp_list_sort.append(x)
+            tmp_list_sort.append(object_list)
+        
         elif select_one == "1":
             object_list = self.model.objects.order_by("rent").filter(
-                                Q(floor_number__startswith="3") | Q(floor_number__startswith="1") | Q(floor_number__startswith="2")
+                            Q(floor_number__startswith="1") | Q(floor_number__startswith="2") | Q(floor_number__startswith="3") 
                         )
-            for x in object_list:
-                tmp_list_sort.append(x)
+            tmp_list_sort.append(object_list)
+           
 
         elif select_one == "2":
             object_list = self.model.objects.order_by("rent").exclude(
-                                Q(floor_number__startswith="3") | Q(floor_number__startswith="1") | Q(floor_number__startswith="2")
+                            Q(floor_number__startswith="1") | Q(floor_number__startswith="2") | Q(floor_number__startswith="3") 
                         )
-            for x in object_list:
-                tmp_list_sort.append(x)
-
+            tmp_list_sort.append(object_list)
+           
         elif select_one == "3":
             object_list = self.model.objects.order_by("updated_at") 
-            for x in object_list:
-               tmp_list_sort.append(x)
+            tmp_list_sort.append(object_list)
+          
         elif select_one == "4":
             live_flag = ArticleLive.objects.all()
+            tmp_live_flag = []
             for x in live_flag:
                 if x.vacancy_info == "0":
-                    object_list = self.model.objects.filter(live_flag=x.id)
-                    if object_list:
-                        for x in object_list:
-                            tmp_list_sort.append(x)
+                    tmp_live_flag.append(x.id)
+
+            object_list = self.model.objects.filter(live_flag__in=tmp_live_flag)
+            tmp_list_sort.append(object_list)
 
         """
         検索ボックス
@@ -707,14 +757,14 @@ class MainView(PaginationMixin, generic.ListView):
 
             tmp_list_sort = []
             object_list = Article.objects.filter(
-                                    Q(article_name__contains=box_text) | Q(address__contains=box_text) 
-                            )
+                            Q(article_name__contains=box_text) | Q(address__contains=box_text) 
+                        )
             if not object_list:
                 object_list = Article.objects.all()
 
-            for x in object_list: 
-                tmp_list_sort.append(x)
-        
+            tmp_list_sort.append(object_list)
+           
+     
         """
         検索部分(PC)
         """
@@ -732,8 +782,8 @@ class MainView(PaginationMixin, generic.ListView):
             floor = '選択なし'
         else:
             for list_value in floor_list:
-                floor = list_value
-
+                floor = list_value[:-1]
+                
         room_list = self.request.GET.getlist('room')
         if room_list == []:
             room = '選択なし'
@@ -741,6 +791,7 @@ class MainView(PaginationMixin, generic.ListView):
             for list_value in room_list:
                 room = list_value
 
+        article_live_list = []
         live_list = self.request.GET.getlist('live')
         if live_list == [] :
             live = '選択なし'
@@ -750,164 +801,81 @@ class MainView(PaginationMixin, generic.ListView):
                 articlelive_list = ArticleLive.objects.filter(vacancy_info=live)
                 for article_list in articlelive_list:
                     live = article_list
-
+                    article_live_list.append(live.id)
+        
         price_list = self.request.GET.getlist('price')
         if price_list == []:
             price = '選択なし'
         else:
-            for list_value in price_list:
-                price = list_value
+            price = price_list
 
-        if self.request.user.is_staff is True:
-            tmp_list = []
-            if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
-                if live == '選択なし':
-                    if price == '選択なし':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '1':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte="3")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '2':
-
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5") , Q(rent__gte="3")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '3':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "7") , Q(rent__gte="5")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '4':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__gte="7")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                else:
-                    if price == '選択なし':
-                        object_list = Article.objects.filter(
-                                Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-
-                    elif price == '1':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte="3")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '2':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5"), Q(rent__gte="3")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '3':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5"), Q(rent__gte="7")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-                    elif price == '4':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__gte="7")
-                        ).filter(customer=self.request.user.id)
-                        tmp_list.append(object_list)
-        else:
-            tmp_list = []
-            if article is not None or address is not None or floor is not None or room is not None or price is not None or live is not None:
-                if live == '選択なし':
-                    if price == '選択なし':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '1':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte="3")
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '2':
-
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5") , Q(rent__gte="3")
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '3':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "7") , Q(rent__gte="5")
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '4':
-                        object_list = Article.objects.filter(
-                                Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__gte="7")
-                        )
-                        tmp_list.append(object_list)
-                else:
-                    if price == '選択なし':
-                        object_list = Article.objects.filter(
-                                Q(live_flag=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)
-                        )
-                        print(object_list)
-                        tmp_list.append(object_list)
-
-                    elif price == '1':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte="3")
-                        )
-                        print(object_list)
-                        tmp_list.append(object_list)
-                    elif price == '2':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5"), Q(rent__gte="3")
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '3':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__lte= "5"), Q(rent__gte="7")
-                        )
-                        tmp_list.append(object_list)
-                    elif price == '4':
-                        object_list = Article.objects.filter(
-                                Q(live_flag__exact=article_list.id)| Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
-                                Q(rent__gte="7")
-                        )
-                        tmp_list.append(object_list)
-
-        if not tmp_list[0] :
-            if self.request.user.is_staff is False:
-
-                object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+        tmp_list = []
+        if article != "選択なし" and address != "選択なし" and floor != "選択なし" and room != "選択なし" and price != "選択なし" and live != "選択なし":
+            if price == '選択なし':
+                object_list = Article.objects.filter(
+                    Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__icontains=room) | Q(live_flag__in=article_live_list)
+                )
                 tmp_list.append(object_list)
-            else:
-                object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+   
+            elif "1" in price:
+                
+                object_list = Article.objects.filter(
+                    Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                    Q(initial_cost__lte="3") | Q(live_flag__in=article_live_list)
+                )
                 tmp_list.append(object_list)
-        
-        if not tmp_list_sort:
-            page_obj = paginate_queryset(self.request, object_list, 10)
+
+            elif "2" in price:
+                object_list = Article.objects.filter(
+                    Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                    Q(initial_cost__lte= "6") | Q(initial_cost__gte= "4") | Q(live_flag__in=article_live_list)
+                )
+                tmp_list.append(object_list)
+            else :
+                object_list = Article.objects.filter(
+                    Q(article_name__contains=article) | Q(address__contains=address) |  Q(floor_number__contains=floor) | Q(floor_plan__contains=room)|
+                    Q(initial_cost__gte= "7") | Q(live_flag__in=article_live_list)
+                )
+                tmp_list.append(object_list)
+
+        if not tmp_list :
+            page_obj_list = []
+            if not tmp_list_sort:
+                if self.request.user.is_staff is False:
+                    object_list = self.model.objects.all().order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                    page_obj = paginate_queryset(self.request, object_list, 9)
+                    page_obj_list.append(page_obj)
+                    page_obj = page_obj_list
+                    tmp_list.append(object_list)
+                else:
+                    object_list = self.model.objects.all().filter(customer=self.request.user.id).order_by('id', 'article_name', 'address', 'floor_number', 'floor_plan', "live_flag")
+                    page_obj = paginate_queryset(self.request, object_list, 9)
+                    page_obj_list.append(page_obj)
+                    page_obj = page_obj_list
+                    tmp_list.append(object_list)
+            else :
+                page_obj_list = []
+                page_obj = paginate_queryset(self.request, object_list, 9)
+                page_obj_list.append(page_obj)
+                page_obj = page_obj_list
+
+        elif tmp_list:
+            page_obj_list = []
+            for object_list in tmp_list:
+                page_obj = paginate_queryset(self.request, object_list, 9)
+                page_obj_list.append(page_obj)
+                page_obj = page_obj_list
+
         else:
-            page_obj = paginate_queryset(self.request, tmp_list_sort, 10)
-      
+            page_obj_list = []
+            page_obj = paginate_queryset(self.request, object_list, 9)
+            page_obj_list.append(page_obj)
+            page_obj = page_obj_list
+
         return super(MainView, self).get_context_data(
                 tmp_list=tmp_list, page_obj=page_obj, fab_selection_list=fab_selection_list, fab_not_view=fab_not_view, live_table=live_table, floor_table=floor_table, 
-                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, auth_user=auth_user, count_over=count_over, **kwargs
+                room_table=room_table, floor_list=floor_list, room_list=room_list, fab_view=fab_view, live=live, fab_article=fab_article, auth_user=auth_user, count_over=count_over, get_params=get_params, 
+                check_room=check_room, check_floor=check_floor , article_check_name=article_check_name, check_price=check_price, check_live=check_live, check_address=check_address, get_param=get_param, **kwargs
             )
             
     def render_to_response(self, context, **response_kwargs):
@@ -957,7 +925,8 @@ class InfoView(generic.ListView):
     def get_context_data(self, **kwargs):
 
         tmp_image = []
-        get = self.request.path.replace('/roomii/info/', '')
+        get = self.request.path.split('/').pop(3)
+        get_params = self.request.path.split('/').pop(4) 
         context = super(InfoView, self).get_context_data(**kwargs)
         floor_list = ArticleFloor.objects.all().order_by('floor_id')
         room_list = ArticleRoom.objects.all().order_by('room_id')
@@ -969,7 +938,7 @@ class InfoView(generic.ListView):
             for room_view in tmp_image:
 
                 context["room_view"] = room_view
-
+        context["get_params"] = get_params
         context['floor_list'] = floor_list
         context['room_list'] = room_list
         context['fab_view'] = fab_view
@@ -977,7 +946,8 @@ class InfoView(generic.ListView):
         return context
 
     def get_queryset(self, **kwargs):
-        get = self.request.path.replace('/roomii/info/', '')
+
+        get = self.request.path.split('/').pop(3)
         context = super(InfoView, self).get_queryset()
         object_list = self.model.objects.filter(id=get)
 
@@ -1384,7 +1354,7 @@ class Article_request(CreateView):
             to = [user.email]
         email = EmailMessage(subject, message, from_email, to)
         for x in files:
-            response = urllib.request.urlopen("http://localhost:8000/media/"+x.name+"")
+            response = urllib.request.urlopen("https://roomii.jp/media/"+x.name+"")
             email.attach(x.name , response.read() , mimetype="image/jpg")
            
         email.send()
@@ -1652,22 +1622,22 @@ class ArticleUpdate(generic.UpdateView):
         return redirect('apps:top')
 
 """
-Googleログイン(ユーザー)
+Googleログイン
 """
 
 class RedirectGoogle(View):
 
     def get(self, request, *args, **kwargs):
         SCOPE = [
-                "https://www.googleapis.com/auth/userinfo.profile",
-                "https://www.googleapis.com/auth/userinfo.email"
+                os.environ.get("GOOGLE_SCOPE_Profile"),
+                os.environ.get("GOOGLE_SCOPE_EMAIL"),
         ]
 
 
         flow = flow_from_clientsecrets(
            './client_id.json',
            scope=SCOPE,
-           redirect_uri= "http://localhost:8000/auth/complete/google-oauth2/")
+           redirect_uri= os.environ.get("GOOGLE_SCOPE_REDIRECT_URL"))
 
         auth_uri = flow.step1_get_authorize_url()
 
@@ -1713,14 +1683,15 @@ class Accesstoken(View):
         else:
             return redirect('apps:login')
 
+
 """
-Facebook, ログイン認証(ユーザー)
+Facebook, ログイン認証
 """
 class RedirectFacebook(View):
 
     def get(self, request, **kwargs):
 
-        url = 'http://www.facebook.com/v3.2/dialog/oauth'
+        url = 'https://www.facebook.com/v3.2/dialog/oauth'
         params = {
             'response_type': 'code',
             'redirect_uri': FACEBOOK_CALLBACK_URL,
@@ -1728,7 +1699,7 @@ class RedirectFacebook(View):
         }
 
         redirect_url = requests.get(url, params=params).url
-
+        print(redirect_url)
         return redirect(redirect_url)
 
 class CallbackFacebook(View):
@@ -1740,14 +1711,13 @@ class CallbackFacebook(View):
             data = check_facebook_access_token(access_token)
             if data['is_valid']:
                 data = get_facebook_user_info(access_token, data['user_id'])
-
                 social = check_socials(data, 'facebook')
                 if social is not False:
                     check_user = Get_user.objects.filter(id=social.user_id)
                     if check_user:
                         for user in check_user:
                             if user.is_active:
-                                login(self.request, user)
+                                login(request, user)
                                 return redirect("apps:login_after")
                             else:
                                 return redirect("apps:login")

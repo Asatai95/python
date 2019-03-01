@@ -78,7 +78,7 @@ class ChatView(View):
     def get(self, request, *args, **kwargs):
         user_id = request.path.split('/').pop(4)
         article_id = request.path.split('/').pop(5)
-        message = self.model.objects.filter(message_flag=1, article=article_id, user=user_id) 
+        message = self.model.objects.filter(article=article_id, user=user_id) 
         if not message:
             return redirect("register:user_detail", request.user.username, request.user.pk)
         else:
@@ -110,17 +110,8 @@ class ChatView(View):
                             'user_id': mark_safe(json.dumps(user_id)),
                             'article_id': mark_safe(json.dumps(article_id)) } )
 
-
     # def post(self, request, *args, **kwargs):
 
-    #     image = request.FILES["icon"]
-    #     print(image)
-    #     image = image.name
-    #     print(image)
-
-    #     image_table = Chat_room.objects.all()
-    #     for table_list in image_table:
-    #         table_list.img = image
-
-    #     table_list.save()
-    #     print(table_list)
+    #     upload_file = self.request.FILES.get('article_image')
+    #     img_filename = Image.open(upload_file)
+    #     img_filename.save(os.path.join('./media/', upload_file.name))
