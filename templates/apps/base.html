@@ -9,9 +9,10 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  
   <link rel="stylesheet" media="screen and (min-width: 431px)" href="{% static 'css/index.css' %} " />
   <link rel="stylesheet" media="screen and (max-width: 430px)" href="{% static 'css/index_sp.css' %} " />
-
+  
 
   <title>roomii</title>
 </head>
@@ -21,7 +22,7 @@
   <!-- ナビバー -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     {% if user.is_authenticated %}
-      <a class="navbar-brand" href="#">roomii</a>
+      <a class="navbar-brand" href="{% url 'apps:top'%}">roomii</a>
     {% else %}
       <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
     {% endif %}
@@ -220,13 +221,12 @@
             <li class="price">
               <ul>
                 <a href="javascript:void(0)">家賃</a>
+            
                 <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_4" name="price" value="1">〜３万円</a></li>
 
-                <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_2" name="price" value="2">3万円〜5万円</a></li>
+                <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_2" name="price" value="2">4万円〜6万円</a></li>
 
-                <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_1" name="price" value="3" >5万円〜7万円</a></li>
-
-                <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_3" name="price" value="4">7万円〜</a></li>
+                <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_3" name="price" value="3">7万円〜</a></li>
 
               </ul>
             </li>
@@ -239,6 +239,43 @@
             </div>
           </ul>
           </form>
+          <div class="view_checkbox">
+            <div class="contents_checkbox">
+              <ul>
+                <li class="checkbox_title">検索ワード</li>
+                {% if check_room != None %}
+                  <li class="room_word check">間取り: {{check_room}} </li>
+                {% else %}
+                  <li class="room_word">間取り: </li>
+                {% endif %}
+                {% if check_floor != None %}
+                  <li class="floor_word check">階数: {{check_floor}} </li>
+                {% else %}
+                  <li class="floor_word">階数: </li>
+                {% endif %}
+                {% if check_live != None %}
+                  <li class="live_word check">空室状況: {{check_live}} </li>
+                {% else %}
+                  <li class="live_word">空室状況: </li>
+                {% endif %}
+                {% if check_price != None %}
+                  <li class="rent_word check">家賃: {{check_price}} </li>
+                {% else %}
+                  <li class="rent_word">家賃: </li>
+                {% endif %}
+                {% if article_check_name != None %}
+                  <li class="name_word check">{{article_check_name}} </li>
+                {% else %}
+                  <li class="name_word"></li>
+                {% endif %}
+                {% if check_address != None %}
+                  <li class="address_word check">{{check_address}} </li>
+                {% else %}
+                  <li class="address_word"></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
 
       </header>
       {% endif %}
@@ -281,11 +318,9 @@
               <a href="javascript:void(0)">家賃</a>
               <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_4" name="price" value="1">〜３万円</a></li>
 
-              <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_2" name="price" value="2">3万円〜5万円</a></li>
+              <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_2" name="price" value="2">4万円〜6万円</a></li>
 
-              <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_1" name="price" value="3" >5万円〜7万円</a></li>
-
-              <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_3" name="price" value="4">7万円〜</a></li>
+              <li><a href="javascript:void(0)"><input type="checkbox" id="filter_kind_3" name="price" value="3">7万円〜</a></li>
 
             </ul>
           </li>
@@ -306,7 +341,7 @@
         <form action="">
           <div class='address_box search-box'>
             <input id="search" name="search_box" type="text" placeholder="キーワード" />
-            <input id="sbtn" type="submit" value="検索" />
+            <input id="sbtn"  class="search_button" type="submit" value="検索" />
           </div>
           <div class="sel sel--black-panther">
             <select name="select-profession" id="select-profession">

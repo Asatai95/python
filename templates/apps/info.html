@@ -3,11 +3,12 @@
 
 {% block content %}
 
+
 <div class='content_main_info'>
   {% for view_list in object_list %}
   <div class='topic'>
     <div class='back_botton'>
-      <a href="{% url 'apps:top' %}"><span class='css-cancel'></span></a>
+      <a href="/roomii/{{get_params}}"><span class='css-cancel info'></span></a>
     </div>
     <div class='image_field'>
       <div class='image_contents'>
@@ -18,7 +19,6 @@
           <li><img src="{{x}}" alt=""></li>
         {% endif %}
       {% endfor %}
-       
       
       </div>
       <div class='image_sub_contents'>

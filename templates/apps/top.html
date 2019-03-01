@@ -9,7 +9,8 @@
 
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-  <link rel="stylesheet" media="screen" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (min-width: 431px)" href="{% static 'css/index.css' %} " />
+  <link rel="stylesheet" media="screen and (max-width: 430px)" href="{% static 'css/index_sp.css' %} " />
 
 
   <title>roomii</title>
@@ -20,7 +21,7 @@
   <!-- ナビバー -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     {% if user.is_authenticated %}
-      <a class="navbar-brand" href="#">roomii</a>
+      <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
     {% else %}
       <a class="navbar-brand" href="{% url 'apps:top' %}">roomii</a>
     {% endif %}
@@ -87,34 +88,11 @@
       </ul>
     </div>
   </nav>
-  {% if user.is_authenticated %}
-  <aside class="sidebar left">
-      <a href="javascript:void(0)" class='btn_sidebar' data-action="toggle" data-side="left">
-          <img src="{% static 'img/Untitled1.png' %}" alt="">
-        </a>
-    <h1 id="brand-logo">roomii</h1>
-    <nav id="global-nav">
-        <ul>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'register:top'%}">TOP</a></li>
-            {% if user.is_company %}
-            <li><a href="{% url 'apps:company_change' %}">業者情報編集</a></li>
-            {%else%}
-            {% endif %}
-            <li><a href="{% url 'apps:company' %}">物件登録</a></li>
-            <li><a href="{% url 'register:user_detail' user.username user.pk %}">マイページ</a></li>
-            <li><a href="#">メッセージBOX</a></li>
-            <li><a href="{% url 'register:logout' %}">ログアウト</a></li>
-          {% else %}
-            <li><a href="{% url 'register:login' %}">ゲストログインはこちら</a></li>
-          {% endif %}
-        </ul>
-    </nav> 
-  </aside>
-  {% endif %}
 
   <div id="main_top_view">
         <div class="top_contents">
+
+          <section id="sec1">
             <div class="title">
                 <p>さっそく検索してみよう！</p>
             </div>
@@ -134,7 +112,180 @@
                         </div>
                 </form>
             </div>
+          </section>
+          <section id="sec2">
+            <div class="sec2_contents">
+              <div class="sec2_title">
+                <h2 class="title">沖縄県内物件情報アプリ</h2>
+                <h2>『 roomii 』</h2>
+                <p>
+                  お気に入り賃貸物件に退去予定があると、<br>メール通知ですぐに内見予約ができます。
+                </p>
+              </div>
+              <div class="sec2_info_main_content">
+                <div class="sec2_info">
+                  <div class="sec2_info_img slide-left" data-plugin-options='{"speed":300}'>
+                    <img src="{% static 'img/top-img1.png' %}" alt="">
+                  </div>
+                  <div class="sec2_info_main">
+                    <h2>
+                      <span>1.</span>空室ではない物件情報も取得できる
+                    </h2>
+                    <p>
+                      ログインせずに物件情報を検索できます。検索機能をあるため、求めている物件情報を簡単に取得できます。
+                    </p>
+                  </div>
+                </div>
+                <div class="sec2_info_right">
+                    <div class="sec2_info_img slide-right sp" data-plugin-options='{"speed":300}'>
+                      <img src="{% static 'img/top-img1.png' %}" alt="">
+                    </div>
+                  <div class="sec2_info_main">
+                      <h2>
+                        <span>2.</span>会員登録をしていただくことで、物件をお気に入り登録できる
+                      </h2>
+                      <p>
+                        お気に入りした物件は随時ご自身のページ(マイページ)より確認できます。
+                        その物件が空室になった際に、メールにてお知らせします。
+                      </p>
+                  </div>
+                  <div class="sec2_info_img slide-right pc" data-plugin-options='{"speed":300}'>
+                    <img src="{% static 'img/top-img1.png' %}" alt="">
+                  </div>
+                </div>
+                <div class="sec2_info">
+                    <div class="sec2_info_img slide-left" data-plugin-options='{"speed":300}'>
+                      <img src="{% static 'img/top-img1.png' %}" alt="">
+                    </div>
+                    <div class="sec2_info_main">
+                        <h2>
+                          <span>3.</span>メッセージ機能
+                        </h2>
+                        <p>
+                          ラインやメッセンジャーなどの個人アカウントを開示せず、
+                          『roomii』のメッセージ機能を利用する。
+                          電話を利用せず、情報のやり取りを行う！
+                        </p>
+                    </div>
+                  </div>
+              </div>
+              <div>
+
+              </div>
+            </div>
+          </section>
+          <section id="sec3">
+            <div class="sec3_contents">
+              <div class="sec3_title_main">
+                <p class="sec3_title">roomiiとは</p>
+                <p class="sec3_title_content">
+                  従来のポータルサイトにはないものをお客様に提供します。<br>
+                </p>
+                
+              </div>
+              <div class="main_comment">
+                <h3>『お気に入りの物件を一緒に探しませんか？』</h3>
+              </div>
+              <div class="sec3_info_contents">
+                <div class="sec3_info">
+                  <p>
+                    空室ではない物件情報を取り扱う<br>
+                    希望の物件を無い場合はリクエストできます。<br>
+                    物件を予約することが可能！
+                  </p>
+                </div>
+                <div class="sec3_info">
+                  <p>
+                    メッセージ機能を利用し、<br>
+                    業者とのやり取りをスムーズにする！
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="sec4">
+            <div>
+              <div class="sec4_title">
+                <h3>あなたの欲しい情報はここにある</h3>
+                <p>
+                  気になる物件を一緒に探しましょう！
+                </p>
+              </div>
+              <div class='sec4_main'>
+                <div class='sec4_main_content'>
+                  <div class="main_container">
+                    {% for x in page_obj %}
+                      {% for view_list in x %}      
+                      <div class="sec4 item box-big{{view_list.id}}"> 
+                        <div class='img_item'>
+                          <div class="hide_text">
+                            <p class='text article_name'>{{view_list.article_name}}</p>
+                          </div>
+                          <a href="{%url 'apps:info' view_list.id %}">
+                            {% if 'http' not in view_list.article_image %}
+                              <img src="/media/{{view_list.article_image}}" alt="">
+                            {% else %}
+                              <img src="{{view_list.article_image}}" alt="">
+                            {% endif %}
+                          </a>
+                        </div>
+                      </div>
+                      {% endfor %}
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section id="sec5">
+            <div class="sec5_main">
+              <div class="sec5_title">
+                <h2>業者情報一覧</h2>
+                <p>様々な業者から情報を共有しております</p>
+              </div>
+              <div class="sec5_content">
+                {% for x in tmp_company_list %}
+                  {% for view_list in x %}
+                  <div class="sec5 item box-big{{view_list.id}}"> 
+                    <div class='sec5_img_item'>
+                        
+                      {% if 'http' not in view_list.company_image %}
+                        <img src="/media/{{view_list.company_image}}" alt="">
+                      {% else %}
+                        <img src="{{view_list.company_image}}" alt="">
+                      {% endif %}
+                    </div>
+                    <div class="company_name">
+                      <p class="sec5_text">{{view_list.company_name}}</p>
+                      <p class="sec5_text_email">{{view_list.email}}</p>
+                    </div>
+                  </div>
+                  {% endfor %}
+                {% endfor %}
+                
+              </div>
+            </div>
+          </section>
+          <section id="sec6">
+            <div class="sec6_main">
+              <div class="sec6_text">
+                <p>さっそく物件を検索しよう。</p>
+                <p>今までにない体験を実感する</p>
+              </div>
+              <div class="sec6_button">
+                <a href="{% url 'apps:login' %}">
+                  <button type="submit" class="btn btn-success btn-lg btn-block login-main-button" >ログインページ</button>
+                </a>
+              </div>
+            </div>
+          </section>
+          <footer class="footer">
+            <div class="container">
+              <p class="text-muted">Place sticky footer content here.</p>
+            </div>
+          </footer>
         </div>
+        
     </div>
 
   <!-- Optional JavaScript -->
@@ -146,6 +297,10 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-sidebar/3.1.0/jquery.sidebar.min.js"></script>
   <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+  <script src="{% static 'js/jquery.fadethis.js' %}"></script>
+  <script>
+    $(window).fadeThis();
+  </script>
   {% block extrajs %}{% endblock %}
   <script src="{% static 'js/jquery.inview-master/jquery.inview.js' %}"></script>
   <script src="{% static 'js/jquery-scrollfade-master/jquery.scrollfade.js' %}"></script>
@@ -156,7 +311,7 @@
   <link rel="stylesheet" type="text/css" href="{% static 'js/slick-theme.css' %}"/>
   <script type="text/javascript" src="{% static 'js/slick.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'js/main.js' %}"></script>
-
+  
 </body>
 
 </html>

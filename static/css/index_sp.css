@@ -38,7 +38,8 @@ header.blank {
 }
 
 .main_view {
-    display: flex;
+  display: flex;
+  margin-top: 40px;
 }
 
 .mx-auto {
@@ -75,7 +76,6 @@ header.blank {
 .top_contents {
   margin: auto;
   position: absolute;
-  width: 700px;
   top: 0;
   right: 0;
   left: 0;
@@ -85,7 +85,7 @@ header.blank {
 }
 
 .top_contents div.title p {
-  font-size: 30px;
+  font-size: 25px;
   color: white;
   font-weight: 800;
   text-shadow: 0 0 10px black;
@@ -95,10 +95,27 @@ header.blank {
   width: 200px;
   height: 50px;
   margin: 15px;
+  border: 2px solid black;
+}
+
+.menu_area::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border: 0px;
+  border-bottom: solid 2px #b4b3b3;
+  border-right: solid 2px #b4b3b3;
+  -ms-transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  margin-top: -4px;
 }
 
 .top_search {
-  display: inline-flex;
+  text-align: center;
   margin: 30px;
 }
 
@@ -107,17 +124,18 @@ header.blank {
 }
 
 .top_search_bar img {
-  width: 50px;
-  height: 50px;
-  margin: 5px;
+  width: 30px;
+  height: 30px;
+  margin: 8px;
 }
 
 .top_search_bar input {
-  width: 450px;
-  height: 70px;
+  width: 250px;
+  height: 45px;
   border: 1px solid black;
   border-radius: 15px;
-  padding-left: 70px;
+  padding-left: 40px;
+  font-size: 12px;
 }
 
 .hidden_button {
@@ -677,6 +695,10 @@ form[name='filter_name'] {
   height: 40px;
 }
 
+.search_button {
+  height: 35px!important;
+}
+
 #fade-in li ul li a input {
   margin-right: 20px;
 }
@@ -745,7 +767,7 @@ form[name='filter_name'] {
 /*検索ボタン*/
 #sbtn{
   width: 70px;
-  height: 45px;
+  height: 35px;
   left:270px;/*検索ボタンの位置調整*/
   top:0;
   border-radius:0 2px 2px 0;/*検索ボタンの角を丸める*/
@@ -764,7 +786,6 @@ form[name='filter_name'] {
   z-index: 50;
   background-color: rgba(255, 255, 255)!important;
   position: fixed;
-  z-index: 30;
 }
 
 .container.mt-3 {
@@ -929,7 +950,7 @@ input[type='submit'] {
   border: none;
   width: 200px;
   height: 40px;
-  background-color: rgba(0, 133, 201);
+  background-color: #0066FF;
   color: white;
   font-weight: 800;
   font-size: 20px;
@@ -1092,11 +1113,11 @@ tr {
 }
 
 .login-main-button {
-    width: 200px;
+    width: 180px;
 }
 
 .pass-change-button {
-    margin: 50px!important;
+    margin: 10px!important;
 }
 
 .cm-remake-button {
@@ -1303,7 +1324,7 @@ li.new_account {
   font-size: 20px;
   font-weight: 800;
   color: white;
-  background-color: rgba(0, 133, 201);
+  background-color: #0066FF;
   margin: 0 10px;
   cursor: pointer;
 }
@@ -1372,6 +1393,7 @@ li.new_account {
   font-size: 15px!important;
   border-radius: 20px;
   width: 140px!important;
+  background:#7fbfff;
 }
 
 .password_change {
@@ -1800,10 +1822,7 @@ a:hover {
 
 .item {
   display: none;
-  float: left;
-  margin: 50px;
   width: 300px;
-  height: 330px;
   background: #1E90FF;
   padding: 10px;
   border-radius: 8px;
@@ -1958,7 +1977,7 @@ a:hover {
 /*詳細情報*/
 
 .topic {
-  background-color: rgba(255, 255, 255);
+  background-color: white;
   border: 2px solid;
   border-radius: 10px;
   margin-bottom: 100px;
@@ -2277,6 +2296,7 @@ span.error {
 .main.mypage {
   background-color: rgba(255, 255, 255);
   margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 label.license_year {
@@ -2808,9 +2828,9 @@ button.stripe-button-el>span:hover {
     height: 10px!important;
 }
 
-
 .res-header {
-  width: 400px;
+  width: 300px;
+  margin: auto;
 }
 
 .rule {
@@ -2829,17 +2849,13 @@ button.stripe-button-el>span:hover {
   background-color: transparent;
   position: absolute;
   cursor: pointer;
-  margin: 10px 50px;
+  margin: 20px 0;
   left: 0;
   right: 0;
 }
 
 .sel::before {
   position: absolute;
-  content: '\f063';
-  font-family: 'FontAwesome';
-  font-size: 2em;
-  color: black;
   right: 20px;
   top: calc(50% - 0.5em);
 }
@@ -2971,7 +2987,9 @@ button.stripe-button-el>span:hover {
 .sbox.search-list {
   right: 0!important;
   position: absolute!important;
-  top: 70px!important;
+  top: 75px!important;
+  left: 220px!important;
+  height: 35px!important;
 }
 
 
@@ -3079,4 +3097,227 @@ span.get_not_info {
 
 .checkbox_switch_hidden{
   display: block;
+}
+
+.view_checkbox {
+  display: none;
+}
+
+
+#sec1  {
+  height: 80vh;
+  width: 100%;
+}
+
+#sec2 {
+  background: rgba(255, 255, 255, .8);
+}
+
+.sec2_info_img {
+  width: 70%;
+  margin: auto;
+}
+
+.sec2_info_img img {
+  width: 100%;
+}
+
+.sec2_info_main {
+  padding: 20px 50px;
+}
+
+.sec2_info_main h2 {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 800;
+  text-shadow: 1px 1px grey;
+}
+
+.sec2_info_main span {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 10px;
+}
+
+.sec2_info_main p {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 30px auto;
+}
+
+.sec2_title {
+  font-size: 40px;
+  font-weight: 800;
+  text-shadow: 1px 1px 1px grey;
+  margin: 10px auto;
+  height: 250px;
+  padding: 30px 0;
+}
+
+.sec2_title h2 {
+  font-size: 27px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.sec2_title p {
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+#sec3 {
+  background: rgba(255, 255, 255, .8);
+  margin-bottom: 0;
+  padding: 50px;
+}
+
+.sec3_title_main {
+  margin: 30px;
+
+}
+
+.sec3_title {
+  font-size: 30px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.sec3_title_content {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sec3_info_contents {
+  margin-top: 30px;
+
+}
+
+.sec3_info {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sec_info p {
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.main_comment h3 {
+  font-size: 25px;
+  font-weight: 800;
+  text-shadow: 2px 2px 2px silver;
+}
+
+#sec4 {
+  background: rgba(255, 255, 255, .8);
+  padding: 50px 0;
+  height: 340vh;
+}
+
+.sec4_title h3 {
+  font-size: 23px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.sec4_title p {
+  font-size: 18px;
+  margin: 20px auto;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sec4_main {
+  height: 90vh;
+  padding: 40px;
+  margin: 0 auto;
+}
+
+#sec5 {
+  background: rgba(255, 255, 255, .8);
+  padding: 50px 0;
+}
+
+.sec5_content {
+  margin: 35px;
+}
+
+.sec5_img_item {
+  width: 276px;
+  height: 207px;
+}
+
+.sec5_title h2 {
+ font-size: 28px;
+ font-weight: 800;
+ text-align: center;
+}
+
+.sec5_title p {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.sec5.slick-slide {
+  display: block!important;
+  width: 300px!important;
+}
+
+.company_name .sec5_text {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 10px;
+}
+
+.company_name .sec5_text_email {
+  font-size: 18px;
+  font-weight: 800;
+  margin: 10px;
+}
+
+#sec6 {
+  height: 93vh;
+  background: rgba(255, 255, 255, .8);
+}
+
+.sec6_main {
+  padding: 150px 0;
+
+}
+
+.sec6_text {
+  margin-bottom : 100px;
+}
+
+.sec6_text p {
+  font-size: 21px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.footer {
+  width: 100%;
+  height: 100px;
+  background-color: #f5f5f5;
+  margin-top: 30px;
+  position: relative!important;
+}
+
+.container .text-muted {
+  margin: 20px 0;
+}
+ 
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.sec2_info_img.sp {
+  display: none;
 }

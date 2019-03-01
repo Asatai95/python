@@ -78,14 +78,14 @@ $(function() {
   });
 });
 
-// ナビゲーションバー
-$(document).ready(function() {
-  var pagetop = $('.navbar-brand');
-  pagetop.click(function () {
-    $('body, html').animate({ scrollTop: 0 }, 500);
-    return false;
-  });
-});
+// // ナビゲーションバー
+// $(document).ready(function() {
+//   var pagetop = $('.navbar-brand');
+//   pagetop.click(function () {
+//     $('body, html').animate({ scrollTop: 0 }, 500);
+//     return false;
+//   });
+// });
 
 $(function(){
   $(document).ready(function(){
@@ -218,6 +218,48 @@ $(function(){
   });
 });
 
+$(function(){
+  $('#chat_img_preview').on('change', function(e) {
+
+    $("#img_id").css("display", "block");
+    $(".chat_room > input ").css("display", "none");
+    $("#img_id > #chat-message-input").attr("readonly", true);
+    $('#chat-message-submit').removeAttr('disabled');
+    $(".img-view").fadeIn(800);
+
+    var file = e.target.files[0],
+        reader = new FileReader(),
+        $preview = $(".preview_chat");
+        t = this;
+    if(file.type.indexOf("image") < 0){
+      return false;
+    }
+
+    reader.onload = (function(file) {
+      return function(e) {
+        $preview.empty();
+        $preview.append($('<img>').attr({
+                  src: e.target.result,
+                  class: "img_preview_chat",
+                  title: file.name
+              }));
+      };
+    })(file);
+
+    reader.readAsDataURL(file);
+  });
+});
+
+$(function(){
+  $(".css-cancel").on("click", function(){
+    $(".preview_chat img").remove();
+    $(".img-view").css("display", "none");
+    $("#img_id").css("display", "none");
+    $(".chat_room > input ").css("display", "inline-block");
+    $('#chat-message-submit').attr('disabled', 'disabled');
+  });
+});
+
 // 画像をプレビューに表示
 $(function(){
   $('#id_files').change(function(){
@@ -269,7 +311,18 @@ $(function(){
     }
 
     $('.preview_files').css('display','block');
+
   });
+  try { 
+    var t = $(".img_preview_chat").offset().top;
+    var p = t - $(".chat_room_contents").height();
+    console.log(p)
+    console.log(t)
+   
+    $("div.chat_room_contents").animate({
+    scrollTop: $(".img_preview_chat").offset().top,}, { duration: 2000, easing: 'swing', });
+    
+  } catch {}
 });
 
 $(function(){
@@ -358,7 +411,6 @@ $(function(){
 
   $(".view_checkbox").each(function(){
     if ($(this).find("li").hasClass("check")){
-      console.log($(".live_word").text());
       $(this).fadeIn();
       if ($(".room_word").text() != "間取り: ") {
         $(".view_checkbox").each(function(){
@@ -673,7 +725,7 @@ $(window).on('scroll', function () {
 
 // チャット機能、
 // 内容送信 → コメントボックス表示
-
+// 内容送信後、ページ最下層にスクロール
 $(function(){
   try{
     $("html,div.chat_room_contents").animate({scrollTop:$('#chat-log').offset().top, },{ duration: 2000, easing: 'swing', });
@@ -692,17 +744,24 @@ $(function(){
 
 // チャット入力確認後に送信ボタン表示
 $(function() {
-  if ( $('#chat-message-input').val() == "" ) {
-    $('#chat-message-submit').attr('disabled', 'disabled');
+  if ( $('.chat_room > #chat-message-input').val() == "" ) {
+    $('.chat_room > #chat-message-submit').attr('disabled', 'disabled');
   }
-  $('#chat-message-input').bind('keydown keyup keypress change', function() {
+  $('.chat_room > #chat-message-input').bind('keydown keyup keypress change', function() {
     if ( $(this).val().length > 0 ) {
-      $('#chat-message-submit').removeAttr('disabled');
+      $('.chat_room > #chat-message-submit').removeAttr('disabled');
     } else {
-      $('#chat-message-submit').attr('disabled', 'disabled');
+      $('.chat_room > #chat-message-submit').attr('disabled', 'disabled');
     }
   });
 });
+
+// $(function(){
+
+//   $("#chat-message-submit").on("click", function(){
+//     $(".img-view.first").css("display", "none")
+//   });
+// });
 
 // ユーザーページ(業者)、チャット可能ユーザーの表示
 $(function(){
@@ -917,25 +976,32 @@ $(function() {
 // マイページ
 // 画面幅に合わせて、要素のwidthのサイズを変更
 $(function(){
-  if ($("body").width() > 435 ){
-    $(".view_checkbox").fadeOut();
-    console.log("test")
+  if ($("body").width() < 435 ){
     if( $(".main_mypage div.main_content .stream").length ) {
-      $(".profilecard").css("height", "25vw");
-    } else {
-      $(".profilecard").css("height", "30vw");
-      $(".profilecard").css("width", "45vw");
-      $(".profilecard").css("margin", "0 auto")
+      $(".sec2_info_img.pc").css("display", "none");
+      $(".sec2_info_img.sp").css("display", "block");
     }
   } else {
-    $(".profilecard").css("height", "");
+    $(".sec2_info_img.pc").css("display", "block");
+    $(".sec2_info_img.sp").css("display", "none");
   }
 });
 
-// $(function(){
-//   if ($("body").width() < 435 ){
-//     $(".content").on("click", function(){
-//       $(this).find(".stream-content a").click();
-//     });
-//   }
-// });
+$(function(){
+  if ($("body").width() > 435 ){
+    $('.sec5_content').slick({
+      infinite: true,
+      slidesToShow: 3,
+      slidesToScroll: 3,
+      dots: true
+    });
+  }
+});
+
+
+$('#chat-message-input').bind('keydown keyup keypress change', function() {
+  if ( $(this).val().length > 0 ) {
+    $("#img_id").css("display", "none")
+    $(".chat_room > input ").css("display", "inline-block")
+  } 
+});

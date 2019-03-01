@@ -9,7 +9,8 @@
 {% endif %}
     <div class="main_container">
    
-  {% for view_list in page_obj %}
+  {% for x in page_obj %}
+    {% for view_list in x %}
    
     <div class="item box-big{{view_list.id}}">
     {% if user.is_staff is False%}
@@ -41,7 +42,7 @@
           <p class='text'>{{view_list.comments}}</p>
           {% endif %}
         </div>
-        <a href="{%url 'apps:info' view_list.id %}">
+        <a href="{%url 'apps:info_path' view_list.id get_param %} ">
           {% if 'http' not in view_list.article_image %}
             <img src="/media/{{view_list.article_image}}" alt="">
           {% else %}
@@ -126,9 +127,20 @@
       {% endif %}
     </div>
     {% endfor %}
+   {% endfor %}
   </div>
 </div>
 
+
+<!-- ページネーション関係 -->
+
+  {% for page_obj_list in page_obj %}
+    {% include 'commons/commons_page.html' %}
+  {% endfor %}
+
+<!-- ------------- -->
+
+<!-- ログインしていないユーザーがお気に入りボタンを押した際に、ログイン画面表示 -->
 <div class='login_menu'>
     <div class="back_login_botton">
       <a href="#"><span class="css-cancel"></span></a>
@@ -159,12 +171,14 @@
       </form>
     </div>
   </div>
-{% include 'commons/commons_page.html' %}
+
 
 {% endblock %}
 
 {% block extrajs %}
 {% if user.is_authenticated %}
+
+<!-- お気に入り処理を非同期 -->
 <script type="text/javascript">
 
 function getCookie(name) {
