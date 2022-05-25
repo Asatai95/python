@@ -49,7 +49,7 @@ pkg-resources==0.0.0
 pyasn1==0.4.4
 pyasn1-modules==0.2.2
 PyHamcrest==1.9.0
-PyJWT==1.6.4
+PyJWT==2.4.0
 pylint==2.2.2
 pyparsing==2.3.1
 python-social-auth==0.3.6
